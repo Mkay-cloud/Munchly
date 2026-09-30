@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+:root,
+[data-theme="light"] {
+  --bg: #fbf8f2;
+  --nav-bg: rgba(251, 248, 242, 0.92);
+  --section: #f6f0e4;
+  --card: #fffdf9;
+  --border: #eadfcf;
+  --border-strong: #e2d3c0;
+  --line: #efe6d8;
+  --line-soft: #f0e7da;
+  --chip: #f3ecdf;
+  --ink: #30231f;
+  --ink-2: #5e4f48;
+  --muted: #6e5f57;
+  --faint: #9a8a80;
+  --check: #cdbfae;
+  --primary: #641f2b;
+  --primary-hover: #4f1822;
+  --primary-text: #641f2b;
+  --sage-tint: #eef0e8;
+  --sage-line: #cdd3c3;
+  --olive: #3e4634;
+  --olive-text: #3e4634;
+  --olive-2: #4f5645;
+  --olive-hover: #2f3627;
+  --terra-tint: #f7e8e1;
+  --terra-ink: #7f3f2f;
+  --terra-text: #a65d48;
+  --footer-bg: #30231f;
+}
+
+[data-theme="dark"] {
+  --bg: #1e1714;
+  --nav-bg: rgba(30, 23, 20, 0.9);
+  --section: #251c19;
+  --card: #2b211d;
+  --border: #3d302a;
+  --border-strong: #4c3d36;
+  --line: #352a25;
+  --line-soft: #3a2e28;
+  --chip: #362a25;
+  --ink: #f3ead9;
+  --ink-2: #d4c6b5;
+  --muted: #b8a898;
+  --faint: #8f8074;
+  --check: #6e5e54;
+  --primary: #9c3346;
+  --primary-hover: #b2445a;
+  --primary-text: #eba3ae;
+  --sage-tint: #262d22;
+  --sage-line: #3d4836;
+  --olive: #5b6849;
+  --olive-text: #c3cdb2;
+  --olive-2: #aeb89f;
+  --olive-hover: #6c7a58;
+  --terra-tint: #3b2620;
+  --terra-ink: #f0b09b;
+  --terra-text: #e39a82;
+  --footer-bg: #140f0d;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.25s;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: var(--primary-text);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+@keyframes mly-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-6px) rotate(-1.5deg);
+  }
+}
+
+@keyframes mly-hop {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(3deg);
+  }
+}
+
+@keyframes mly-cheer {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-22px) scale(1.06) rotate(-4deg);
+  }
+  55% {
+    transform: translateY(0) scale(0.97, 1.03);
+  }
+  75% {
+    transform: translateY(-8px) rotate(3deg);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mly-mascot {
+    animation: none !important;
+  }
+}
