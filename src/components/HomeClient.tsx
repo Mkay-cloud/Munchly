@@ -141,10 +141,21 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
             </span>
           </a>
           <nav style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <a href="#browse" style={{ padding: "10px 14px", borderRadius: 999, fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {/* Hidden below the sm breakpoint - on phones these two text
+                links plus the logo left no room for the dark-mode toggle
+                and Sign in button, which got pushed off-screen. */}
+            <a
+              href="#browse"
+              className="hidden sm:inline"
+              style={{ padding: "10px 14px", borderRadius: 999, fontWeight: 600, fontSize: 15, color: "var(--ink)" }}
+            >
               Recipes
             </a>
-            <a href="#grows" style={{ padding: "10px 14px", borderRadius: 999, fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            <a
+              href="#grows"
+              className="hidden sm:inline"
+              style={{ padding: "10px 14px", borderRadius: 999, fontWeight: 600, fontSize: 15, color: "var(--ink)" }}
+            >
               What&apos;s next
             </a>
             <button
