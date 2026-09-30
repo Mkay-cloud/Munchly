@@ -1,8 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getRecipesBySlugs } from "@/sanity/queries";
 import FavoritesGate from "./FavoritesGate";
+
+export const metadata: Metadata = {
+  title: "My favorites — Munchly",
+  alternates: {
+    canonical: "/favorites",
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
 export default async function FavoritesPage() {
   const supabase = await createClient();

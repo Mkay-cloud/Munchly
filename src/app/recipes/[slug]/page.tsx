@@ -1,11 +1,33 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getRecipeBySlug } from "@/sanity/queries";
 import FavoriteButton from "@/components/FavoriteButton";
 import AccountNav from "@/components/AccountNav";
 
 export const revalidate = 60;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const recipe = await getRecipeBySlug(slug);
+  if (!recipe) return {};
+
+  return {
+    title: `${recipe.title} — Munchly`,
+    description: recipe.note || `${recipe.title}${recipe.cuisine ? ` — a ${recipe.cuisine} recipe` : ""} on Munchly.`,
+    alternates: {
+      canonical: `/recipes/${slug}`,
+    },
+    openGraph: recipe.imageUrl
+      ? { images: [{ url: recipe.imageUrl }] }
+      : undefined,
+  };
+}
 
 export default async function RecipePage({
   params,

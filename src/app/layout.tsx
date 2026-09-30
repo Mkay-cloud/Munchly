@@ -16,9 +16,13 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://munchly.online"),
   title: "Munchly",
   description:
     "A quick decision tool for when you can't figure out what to eat — pick a mood, spin, get an answer.",
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({

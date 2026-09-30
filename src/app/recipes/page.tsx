@@ -1,9 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getAllRecipes } from "@/sanity/queries";
 import AccountNav from "@/components/AccountNav";
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "All recipes — Munchly",
+  description: "Browse every recipe in the Munchly library.",
+  alternates: {
+    canonical: "/recipes",
+  },
+};
 
 export default async function AllRecipesPage() {
   const recipes = await getAllRecipes();
