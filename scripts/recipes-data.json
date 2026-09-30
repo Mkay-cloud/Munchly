@@ -1,0 +1,215 @@
+[
+  {
+    "slug": "mac-and-cheese",
+    "title": "Baked mac & cheese",
+    "cuisine": "American",
+    "moods": ["Comfort"],
+    "timeMinutes": 45,
+    "note": "golden top",
+    "image": "mac-and-cheese.jpg",
+    "ingredients": ["400g elbow macaroni", "60g butter", "60g flour", "700ml whole milk", "300g sharp cheddar, grated", "100g gruyère, grated", "1/2 tsp mustard powder", "Salt and pepper", "50g breadcrumbs"],
+    "instructions": [
+      "Boil the macaroni until just shy of al dente, then drain.",
+      "Melt the butter in a saucepan, whisk in the flour and cook for 1 minute.",
+      "Slowly whisk in the milk, then simmer until thickened, about 5 minutes.",
+      "Off heat, stir in the cheddar, gruyère and mustard powder until smooth. Season.",
+      "Fold in the macaroni, tip into a baking dish, top with breadcrumbs.",
+      "Bake at 200°C (400°F) for 20 minutes until golden and bubbling."
+    ]
+  },
+  {
+    "slug": "pesto-pasta",
+    "title": "Pesto pasta",
+    "cuisine": "Italian",
+    "moods": ["Quick"],
+    "timeMinutes": 15,
+    "note": "five ingredients",
+    "image": "pesto-pasta.jpg",
+    "ingredients": ["350g spaghetti or fusilli", "120g basil pesto", "50g parmesan, grated", "A handful of cherry tomatoes, halved", "Olive oil, salt, black pepper"],
+    "instructions": [
+      "Cook the pasta in well-salted water until al dente, reserving a cup of the water.",
+      "Drain and return the pasta to the pot.",
+      "Stir through the pesto, loosening with a splash of the reserved pasta water.",
+      "Toss in the cherry tomatoes and half the parmesan.",
+      "Serve with the rest of the parmesan and a crack of black pepper."
+    ]
+  },
+  {
+    "slug": "mapo-tofu",
+    "title": "Mapo tofu",
+    "cuisine": "Other",
+    "moods": ["Spicy"],
+    "timeMinutes": 25,
+    "note": "numbing heat",
+    "image": "mapo-tofu.jpg",
+    "ingredients": ["400g silken tofu, cubed", "150g ground pork (or plant-based mince)", "2 tbsp doubanjiang (chili bean paste)", "1 tbsp fermented black beans", "1 tsp Sichuan peppercorns, ground", "3 cloves garlic, minced", "1 tbsp ginger, minced", "200ml stock", "1 tbsp cornstarch + 2 tbsp water", "2 spring onions, sliced"],
+    "instructions": [
+      "Brown the pork in a hot wok until crisp at the edges.",
+      "Add garlic, ginger, doubanjiang and black beans; fry until fragrant.",
+      "Pour in the stock and bring to a simmer.",
+      "Gently slide in the tofu cubes and simmer 5 minutes without stirring hard.",
+      "Stir in the cornstarch slurry to thicken, then dust with ground Sichuan pepper.",
+      "Scatter with spring onions and serve over rice."
+    ]
+  },
+  {
+    "slug": "tiramisu",
+    "title": "Tiramisu",
+    "cuisine": "Italian",
+    "moods": ["Sweet"],
+    "timeMinutes": 30,
+    "note": "coffee and cream",
+    "image": "tiramisu.jpg",
+    "ingredients": ["6 egg yolks", "150g sugar", "500g mascarpone", "300ml strong coffee, cooled", "2 tbsp coffee liqueur (optional)", "24 ladyfinger biscuits", "Cocoa powder, for dusting"],
+    "instructions": [
+      "Whisk egg yolks and sugar until pale and thick.",
+      "Fold in the mascarpone until smooth.",
+      "Mix the coffee with the liqueur in a shallow dish.",
+      "Dip each ladyfinger briefly and layer in a dish; spread over half the mascarpone mix.",
+      "Repeat with a second layer of dipped biscuits and remaining mascarpone.",
+      "Chill at least 4 hours, then dust generously with cocoa before serving."
+    ]
+  },
+  {
+    "slug": "butter-chicken",
+    "title": "Butter chicken",
+    "cuisine": "Indian",
+    "moods": ["Comfort"],
+    "timeMinutes": 40,
+    "note": "rich and mild",
+    "image": "butter-chicken.jpg",
+    "ingredients": ["600g chicken thighs, cubed", "200g yogurt", "2 tbsp butter", "1 onion, finely chopped", "3 cloves garlic, 1 tbsp ginger, minced", "400g tomato passata", "150ml cream", "2 tsp garam masala", "1 tsp turmeric", "1 tsp chili powder"],
+    "instructions": [
+      "Marinate the chicken in yogurt, turmeric and half the garam masala for at least 30 minutes.",
+      "Sear the chicken in butter until browned, then set aside.",
+      "In the same pan, soften the onion, garlic and ginger.",
+      "Add the passata and remaining spices, simmer 10 minutes.",
+      "Return the chicken to the pan and simmer until cooked through.",
+      "Stir in the cream, adjust seasoning, and serve with rice or naan."
+    ]
+  },
+  {
+    "slug": "beef-lasagna",
+    "title": "Beef lasagna",
+    "cuisine": "Italian",
+    "moods": ["Comfort"],
+    "timeMinutes": 80,
+    "note": "worth the wait",
+    "image": "beef-lasagna.jpg",
+    "ingredients": ["500g ground beef", "1 onion, 2 cloves garlic", "700g passata", "250g lasagna sheets", "500ml béchamel sauce", "200g mozzarella, grated", "50g parmesan", "Dried oregano, salt, pepper"],
+    "instructions": [
+      "Brown the beef with onion and garlic, then add passata and oregano.",
+      "Simmer the ragù for 30 minutes until thickened. Season to taste.",
+      "Layer ragù, lasagna sheets and béchamel in a baking dish, repeating three times.",
+      "Finish with a béchamel layer and scatter over mozzarella and parmesan.",
+      "Bake at 190°C (375°F) for 30–35 minutes until golden and bubbling.",
+      "Rest 10 minutes before slicing."
+    ]
+  },
+  {
+    "slug": "birria-tacos",
+    "title": "Birria tacos",
+    "cuisine": "Mexican",
+    "moods": ["Spicy"],
+    "timeMinutes": 180,
+    "note": "dunk in consommé",
+    "image": "birria-tacos.jpg",
+    "ingredients": ["1.5kg beef chuck", "4 dried guajillo chiles", "2 dried ancho chiles", "1 onion, 4 cloves garlic", "2 tomatoes", "1 tsp cumin, 1 tsp oregano", "Corn tortillas", "Mozzarella or Oaxaca cheese", "Cilantro and diced onion, to serve"],
+    "instructions": [
+      "Toast and soak the dried chiles, then blend with tomatoes, onion, garlic and spices into a paste.",
+      "Sear the beef, then add the chile paste and enough water to cover. Simmer covered for 2.5–3 hours until falling apart.",
+      "Shred the meat and skim fat from the broth (the consommé) into a bowl for dipping.",
+      "Dip tortillas in the fat on top of the broth, fill with meat and cheese, and fold.",
+      "Griddle each taco until crisp and the cheese melts.",
+      "Serve with the warm consommé for dunking, topped with cilantro and onion."
+    ]
+  },
+  {
+    "slug": "miso-ramen",
+    "title": "Miso ramen",
+    "cuisine": "Japanese",
+    "moods": ["Anything"],
+    "timeMinutes": 30,
+    "note": "big bowl energy",
+    "image": "miso-ramen.jpg",
+    "ingredients": ["2 portions fresh ramen noodles", "1.2L chicken or vegetable stock", "3 tbsp white miso paste", "1 tbsp soy sauce", "1 clove garlic, 1 tsp ginger, minced", "2 soft-boiled eggs", "Sliced spring onion, nori, chili oil, to top"],
+    "instructions": [
+      "Whisk the miso and soy sauce into the hot stock along with garlic and ginger.",
+      "Simmer gently for 10 minutes; don't let it boil hard once the miso is in.",
+      "Cook the noodles separately according to the pack, then drain.",
+      "Divide noodles between bowls and ladle over the broth.",
+      "Top with halved soft-boiled eggs, spring onion, nori and a swirl of chili oil."
+    ]
+  },
+  {
+    "slug": "pad-thai",
+    "title": "Pad thai",
+    "cuisine": "Thai",
+    "moods": ["Anything"],
+    "timeMinutes": 25,
+    "note": "sweet, sour, nutty",
+    "image": "pad-thai.jpg",
+    "ingredients": ["200g flat rice noodles", "200g prawns or chicken", "2 eggs", "3 tbsp tamarind paste", "2 tbsp fish sauce", "2 tbsp palm sugar", "100g bean sprouts", "3 spring onions", "Crushed peanuts, lime wedges, chili flakes"],
+    "instructions": [
+      "Soak the rice noodles in warm water until pliable, then drain.",
+      "Whisk tamarind paste, fish sauce and palm sugar together for the sauce.",
+      "Stir-fry the prawns or chicken in a hot wok until just cooked, push to one side.",
+      "Scramble the eggs in the cleared space, then mix everything together.",
+      "Add the noodles and sauce, tossing until the noodles are coated and tender.",
+      "Fold in bean sprouts and spring onion; serve topped with peanuts, lime and chili flakes."
+    ]
+  },
+  {
+    "slug": "shakshuka",
+    "title": "Shakshuka",
+    "cuisine": "Middle Eastern",
+    "moods": ["Comfort"],
+    "timeMinutes": 30,
+    "note": "one pan",
+    "image": "shakshuka.jpg",
+    "ingredients": ["2 tbsp olive oil", "1 onion, 1 red pepper, sliced", "3 cloves garlic", "1 tsp cumin, 1 tsp paprika", "800g canned crushed tomatoes", "4–6 eggs", "Feta, cilantro, to serve"],
+    "instructions": [
+      "Soften the onion and pepper in olive oil, then add garlic and spices.",
+      "Pour in the crushed tomatoes and simmer 15 minutes until thickened.",
+      "Make small wells in the sauce and crack in the eggs.",
+      "Cover and cook gently until the whites are set but yolks still soft, 6–8 minutes.",
+      "Scatter with crumbled feta and cilantro, and serve straight from the pan with bread."
+    ]
+  },
+  {
+    "slug": "egg-fried-rice",
+    "title": "Egg fried rice",
+    "cuisine": "Chinese",
+    "moods": ["Quick"],
+    "timeMinutes": 15,
+    "note": "use up leftovers",
+    "image": "egg-fried-rice.jpg",
+    "ingredients": ["3 cups cold cooked rice (day-old is best)", "2 eggs, beaten", "2 spring onions, sliced", "1 carrot, diced small", "80g frozen peas", "2 tbsp soy sauce", "1 tsp sesame oil", "2 tbsp neutral oil"],
+    "instructions": [
+      "Heat oil in a wok until shimmering.",
+      "Scramble the eggs quickly, then remove and set aside.",
+      "Stir-fry the carrot and peas for 2 minutes.",
+      "Add the rice, breaking up any clumps, and fry until starting to crisp.",
+      "Return the egg, add soy sauce and sesame oil, and toss everything together.",
+      "Finish with sliced spring onion."
+    ]
+  },
+  {
+    "slug": "bibimbap",
+    "title": "Bibimbap",
+    "cuisine": "Korean",
+    "moods": ["Anything"],
+    "timeMinutes": 35,
+    "note": "build your bowl",
+    "image": "bibimbap.jpg",
+    "ingredients": ["2 cups cooked short-grain rice", "150g beef bulgogi or mince", "1 carrot, julienned", "1 zucchini, julienned", "A handful of spinach, blanched", "2 eggs", "2 tbsp gochujang", "1 tsp sesame oil", "Sesame seeds"],
+    "instructions": [
+      "Cook the beef until browned and just cooked through.",
+      "Quickly sauté the carrot and zucchini separately, keeping their colors bright.",
+      "Fry the eggs sunny-side up.",
+      "Divide rice between bowls and arrange the beef and vegetables in sections on top.",
+      "Top each bowl with a fried egg, a spoon of gochujang, sesame oil and sesame seeds.",
+      "Mix everything together at the table before eating."
+    ]
+  }
+]
