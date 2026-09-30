@@ -7,6 +7,7 @@ export type Recipe = {
   slug: string;
   cuisine: string | null;
   moods: string[];
+  tags: string[];
   timeMinutes: number | null;
   note: string | null;
   ingredients: string[];
@@ -20,6 +21,7 @@ type RawRecipe = {
   slug: string;
   cuisine?: string | null;
   moods?: string[] | null;
+  tags?: string[] | null;
   timeMinutes?: number | null;
   note?: string | null;
   ingredients?: string[] | null;
@@ -33,6 +35,7 @@ const RECIPE_PROJECTION = `{
   "slug": slug.current,
   cuisine,
   moods,
+  tags,
   timeMinutes,
   note,
   ingredients,
@@ -50,6 +53,7 @@ export async function getAllRecipes(): Promise<Recipe[]> {
     slug: r.slug,
     cuisine: r.cuisine ?? null,
     moods: r.moods ?? [],
+    tags: r.tags ?? [],
     timeMinutes: r.timeMinutes ?? null,
     note: r.note ?? null,
     ingredients: r.ingredients ?? [],
@@ -70,6 +74,7 @@ export async function getRecipeBySlug(slug: string): Promise<Recipe | null> {
     slug: r.slug,
     cuisine: r.cuisine ?? null,
     moods: r.moods ?? [],
+    tags: r.tags ?? [],
     timeMinutes: r.timeMinutes ?? null,
     note: r.note ?? null,
     ingredients: r.ingredients ?? [],

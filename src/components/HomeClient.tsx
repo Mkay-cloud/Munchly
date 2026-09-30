@@ -18,13 +18,13 @@ const PALETTES: [string, string][][] = [
 ];
 const PALETTE = PALETTES[0];
 
-const MOOD_TILES: { mood: Mood | null; title: string; sub: string }[] = [
-  { mood: "Comfort", title: "Comfort food", sub: "Hearty classics" },
-  { mood: "Quick", title: "Quick meals", sub: "Ready in 20 min" },
-  { mood: "Spicy", title: "Spicy", sub: "Bring the heat" },
-  { mood: "Sweet", title: "Sweet", sub: "Desserts and treats" },
-  { mood: null, title: "Light & fresh", sub: "Salads and bowls" },
-  { mood: null, title: "Cozy soups", sub: "One pot, big spoon" },
+const MOOD_TILES: { match: (r: Recipe) => boolean; title: string; sub: string }[] = [
+  { match: (r) => r.moods.includes("Comfort"), title: "Comfort food", sub: "Hearty classics" },
+  { match: (r) => r.moods.includes("Quick"), title: "Quick meals", sub: "Ready in 20 min" },
+  { match: (r) => r.moods.includes("Spicy"), title: "Spicy", sub: "Bring the heat" },
+  { match: (r) => r.moods.includes("Sweet"), title: "Sweet", sub: "Desserts and treats" },
+  { match: (r) => r.tags.includes("Light & fresh"), title: "Light & fresh", sub: "Salads and bowls" },
+  { match: (r) => r.tags.includes("Cozy soups"), title: "Cozy soups", sub: "One pot, big spoon" },
 ];
 
 function buildMoodPool(recipes: Recipe[], mood: Mood): Recipe[] {
@@ -87,7 +87,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
   });
 
   const moodTilesResolved = MOOD_TILES.map((t) => {
-    const rep = t.mood ? recipes.find((r) => r.moods.includes(t.mood!)) : undefined;
+    const rep = recipes.find(t.match);
     return { ...t, rep };
   });
 
@@ -572,6 +572,21 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
                   <BrowseCard key={t.cuisine} title={t.cuisine} sub={`${t.rep.title} and more`} rep={t.rep} />
                 ))}
           </div>
+
+          <Link
+            href="/recipes"
+            style={{
+              alignSelf: "flex-start",
+              fontSize: 15,
+              fontWeight: 600,
+              color: "var(--primary)",
+              textDecoration: "none",
+              borderBottom: "1px solid var(--primary)",
+              paddingBottom: 2,
+            }}
+          >
+            See all {recipes.length} recipes →
+          </Link>
         </div>
       </section>
 

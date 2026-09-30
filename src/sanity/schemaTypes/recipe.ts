@@ -40,6 +40,8 @@ export const recipe = defineType({
           "Chinese",
           "Korean",
           "French",
+          "Greek",
+          "Vietnamese",
           "Other",
         ],
       },
@@ -52,6 +54,17 @@ export const recipe = defineType({
       of: [{ type: "string" }],
       options: {
         list: ["Comfort", "Quick", "Spicy", "Sweet", "Anything"],
+      },
+    }),
+    defineField({
+      name: "tags",
+      title: "Browse tags",
+      description:
+        "Extra categories shown only in the browse grid (e.g. Light & fresh, Cozy soups). Separate from Moods, which controls the spin wheel.",
+      type: "array",
+      of: [{ type: "string" }],
+      options: {
+        list: ["Light & fresh", "Cozy soups"],
       },
     }),
     defineField({
