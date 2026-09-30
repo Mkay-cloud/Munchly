@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRecipeBySlug } from "@/sanity/queries";
+import FavoriteButton from "@/components/FavoriteButton";
+import AccountNav from "@/components/AccountNav";
 
 export const revalidate = 60;
 
@@ -26,10 +28,11 @@ export default async function RecipePage({
           borderBottom: "1px solid var(--line)",
         }}
       >
-        <div style={{ maxWidth: 800, margin: "0 auto", padding: "12px 20px" }}>
+        <div style={{ maxWidth: 800, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
           <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to Munchly
           </Link>
+          <AccountNav />
         </div>
       </header>
 
@@ -58,6 +61,9 @@ export default async function RecipePage({
               .filter(Boolean)
               .join(" · ")}
           </p>
+          <div>
+            <FavoriteButton slug={recipe.slug} title={recipe.title} />
+          </div>
         </div>
 
         {recipe.ingredients?.length > 0 && (

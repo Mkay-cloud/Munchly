@@ -62,6 +62,34 @@ export async function getAllRecipes(): Promise<Recipe[]> {
   }));
 }
 
+export async function getRecipesBySlugs(slugs: string[]): Promise<Recipe[]> {
+  if (slugs.length === 0) return [];
+  const raw: RawRecipe[] = await client.fetch(
+    `*[_type == "recipe" && slug.current in $slugs] ${RECIPE_PROJECTION}`,
+    { slugs }
+  );
+  const bySlug = new Map(
+    raw.map((r) => [
+      r.slug,
+      {
+        _id: r._id,
+        title: r.title,
+        slug: r.slug,
+        cuisine: r.cuisine ?? null,
+        moods: r.moods ?? [],
+        tags: r.tags ?? [],
+        timeMinutes: r.timeMinutes ?? null,
+        note: r.note ?? null,
+        ingredients: r.ingredients ?? [],
+        instructions: r.instructions ?? [],
+        imageUrl: r.image ? urlFor(r.image).width(800).height(600).fit("crop").url() : null,
+      } satisfies Recipe,
+    ])
+  );
+  // Preserve the order the slugs were given in (e.g. most-recently-favorited first).
+  return slugs.map((s) => bySlug.get(s)).filter((r): r is Recipe => !!r);
+}
+
 export async function getRecipeBySlug(slug: string): Promise<Recipe | null> {
   const r: RawRecipe | null = await client.fetch(
     `*[_type == "recipe" && slug.current == $slug][0] ${RECIPE_PROJECTION}`,

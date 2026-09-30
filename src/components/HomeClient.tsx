@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Recipe } from "@/sanity/queries";
+import AccountNav from "./AccountNav";
+import FavoriteButton from "./FavoriteButton";
 
 const MOODS = ["Anything", "Comfort", "Quick", "Spicy", "Sweet"] as const;
 type Mood = (typeof MOODS)[number];
@@ -172,20 +174,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
                 }}
               />
             </button>
-            <a
-              href="#"
-              style={{
-                padding: "10px 18px",
-                borderRadius: 999,
-                fontWeight: 600,
-                fontSize: 15,
-                color: "var(--primary-text)",
-                border: "1.5px solid var(--border-strong)",
-                background: "var(--card)",
-              }}
-            >
-              Sign in
-            </a>
+            <AccountNav />
           </nav>
         </div>
       </header>
@@ -473,6 +462,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
                   </span>
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  <FavoriteButton slug={result.slug} title={result.title} variant="outline" />
                   <Link
                     href={`/recipes/${result.slug}`}
                     style={{
@@ -614,7 +604,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 250px), 1fr))", gap: 16 }}>
           {[
-            { tag: "Next up", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Save favorites", body: "Keep the meals you loved. The wheel starts leaning your way." },
+            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Save favorites", body: "Sign in free and tap the heart on any recipe to keep it in your list." },
             { tag: "Coming soon", tagBg: "var(--chip)", tagColor: "var(--muted)", title: "Plan your week", body: "Spin once for the whole week. Skip the days you're eating out." },
             { tag: "Coming soon", tagBg: "var(--chip)", tagColor: "var(--muted)", title: "Build a shopping list", body: "Your planned meals turn into one list, grouped by aisle." },
             { tag: "Coming soon", tagBg: "var(--chip)", tagColor: "var(--muted)", title: "Cook from your fridge", body: "Tell us what's in the kitchen and we'll find what you can make with it." },
@@ -684,14 +674,9 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
           }}
         >
           <p style={{ margin: 0, fontSize: 16, color: "var(--olive-text)", fontWeight: 500, maxWidth: "34em" }}>
-            Make a free account now and your saved spins will be waiting when favorites go live.
+            Sign in free and tap the heart on any recipe to keep it in your favorites.
           </p>
-          <a
-            href="#"
-            style={{ padding: "13px 22px", borderRadius: 999, background: "var(--olive)", color: "#FBF8F2", fontWeight: 600, fontSize: 15 }}
-          >
-            Create an account
-          </a>
+          <AccountNav />
         </div>
       </section>
 

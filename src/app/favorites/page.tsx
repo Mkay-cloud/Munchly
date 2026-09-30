@@ -1,12 +1,24 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getAllRecipes } from "@/sanity/queries";
-import AccountNav from "@/components/AccountNav";
+import { createClient } from "@/lib/supabase/server";
+import { getRecipesBySlugs } from "@/sanity/queries";
+import FavoritesGate from "./FavoritesGate";
 
-export const revalidate = 60;
+export default async function FavoritesPage() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const userId = data?.claims?.sub as string | undefined;
 
-export default async function AllRecipesPage() {
-  const recipes = await getAllRecipes();
+  let recipes: Awaited<ReturnType<typeof getRecipesBySlugs>> = [];
+
+  if (userId) {
+    const { data: rows } = await supabase
+      .from("favorites")
+      .select("recipe_slug")
+      .order("created_at", { ascending: false });
+    const slugs = (rows ?? []).map((r) => r.recipe_slug as string);
+    recipes = await getRecipesBySlugs(slugs);
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)" }}>
@@ -20,11 +32,10 @@ export default async function AllRecipesPage() {
           borderBottom: "1px solid var(--line)",
         }}
       >
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "12px 20px" }}>
           <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to Munchly
           </Link>
-          <AccountNav />
         </div>
       </header>
 
@@ -40,15 +51,21 @@ export default async function AllRecipesPage() {
               letterSpacing: "-0.015em",
             }}
           >
-            All recipes
+            My favorites
           </h1>
-          <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            {recipes.length} recipe{recipes.length === 1 ? "" : "s"} in the library so far.
-          </p>
+          {userId && (
+            <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
+              {recipes.length} saved recipe{recipes.length === 1 ? "" : "s"}.
+            </p>
+          )}
         </div>
 
-        {recipes.length === 0 ? (
-          <p style={{ color: "var(--muted)" }}>No recipes yet — check back soon.</p>
+        {!userId ? (
+          <FavoritesGate />
+        ) : recipes.length === 0 ? (
+          <p style={{ color: "var(--muted)" }}>
+            Nothing saved yet. Tap the heart on any recipe to keep it here.
+          </p>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 240px), 1fr))", gap: 16 }}>
             {recipes.map((r) => (
