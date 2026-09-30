@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 
 export default function AuthModal({
@@ -51,7 +52,12 @@ export default function AuthModal({
     onSuccess();
   };
 
-  return (
+  // AuthModal only ever mounts client-side in response to a button click
+  // (never part of the initial server-rendered tree), so `document` is
+  // always available here — no SSR guard needed. The portal escapes the
+  // header's `backdropFilter`, which would otherwise turn this fixed-position
+  // overlay into one scoped to the header instead of the viewport.
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -139,6 +145,9 @@ export default function AuthModal({
             <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>
               We sent a 6-digit code to <strong>{email}</strong>. Enter it below.
             </p>
+            <p style={{ margin: 0, fontSize: 13, color: "var(--muted)" }}>
+              Don&apos;t see it? Check your spam or junk folder — it can land there the first time.
+            </p>
             <input
               type="text"
               inputMode="numeric"
@@ -192,6 +201,7 @@ export default function AuthModal({
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
