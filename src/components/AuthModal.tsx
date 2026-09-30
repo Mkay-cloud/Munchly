@@ -39,24 +39,18 @@ export default function AuthModal({
     setError(null);
     setLoading(true);
     const supabase = createClient();
-    // A brand-new signup's code is tagged type "signup" by Supabase; a
-    // returning user's code is tagged "email". We can't tell which one
-    // this is client-side, so try "email" first (the common case) and
-    // fall back to "signup" before reporting a real failure - otherwise a
-    // first-time signup's perfectly valid code gets rejected as
-    // "expired or invalid" purely from a type mismatch.
-    let { error } = await supabase.auth.verifyOtp({
+    // Every code verifies as type "email" now - with "Confirm email"
+    // turned off in Supabase (see project notes), a brand-new signup and
+    // a returning sign-in both issue the same "email"-typed OTP, so there's
+    // no second type to fall back to. (An earlier version tried "email"
+    // then "signup" as a fallback, but Supabase invalidates a code on its
+    // first verification attempt regardless of whether the type matched -
+    // so that fallback never actually got a live code to retry with.)
+    const { error } = await supabase.auth.verifyOtp({
       email,
       token: code,
       type: "email",
     });
-    if (error) {
-      ({ error } = await supabase.auth.verifyOtp({
-        email,
-        token: code,
-        type: "signup",
-      }));
-    }
     setLoading(false);
     if (error) {
       setError(error.message);
