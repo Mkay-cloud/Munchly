@@ -110,7 +110,7 @@ export default function AuthModal({
         {step === "email" ? (
           <form onSubmit={sendCode} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>
-              No password needed. We&apos;ll email you a 6-digit code to sign in.
+              No password needed. We&apos;ll email you a code to sign in.
             </p>
             <input
               type="email"
@@ -150,7 +150,7 @@ export default function AuthModal({
         ) : (
           <form onSubmit={verifyCode} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>
-              We sent a 6-digit code to <strong>{email}</strong>. Enter it below.
+              We sent a code to <strong>{email}</strong>. Enter it below.
             </p>
             <p style={{ margin: 0, fontSize: 13, color: "var(--muted)" }}>
               Don&apos;t see it? Check your spam or junk folder — it can land there the first time.
@@ -159,10 +159,16 @@ export default function AuthModal({
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              maxLength={6}
+              // Supabase's email OTP length is a project setting, not a
+              // fixed 6 digits (this project currently issues 8) - capping
+              // this too low silently truncated every code before it was
+              // submitted, making every code look "invalid". 10 comfortably
+              // covers Supabase's configurable range without hardcoding
+              // today's specific length.
+              maxLength={10}
               required
               autoFocus
-              placeholder="123456"
+              placeholder="Enter your code"
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
               style={{
@@ -194,6 +200,9 @@ export default function AuthModal({
             >
               {loading ? "Verifying…" : "Verify & sign in"}
             </button>
+            {/* 6 is just a sane minimum before enabling submit - Supabase's
+                actual required length (8, currently) is enforced server-side
+                by verifyOtp, which reports a clear error if it's short. */}
             <button
               type="button"
               onClick={() => {
