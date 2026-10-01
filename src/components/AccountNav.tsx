@@ -91,6 +91,13 @@ export default function AccountNav() {
           >
             My favorites
           </Link>
+          <Link
+            href="/profile"
+            onClick={() => setMenuOpen(false)}
+            style={{ padding: "10px 12px", borderRadius: 10, fontWeight: 600, fontSize: 14, color: "var(--ink)" }}
+          >
+            My profile
+          </Link>
           <button
             onClick={signOut}
             style={{
