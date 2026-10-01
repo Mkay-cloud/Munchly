@@ -766,9 +766,9 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: "#D4AF7C" }}>Munchly</span>
-                <a href="#" style={{ color: "#EADFCF", fontSize: 15 }}>About</a>
+                <Link href="/about" style={{ color: "#EADFCF", fontSize: 15 }}>About</Link>
                 <a href="#" style={{ color: "#EADFCF", fontSize: 15 }}>Suggest a recipe</a>
-                <a href="#" style={{ color: "#EADFCF", fontSize: 15 }}>Contact</a>
+                <Link href="/contact" style={{ color: "#EADFCF", fontSize: 15 }}>Contact</Link>
               </div>
             </div>
           </div>
@@ -786,7 +786,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
           >
             <span>© 2026 Munchly</span>
             <div style={{ display: "flex", gap: 18 }}>
-              <a href="#" style={{ color: "#B3A393" }}>Privacy</a>
+              <Link href="/privacy" style={{ color: "#B3A393" }}>Privacy</Link>
               <a href="#" style={{ color: "#B3A393" }}>Terms</a>
             </div>
           </div>

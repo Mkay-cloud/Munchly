@@ -12,6 +12,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/plan`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/shopping-list`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/fridge`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/about`, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${SITE_URL}/contact`, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${SITE_URL}/privacy`, changeFrequency: "yearly", priority: 0.2 },
     // /favorites is intentionally left out - it's marked noindex (signed-in,
     // user-specific) and has nothing useful for a crawler to index.
   ];
