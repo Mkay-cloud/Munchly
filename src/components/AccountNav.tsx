@@ -71,6 +71,10 @@ export default function AccountNav() {
   }
 
   const label = profile?.display_name || session.user.email;
+  const isAdmin =
+    !!session.user.email &&
+    !!process.env.NEXT_PUBLIC_ADMIN_EMAIL &&
+    session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
   return (
     <div style={{ position: "relative" }}>
@@ -137,6 +141,15 @@ export default function AccountNav() {
           >
             My profile
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              onClick={() => setMenuOpen(false)}
+              style={{ padding: "10px 12px", borderRadius: 10, fontWeight: 600, fontSize: 14, color: "var(--primary)" }}
+            >
+              Review submissions
+            </Link>
+          )}
           <button
             onClick={signOut}
             style={{
