@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Recipe } from "@/sanity/queries";
 import AccountNav from "./AccountNav";
 import FavoriteButton from "./FavoriteButton";
+import { isSoundEnabled, playLandSound, playSpinSound, setSoundEnabled } from "@/lib/sound";
 
 const MOODS = ["Anything", "Comfort", "Quick", "Spicy", "Sweet"] as const;
 type Mood = (typeof MOODS)[number];
@@ -45,6 +46,10 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<Recipe | null>(null);
   const [tab, setTab] = useState<"Mood" | "Cuisine">("Mood");
+  // Lazy initializer (not an effect) - same pattern as the shopping list /
+  // fridge pantry state elsewhere in this app. isSoundEnabled() guards on
+  // `typeof window === "undefined"` so it's safe during SSR.
+  const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -57,6 +62,12 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
+
+  const toggleSound = () => {
+    const next = !soundOn;
+    setSoundOn(next);
+    setSoundEnabled(next);
+  };
 
   const dark = themeOverride ? themeOverride === "dark" : sysDark;
   const pool = buildMoodPool(recipes, mood);
@@ -73,9 +84,11 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
     setSpinning(true);
     setResult(null);
     setRot(base - (i + 0.5) * seg + jitter);
+    playSpinSound(4200);
     timerRef.current = setTimeout(() => {
       setSpinning(false);
       setResult(pool[i]);
+      playLandSound();
     }, 4200);
   };
 
@@ -330,9 +343,34 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)", letterSpacing: "0.02em" }}>
-                I&apos;m in the mood for
-              </span>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)", letterSpacing: "0.02em" }}>
+                  I&apos;m in the mood for
+                </span>
+                <button
+                  type="button"
+                  onClick={toggleSound}
+                  aria-pressed={soundOn}
+                  aria-label={soundOn ? "Mute spin sound effects" : "Unmute spin sound effects"}
+                  title={soundOn ? "Sound on" : "Sound off"}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 30,
+                    height: 30,
+                    borderRadius: "50%",
+                    border: "1.5px solid var(--border)",
+                    background: "var(--card)",
+                    color: "var(--muted)",
+                    cursor: "pointer",
+                    fontSize: 14,
+                    flexShrink: 0,
+                  }}
+                >
+                  <span aria-hidden>{soundOn ? "🔊" : "🔇"}</span>
+                </button>
+              </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {MOODS.map((m) => {
                   const on = m === mood;
