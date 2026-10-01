@@ -23,6 +23,22 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  openGraph: {
+    title: "Munchly",
+    description:
+      "A quick decision tool for when you can't figure out what to eat — pick a mood, spin, get an answer.",
+    url: "https://munchly.online",
+    siteName: "Munchly",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Munchly" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Munchly",
+    description:
+      "A quick decision tool for when you can't figure out what to eat — pick a mood, spin, get an answer.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
