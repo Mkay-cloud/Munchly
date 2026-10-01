@@ -800,12 +800,13 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
                 <Link href="/plan" style={{ color: "#EADFCF", fontSize: 15 }}>Plan your week</Link>
                 <Link href="/shopping-list" style={{ color: "#EADFCF", fontSize: 15 }}>Shopping list</Link>
                 <Link href="/fridge" style={{ color: "#EADFCF", fontSize: 15 }}>Cook from your fridge</Link>
+                <Link href="/community" style={{ color: "#EADFCF", fontSize: 15 }}>Community recipes</Link>
                 <a href="#grows" style={{ color: "#EADFCF", fontSize: 15 }}>What&apos;s next</a>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: "#D4AF7C" }}>Munchly</span>
                 <Link href="/about" style={{ color: "#EADFCF", fontSize: 15 }}>About</Link>
-                <a href="#" style={{ color: "#EADFCF", fontSize: 15 }}>Suggest a recipe</a>
+                <Link href="/suggest" style={{ color: "#EADFCF", fontSize: 15 }}>Suggest a recipe</Link>
                 <Link href="/contact" style={{ color: "#EADFCF", fontSize: 15 }}>Contact</Link>
               </div>
             </div>
