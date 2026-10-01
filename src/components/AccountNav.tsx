@@ -1,15 +1,39 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AuthModal from "./AuthModal";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@/lib/supabase/useSession";
+
+type Profile = { display_name: string | null; avatar_url: string | null };
 
 export default function AccountNav() {
   const { session, loading } = useSession();
   const [showAuth, setShowAuth] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  useEffect(() => {
+    // No reset-to-null branch for the signed-out case: when there's no
+    // session this component renders the "Sign in" button below and never
+    // reads `profile` at all, so there's nothing stale to clear.
+    if (!session) return;
+    let cancelled = false;
+    const supabase = createClient();
+    supabase
+      .from("profiles")
+      .select("display_name, avatar_url")
+      .eq("id", session.user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled) setProfile(data ?? null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [session]);
 
   const signOut = async () => {
     const supabase = createClient();
@@ -46,12 +70,17 @@ export default function AccountNav() {
     );
   }
 
+  const label = profile?.display_name || session.user.email;
+
   return (
     <div style={{ position: "relative" }}>
       <button
         onClick={() => setMenuOpen((v) => !v)}
         style={{
-          padding: "10px 18px",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "6px 16px 6px 6px",
           borderRadius: 999,
           fontWeight: 600,
           fontSize: 15,
@@ -60,12 +89,22 @@ export default function AccountNav() {
           background: "var(--card)",
           cursor: "pointer",
           maxWidth: 220,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
         }}
       >
-        {session.user.email}
+        <span
+          style={{
+            position: "relative",
+            width: 28,
+            height: 28,
+            borderRadius: "50%",
+            overflow: "hidden",
+            background: "var(--chip)",
+            flexShrink: 0,
+          }}
+        >
+          <Image src={profile?.avatar_url || "/panda-head.png"} alt="" fill sizes="28px" style={{ objectFit: "cover" }} />
+        </span>
+        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
       </button>
       {menuOpen && (
         <div
