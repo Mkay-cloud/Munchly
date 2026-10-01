@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { getRecipeBySlug } from "@/sanity/queries";
 import FavoriteButton from "@/components/FavoriteButton";
 import AccountNav from "@/components/AccountNav";
+import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export const revalidate = 60;
@@ -55,14 +56,10 @@ export default async function RecipePage({
           <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to Munchly
           </Link>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <Link href="/suggest" className="hidden sm:inline" style={{ fontWeight: 600, fontSize: 15, color: "var(--primary)" }}>
-              Suggest a recipe
-            </Link>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <ThemeToggle />
-              <AccountNav />
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <SiteMenu />
+            <ThemeToggle />
+            <AccountNav />
           </div>
         </div>
       </header>

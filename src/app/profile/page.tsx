@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import SignInGate from "@/components/SignInGate";
+import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import ProfileClient from "./ProfileClient";
 
@@ -58,10 +59,8 @@ export default async function ProfilePage() {
           <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to Munchly
           </Link>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <Link href="/suggest" className="hidden sm:inline" style={{ fontWeight: 600, fontSize: 15, color: "var(--primary)" }}>
-              Suggest a recipe
-            </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <SiteMenu />
             <ThemeToggle />
           </div>
         </div>

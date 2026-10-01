@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Recipe } from "@/sanity/queries";
 import AccountNav from "./AccountNav";
 import FavoriteButton from "./FavoriteButton";
+import SiteMenu from "./SiteMenu";
 import ThemeToggle from "./ThemeToggle";
 import { isSoundEnabled, playLandSound, playSpinSound, setSoundEnabled } from "@/lib/sound";
 
@@ -143,31 +144,8 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
               Munchly
             </span>
           </a>
-          <nav style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            {/* Hidden below the sm breakpoint - on phones these text links
-                plus the logo left no room for the dark-mode toggle and Sign
-                in button, which got pushed off-screen. */}
-            <Link
-              href="/suggest"
-              className="hidden sm:inline"
-              style={{ padding: "10px 14px", borderRadius: 999, fontWeight: 600, fontSize: 15, color: "var(--primary-text)" }}
-            >
-              Suggest a recipe
-            </Link>
-            <a
-              href="#browse"
-              className="hidden sm:inline"
-              style={{ padding: "10px 14px", borderRadius: 999, fontWeight: 600, fontSize: 15, color: "var(--ink)" }}
-            >
-              Recipes
-            </a>
-            <a
-              href="#grows"
-              className="hidden sm:inline"
-              style={{ padding: "10px 14px", borderRadius: 999, fontWeight: 600, fontSize: 15, color: "var(--ink)" }}
-            >
-              What&apos;s next
-            </a>
+          <nav style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <SiteMenu />
             <ThemeToggle />
             <AccountNav />
           </nav>

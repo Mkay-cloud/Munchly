@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import AccountNav from "@/components/AccountNav";
+import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import LikeButton from "@/components/LikeButton";
 import type { CommunityProfile, CommunityRecipe } from "@/lib/community";
@@ -69,14 +70,10 @@ export default async function CommunityPage() {
           <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to Munchly
           </Link>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <Link href="/suggest" className="hidden sm:inline" style={{ fontWeight: 600, fontSize: 15, color: "var(--primary)" }}>
-              Suggest a recipe
-            </Link>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <ThemeToggle />
-              <AccountNav />
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <SiteMenu />
+            <ThemeToggle />
+            <AccountNav />
           </div>
         </div>
       </header>

@@ -7,6 +7,7 @@ import AccountNav from "@/components/AccountNav";
 import DeleteRecipeButton from "@/components/DeleteRecipeButton";
 import LikeButton from "@/components/LikeButton";
 import SignInGate from "@/components/SignInGate";
+import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import CommentForm from "./CommentForm";
 import { splitLines, type CommunityComment, type CommunityProfile, type CommunityRecipe } from "@/lib/community";
@@ -102,14 +103,10 @@ export default async function CommunityRecipePage({
           <Link href="/community" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to community recipes
           </Link>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <Link href="/suggest" className="hidden sm:inline" style={{ fontWeight: 600, fontSize: 15, color: "var(--primary)" }}>
-              Suggest a recipe
-            </Link>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <ThemeToggle />
-              <AccountNav />
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <SiteMenu />
+            <ThemeToggle />
+            <AccountNav />
           </div>
         </div>
       </header>

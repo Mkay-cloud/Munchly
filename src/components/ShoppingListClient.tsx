@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { Recipe } from "@/sanity/queries";
+import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import { loadWeekPlan, type WeekPlan } from "@/lib/weekPlan";
 import { buildShoppingList, loadCheckedIds, saveCheckedIds } from "@/lib/shoppingList";
@@ -50,10 +51,8 @@ export default function ShoppingListClient({ recipes }: { recipes: Recipe[] }) {
           <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to Munchly
           </Link>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <Link href="/suggest" className="hidden sm:inline" style={{ fontWeight: 600, fontSize: 15, color: "var(--primary)" }}>
-              Suggest a recipe
-            </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <SiteMenu />
             <ThemeToggle />
           </div>
         </div>
