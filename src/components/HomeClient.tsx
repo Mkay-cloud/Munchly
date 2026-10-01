@@ -631,10 +631,10 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 250px), 1fr))", gap: 16 }}>
           {[
-            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Save favorites", body: "Sign in free and tap the heart on any recipe to keep it in your list.", href: null },
-            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Plan your week", body: "Spin once for the whole week. Skip the days you're eating out.", href: "/plan" },
-            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Build a shopping list", body: "Your planned meals turn into one combined list you can check off.", href: "/shopping-list" },
-            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Cook from your fridge", body: "Tell us what's in the kitchen and we'll find what you can make with it.", href: "/fridge" },
+            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Save favorites", body: "Sign in free and tap the heart on any recipe to keep it in your list.", href: null, image: "/mascots/favorites.png", delay: "0s" },
+            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Plan your week", body: "Spin once for the whole week. Skip the days you're eating out.", href: "/plan", image: "/mascots/plan.png", delay: "0.3s" },
+            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Build a shopping list", body: "Your planned meals turn into one combined list you can check off.", href: "/shopping-list", image: "/mascots/shopping-list.png", delay: "0.6s" },
+            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Cook from your fridge", body: "Tell us what's in the kitchen and we'll find what you can make with it.", href: "/fridge", image: "/mascots/fridge.png", delay: "0.9s" },
           ].map((f) => {
             const cardStyle = {
               background: "var(--card)",
@@ -658,11 +658,21 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    color: "var(--faint)",
-                    fontSize: 13,
+                    overflow: "hidden",
                   }}
                 >
-                  preview
+                  <span
+                    className="mly-mascot"
+                    style={{
+                      display: "inline-block",
+                      width: 110,
+                      height: 110,
+                      position: "relative",
+                      animation: `mly-bob 3.2s ease-in-out ${f.delay} infinite`,
+                    }}
+                  >
+                    <Image src={f.image} alt="" fill sizes="110px" style={{ objectFit: "contain" }} />
+                  </span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   <span
