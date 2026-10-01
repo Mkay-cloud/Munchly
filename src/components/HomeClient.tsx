@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Recipe } from "@/sanity/queries";
 import AccountNav from "./AccountNav";
 import FavoriteButton from "./FavoriteButton";
+import ThemeToggle from "./ThemeToggle";
 import { isSoundEnabled, playLandSound, playSpinSound, setSoundEnabled } from "@/lib/sound";
 
 const MOODS = ["Anything", "Comfort", "Quick", "Spicy", "Sweet"] as const;
@@ -39,8 +40,6 @@ function buildMoodPool(recipes: Recipe[], mood: Mood): Recipe[] {
 }
 
 export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
-  const [themeOverride, setThemeOverride] = useState<"light" | "dark" | null>(null);
-  const [sysDark, setSysDark] = useState(false);
   const [mood, setMood] = useState<Mood>("Anything");
   const [rot, setRot] = useState(0);
   const [spinning, setSpinning] = useState(false);
@@ -53,12 +52,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => setSysDark(mq.matches);
-    onChange();
-    mq.addEventListener("change", onChange);
     return () => {
-      mq.removeEventListener("change", onChange);
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
@@ -69,7 +63,6 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
     setSoundEnabled(next);
   };
 
-  const dark = themeOverride ? themeOverride === "dark" : sysDark;
   const pool = buildMoodPool(recipes, mood);
   const seg = pool.length ? 360 / pool.length : 360;
   const stops = pool
@@ -107,10 +100,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
   });
 
   return (
-    <div
-      data-theme={dark ? "dark" : "light"}
-      style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)", overflowX: "hidden" }}
-    >
+    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)", overflowX: "hidden" }}>
       {/* Nav */}
       <header
         style={{
@@ -171,33 +161,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
             >
               What&apos;s next
             </a>
-            <button
-              onClick={() => setThemeOverride(dark ? "light" : "dark")}
-              aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-              title={dark ? "Switch to light mode" : "Switch to dark mode"}
-              style={{
-                width: 42,
-                height: 42,
-                flex: "none",
-                borderRadius: "50%",
-                border: "1.5px solid var(--border-strong)",
-                background: "var(--card)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-              }}
-            >
-              <span
-                style={{
-                  width: 16,
-                  height: 16,
-                  borderRadius: "50%",
-                  border: "2px solid var(--ink)",
-                  background: "linear-gradient(90deg, var(--ink) 50%, transparent 50%)",
-                }}
-              />
-            </button>
+            <ThemeToggle />
             <AccountNav />
           </nav>
         </div>

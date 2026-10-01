@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Contact — Munchly",
@@ -22,10 +23,11 @@ export default function ContactPage() {
           borderBottom: "1px solid var(--line)",
         }}
       >
-        <div style={{ maxWidth: 760, margin: "0 auto", padding: "12px 20px" }}>
+        <div style={{ maxWidth: 760, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
           <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to Munchly
           </Link>
+          <ThemeToggle />
         </div>
       </header>
 

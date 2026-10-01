@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { Recipe } from "@/sanity/queries";
+import ThemeToggle from "@/components/ThemeToggle";
 import { loadWeekPlan, type WeekPlan } from "@/lib/weekPlan";
 import { buildShoppingList, loadCheckedIds, saveCheckedIds } from "@/lib/shoppingList";
 
@@ -45,10 +46,11 @@ export default function ShoppingListClient({ recipes }: { recipes: Recipe[] }) {
           borderBottom: "1px solid var(--line)",
         }}
       >
-        <div style={{ maxWidth: 900, margin: "0 auto", padding: "12px 20px" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
           <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to Munchly
           </Link>
+          <ThemeToggle />
         </div>
       </header>
 

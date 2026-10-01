@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getAllRecipes } from "@/sanity/queries";
 import AccountNav from "@/components/AccountNav";
+import ThemeToggle from "@/components/ThemeToggle";
 import FavoriteButton from "@/components/FavoriteButton";
 
 export const revalidate = 60;
@@ -34,7 +35,10 @@ export default async function AllRecipesPage() {
           <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to Munchly
           </Link>
-          <AccountNav />
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <ThemeToggle />
+            <AccountNav />
+          </div>
         </div>
       </header>
 
