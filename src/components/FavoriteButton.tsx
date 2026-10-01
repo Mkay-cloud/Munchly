@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import AuthModal from "./AuthModal";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@/lib/supabase/useSession";
@@ -12,7 +12,7 @@ export default function FavoriteButton({
 }: {
   slug: string;
   title: string;
-  variant?: "solid" | "outline";
+  variant?: "solid" | "outline" | "icon";
 }) {
   const { session, loading: sessionLoading } = useSession();
   // Keyed by slug so a stale result from a previously-viewed recipe never
@@ -43,7 +43,11 @@ export default function FavoriteButton({
   const checking = !!session && (!favoriteInfo || favoriteInfo.slug !== slug);
   const favorited = session && favoriteInfo?.slug === slug ? favoriteInfo.favorited : false;
 
-  const toggle = async () => {
+  const toggle = async (e?: MouseEvent) => {
+    // Cards render this as an overlay on top of a clickable Link to the
+    // recipe - stop the click from also triggering that navigation.
+    e?.preventDefault();
+    e?.stopPropagation();
     if (!session) {
       setShowAuth(true);
       return;
@@ -75,8 +79,27 @@ export default function FavoriteButton({
     opacity: busy || checking ? 0.7 : 1,
   } as const;
 
+  const iconStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 36,
+    height: 36,
+    borderRadius: "50%",
+    border: "1.5px solid var(--border)",
+    background: favorited ? "var(--olive)" : "rgba(255, 253, 249, 0.92)",
+    color: favorited ? "#FBF8F2" : "var(--ink)",
+    fontSize: 17,
+    lineHeight: 1,
+    cursor: busy || checking ? "default" : "pointer",
+    opacity: busy || checking ? 0.7 : 1,
+    boxShadow: "0 1px 5px rgba(0, 0, 0, 0.16)",
+  } as const;
+
   const style =
-    variant === "solid"
+    variant === "icon"
+      ? iconStyle
+      : variant === "solid"
       ? { ...base, background: favorited ? "var(--olive)" : "var(--card)", color: favorited ? "#FBF8F2" : "var(--olive-text)" }
       : { ...base, background: "var(--card)", color: "var(--olive-text)" };
 
@@ -91,7 +114,7 @@ export default function FavoriteButton({
         style={style}
       >
         <span aria-hidden>{favorited ? "♥" : "♡"}</span>
-        {favorited ? "Saved" : "Save"}
+        {variant !== "icon" && (favorited ? "Saved" : "Save")}
       </button>
       {showAuth && (
         <AuthModal onClose={() => setShowAuth(false)} onSuccess={() => setShowAuth(false)} />

@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getAllRecipes } from "@/sanity/queries";
 import AccountNav from "@/components/AccountNav";
+import FavoriteButton from "@/components/FavoriteButton";
 
 export const revalidate = 60;
 
@@ -61,32 +62,36 @@ export default async function AllRecipesPage() {
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 240px), 1fr))", gap: 16 }}>
             {recipes.map((r) => (
-              <Link
-                key={r._id}
-                href={`/recipes/${r.slug}`}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  borderRadius: 20,
-                  overflow: "hidden",
-                  border: "1px solid var(--border)",
-                  background: "var(--card)",
-                  textDecoration: "none",
-                  color: "var(--ink)",
-                }}
-              >
-                <div style={{ position: "relative", width: "100%", aspectRatio: "4/3", background: "var(--section)" }}>
-                  {r.imageUrl && (
-                    <Image src={r.imageUrl} alt={r.title} fill sizes="240px" style={{ objectFit: "cover" }} />
-                  )}
+              <div key={r._id} style={{ position: "relative" }}>
+                <Link
+                  href={`/recipes/${r.slug}`}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    borderRadius: 20,
+                    overflow: "hidden",
+                    border: "1px solid var(--border)",
+                    background: "var(--card)",
+                    textDecoration: "none",
+                    color: "var(--ink)",
+                  }}
+                >
+                  <div style={{ position: "relative", width: "100%", aspectRatio: "4/3", background: "var(--section)" }}>
+                    {r.imageUrl && (
+                      <Image src={r.imageUrl} alt={r.title} fill sizes="240px" style={{ objectFit: "cover" }} />
+                    )}
+                  </div>
+                  <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span style={{ fontWeight: 600, fontSize: 16 }}>{r.title}</span>
+                    <span style={{ fontSize: 13, color: "var(--muted)" }}>
+                      {[r.cuisine, r.timeMinutes ? `${r.timeMinutes} min` : null].filter(Boolean).join(" · ")}
+                    </span>
+                  </div>
+                </Link>
+                <div style={{ position: "absolute", top: 10, right: 10, zIndex: 1 }}>
+                  <FavoriteButton slug={r.slug} title={r.title} variant="icon" />
                 </div>
-                <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 4 }}>
-                  <span style={{ fontWeight: 600, fontSize: 16 }}>{r.title}</span>
-                  <span style={{ fontSize: 13, color: "var(--muted)" }}>
-                    {[r.cuisine, r.timeMinutes ? `${r.timeMinutes} min` : null].filter(Boolean).join(" · ")}
-                  </span>
-                </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}
