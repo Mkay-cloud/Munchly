@@ -144,9 +144,16 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
             </span>
           </a>
           <nav style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            {/* Hidden below the sm breakpoint - on phones these two text
-                links plus the logo left no room for the dark-mode toggle
-                and Sign in button, which got pushed off-screen. */}
+            {/* Hidden below the sm breakpoint - on phones these text links
+                plus the logo left no room for the dark-mode toggle and Sign
+                in button, which got pushed off-screen. */}
+            <Link
+              href="/suggest"
+              className="hidden sm:inline"
+              style={{ padding: "10px 14px", borderRadius: 999, fontWeight: 600, fontSize: 15, color: "var(--primary-text)" }}
+            >
+              Suggest a recipe
+            </Link>
             <a
               href="#browse"
               className="hidden sm:inline"
@@ -264,6 +271,22 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
               }}
             >
               Plan your week
+            </Link>
+            <Link
+              href="/suggest"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "16px 22px",
+                borderRadius: 999,
+                color: "var(--olive-text)",
+                fontWeight: 600,
+                fontSize: 17,
+                border: "1.5px solid var(--sage-line)",
+                background: "var(--sage-tint)",
+              }}
+            >
+              Suggest a recipe
             </Link>
           </div>
           <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Free to use. No account needed to spin.</p>

@@ -27,7 +27,12 @@ export default function AboutPage() {
           <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to Munchly
           </Link>
-          <ThemeToggle />
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <Link href="/suggest" className="hidden sm:inline" style={{ fontWeight: 600, fontSize: 15, color: "var(--primary)" }}>
+              Suggest a recipe
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

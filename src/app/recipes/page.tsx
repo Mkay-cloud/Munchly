@@ -35,9 +35,14 @@ export default async function AllRecipesPage() {
           <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
             ← Back to Munchly
           </Link>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <ThemeToggle />
-            <AccountNav />
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <Link href="/suggest" className="hidden sm:inline" style={{ fontWeight: 600, fontSize: 15, color: "var(--primary)" }}>
+              Suggest a recipe
+            </Link>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <ThemeToggle />
+              <AccountNav />
+            </div>
           </div>
         </div>
       </header>
