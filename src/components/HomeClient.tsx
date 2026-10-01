@@ -272,6 +272,22 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
             >
               Browse recipes
             </a>
+            <Link
+              href="/plan"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "16px 22px",
+                borderRadius: 999,
+                color: "var(--ink)",
+                fontWeight: 600,
+                fontSize: 17,
+                border: "1.5px solid var(--border-strong)",
+                background: "var(--card)",
+              }}
+            >
+              Plan your week
+            </Link>
           </div>
           <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Free to use. No account needed to spin.</p>
         </div>
@@ -615,60 +631,70 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 250px), 1fr))", gap: 16 }}>
           {[
-            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Save favorites", body: "Sign in free and tap the heart on any recipe to keep it in your list." },
-            { tag: "Coming soon", tagBg: "var(--chip)", tagColor: "var(--muted)", title: "Plan your week", body: "Spin once for the whole week. Skip the days you're eating out." },
-            { tag: "Coming soon", tagBg: "var(--chip)", tagColor: "var(--muted)", title: "Build a shopping list", body: "Your planned meals turn into one list, grouped by aisle." },
-            { tag: "Coming soon", tagBg: "var(--chip)", tagColor: "var(--muted)", title: "Cook from your fridge", body: "Tell us what's in the kitchen and we'll find what you can make with it." },
-          ].map((f) => (
-            <div
-              key={f.title}
-              style={{
-                background: "var(--card)",
-                border: "1px solid var(--border)",
-                borderRadius: 28,
-                padding: 22,
-                display: "flex",
-                flexDirection: "column",
-                gap: 18,
-              }}
-            >
-              <div
-                style={{
-                  background: "var(--bg)",
-                  border: "1px solid var(--line-soft)",
-                  borderRadius: 18,
-                  padding: 14,
-                  minHeight: 150,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "var(--faint)",
-                  fontSize: 13,
-                }}
-              >
-                preview
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <span
+            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Save favorites", body: "Sign in free and tap the heart on any recipe to keep it in your list.", href: null },
+            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Plan your week", body: "Spin once for the whole week. Skip the days you're eating out.", href: "/plan" },
+            { tag: "Coming soon", tagBg: "var(--chip)", tagColor: "var(--muted)", title: "Build a shopping list", body: "Your planned meals turn into one list, grouped by aisle.", href: null },
+            { tag: "Coming soon", tagBg: "var(--chip)", tagColor: "var(--muted)", title: "Cook from your fridge", body: "Tell us what's in the kitchen and we'll find what you can make with it.", href: null },
+          ].map((f) => {
+            const cardStyle = {
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              borderRadius: 28,
+              padding: 22,
+              display: "flex",
+              flexDirection: "column" as const,
+              gap: 18,
+              color: "inherit",
+            };
+            const content = (
+              <>
+                <div
                   style={{
-                    alignSelf: "flex-start",
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: f.tagColor,
-                    background: f.tagBg,
-                    padding: "4px 10px",
-                    borderRadius: 999,
+                    background: "var(--bg)",
+                    border: "1px solid var(--line-soft)",
+                    borderRadius: 18,
+                    padding: 14,
+                    minHeight: 150,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--faint)",
+                    fontSize: 13,
                   }}
                 >
-                  {f.tag}
-                </span>
-                <h3 style={{ margin: "4px 0 0", fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 22, color: "var(--ink)" }}>
-                  {f.title}
-                </h3>
-                <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5, color: "var(--muted)" }}>{f.body}</p>
+                  preview
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <span
+                    style={{
+                      alignSelf: "flex-start",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: f.tagColor,
+                      background: f.tagBg,
+                      padding: "4px 10px",
+                      borderRadius: 999,
+                    }}
+                  >
+                    {f.tag}
+                  </span>
+                  <h3 style={{ margin: "4px 0 0", fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 22, color: "var(--ink)" }}>
+                    {f.title}
+                  </h3>
+                  <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5, color: "var(--muted)" }}>{f.body}</p>
+                </div>
+              </>
+            );
+            return f.href ? (
+              <Link key={f.title} href={f.href} style={cardStyle}>
+                {content}
+              </Link>
+            ) : (
+              <div key={f.title} style={cardStyle}>
+                {content}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div
@@ -722,6 +748,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
                 <span style={{ fontSize: 13, fontWeight: 700, color: "#D4AF7C" }}>App</span>
                 <a href="#spinner" style={{ color: "#EADFCF", fontSize: 15 }}>Spin the wheel</a>
                 <a href="#browse" style={{ color: "#EADFCF", fontSize: 15 }}>Recipes</a>
+                <Link href="/plan" style={{ color: "#EADFCF", fontSize: 15 }}>Plan your week</Link>
                 <a href="#grows" style={{ color: "#EADFCF", fontSize: 15 }}>What&apos;s next</a>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
