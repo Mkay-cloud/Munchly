@@ -631,7 +631,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 250px), 1fr))", gap: 16 }}>
           {[
-            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Save favorites", body: "Sign in free and tap the heart on any recipe to keep it in your list.", href: "#favorites-cta", image: "/mascots/favorites.png", delay: "0s" },
+            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Save favorites", body: "Sign in free and tap the heart on any recipe to keep it in your list.", href: "/favorites", image: "/mascots/favorites.png", delay: "0s" },
             { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Plan your week", body: "Spin once for the whole week. Skip the days you're eating out.", href: "/plan", image: "/mascots/plan.png", delay: "0.3s" },
             { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Build a shopping list", body: "Your planned meals turn into one combined list you can check off.", href: "/shopping-list", image: "/mascots/shopping-list.png", delay: "0.6s" },
             { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Cook from your fridge", body: "Tell us what's in the kitchen and we'll find what you can make with it.", href: "/fridge", image: "/mascots/fridge.png", delay: "0.9s" },
