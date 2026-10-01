@@ -13,7 +13,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function SuggestPage() {
+export default async function SuggestPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ edit?: string }>;
+}) {
+  const { edit } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const userId = data?.claims?.sub as string | undefined;
@@ -36,6 +41,12 @@ export default async function SuggestPage() {
       .order("created_at", { ascending: false });
     mySubmissions = (rows ?? []) as CommunityRecipe[];
   }
+
+  // The recipe being edited, if any - found in the submissions we already
+  // fetched above rather than with a second query. If the id doesn't match
+  // one of the viewer's own rows (bad link, someone else's recipe), this is
+  // just null and the form falls back to "new submission" mode.
+  const editingRecipe = edit ? mySubmissions.find((r) => r.id === edit) ?? null : null;
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)" }}>
@@ -113,7 +124,12 @@ export default async function SuggestPage() {
             </Link>
           </div>
         ) : (
-          <SuggestForm displayName={displayName} initialSubmissions={mySubmissions} />
+          <SuggestForm
+            key={editingRecipe?.id ?? "new"}
+            displayName={displayName}
+            initialSubmissions={mySubmissions}
+            editingRecipe={editingRecipe}
+          />
         )}
       </main>
     </div>

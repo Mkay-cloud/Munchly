@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import AccountNav from "@/components/AccountNav";
+import DeleteRecipeButton from "@/components/DeleteRecipeButton";
 import LikeButton from "@/components/LikeButton";
 import SignInGate from "@/components/SignInGate";
 import CommentForm from "./CommentForm";
@@ -122,6 +123,21 @@ export default async function CommunityRecipePage({
           </div>
         )}
 
+        {isOwner && recipe.status === "approved" && recipe.has_pending_edit && (
+          <div
+            style={{
+              padding: "14px 18px",
+              borderRadius: 16,
+              background: "var(--chip)",
+              color: "var(--muted)",
+              fontSize: 14,
+              fontWeight: 600,
+            }}
+          >
+            Your edit is under review. Everyone else still sees the version below until it&rsquo;s approved.
+          </div>
+        )}
+
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <h1
             style={{
@@ -149,8 +165,16 @@ export default async function CommunityRecipePage({
             <span style={{ fontSize: 14, color: "var(--muted)" }}>by {author?.display_name ?? "Someone"}</span>
           </div>
 
-          <div style={{ marginTop: 4 }}>
+          <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
             <LikeButton recipeId={recipe.id} initialLiked={likedByViewer} initialCount={likeCount} />
+            {isOwner && (
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <Link href={`/suggest?edit=${recipe.id}`} style={{ fontSize: 14, fontWeight: 700, color: "var(--primary)" }}>
+                  Edit recipe
+                </Link>
+                <DeleteRecipeButton recipeId={recipe.id} redirectTo="/suggest" />
+              </div>
+            )}
           </div>
         </div>
 

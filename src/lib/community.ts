@@ -16,6 +16,18 @@ export type CommunityRecipe = {
   time_minutes: number | null;
   status: CommunityRecipeStatus;
   created_at: string;
+  // An edit to an already-approved recipe is staged here rather than
+  // overwriting the live fields above, so the published version keeps
+  // showing to everyone until an admin approves the edit (see the
+  // "approve a pending edit" SQL snippet). Always null/false for recipes
+  // that are still pending or rejected - those are edited in place instead.
+  pending_title: string | null;
+  pending_description: string | null;
+  pending_ingredients: string | null;
+  pending_instructions: string | null;
+  pending_cuisine: string | null;
+  pending_time_minutes: number | null;
+  has_pending_edit: boolean;
 };
 
 export type CommunityProfile = {
