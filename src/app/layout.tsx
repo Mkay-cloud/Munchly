@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fredoka, DM_Sans } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 const fredoka = Fredoka({
@@ -41,6 +42,12 @@ export const metadata: Metadata = {
   },
 };
 
+// Only set in Vercel's Production environment (not Preview or local dev) -
+// see .env.example. That keeps preview-deployment and local testing traffic
+// out of the real analytics, without needing to detect the domain at
+// runtime.
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -54,6 +61,7 @@ export default function RootLayout({
       >
         {children}
       </body>
+      {GA_MEASUREMENT_ID && <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />}
     </html>
   );
 }
