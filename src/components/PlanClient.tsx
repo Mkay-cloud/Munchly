@@ -129,6 +129,22 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
             {plan ? "Re-plan my week →" : "Plan my week →"}
           </button>
           {plan && (
+            <Link
+              href="/shopping-list"
+              style={{
+                padding: "14px 18px",
+                borderRadius: 999,
+                background: "var(--card)",
+                color: "var(--ink)",
+                fontWeight: 600,
+                fontSize: 15,
+                border: "1.5px solid var(--border-strong)",
+              }}
+            >
+              Shopping list →
+            </Link>
+          )}
+          {plan && (
             <button
               type="button"
               onClick={handleClear}

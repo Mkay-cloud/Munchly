@@ -633,7 +633,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
           {[
             { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Save favorites", body: "Sign in free and tap the heart on any recipe to keep it in your list.", href: null },
             { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Plan your week", body: "Spin once for the whole week. Skip the days you're eating out.", href: "/plan" },
-            { tag: "Coming soon", tagBg: "var(--chip)", tagColor: "var(--muted)", title: "Build a shopping list", body: "Your planned meals turn into one list, grouped by aisle.", href: null },
+            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Build a shopping list", body: "Your planned meals turn into one combined list you can check off.", href: "/shopping-list" },
             { tag: "Coming soon", tagBg: "var(--chip)", tagColor: "var(--muted)", title: "Cook from your fridge", body: "Tell us what's in the kitchen and we'll find what you can make with it.", href: null },
           ].map((f) => {
             const cardStyle = {
@@ -749,6 +749,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
                 <a href="#spinner" style={{ color: "#EADFCF", fontSize: 15 }}>Spin the wheel</a>
                 <a href="#browse" style={{ color: "#EADFCF", fontSize: 15 }}>Recipes</a>
                 <Link href="/plan" style={{ color: "#EADFCF", fontSize: 15 }}>Plan your week</Link>
+                <Link href="/shopping-list" style={{ color: "#EADFCF", fontSize: 15 }}>Shopping list</Link>
                 <a href="#grows" style={{ color: "#EADFCF", fontSize: 15 }}>What&apos;s next</a>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
