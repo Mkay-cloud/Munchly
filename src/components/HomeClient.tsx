@@ -32,6 +32,12 @@ const MOOD_TILES: { match: (r: Recipe) => boolean; title: string; sub: string }[
   { match: (r) => r.tags.includes("Cozy soups"), title: "Cozy soups", sub: "One pot, big spoon" },
 ];
 
+// Hero button fills. The green is the same --olive as the Play button on
+// /games (#3e4634 light / #5b6849 dark) - near-white text on it is 9.3:1 in
+// light mode and 5.6:1 in dark; on --primary it's 11.2:1 / 6.7:1.
+const HERO_BURGUNDY = { background: "var(--primary)", color: "#FBF8F2", border: "1.5px solid var(--primary)" } as const;
+const HERO_GREEN = { background: "var(--olive)", color: "#FBF8F2", border: "1.5px solid var(--olive)" } as const;
+
 function buildMoodPool(recipes: Recipe[], mood: Mood): Recipe[] {
   if (mood === "Anything") return recipes;
   const matching = recipes.filter((r) => r.moods.includes(mood));
@@ -202,47 +208,23 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
           </p>
           {/* Five equal-size buttons in exactly two rows (3 + 2, second row
               centred) at every width - sizing lives in globals.css
-              (.mly-hero-actions / .mly-hero-btn); only colours are inline. */}
+              (.mly-hero-actions / .mly-hero-btn). Solid fills alternating
+              burgundy / green, with near-white text on both. */}
           <div className="mly-hero-actions">
-            <a
-              href="#spinner"
-              className="mly-hero-btn"
-              style={{
-                background: "var(--primary)",
-                color: "#FBF8F2",
-                border: "1.5px solid var(--primary)",
-                boxShadow: "0 6px 18px rgba(100,31,43,0.22)",
-              }}
-            >
+            <a href="#spinner" className="mly-hero-btn" style={HERO_BURGUNDY}>
               Spin the wheel →
             </a>
-            <a
-              href="#browse"
-              className="mly-hero-btn"
-              style={{ color: "var(--ink)", border: "1.5px solid var(--border-strong)", background: "var(--card)" }}
-            >
+            <a href="#browse" className="mly-hero-btn" style={HERO_GREEN}>
               Browse recipes
             </a>
-            <Link
-              href="/plan"
-              className="mly-hero-btn"
-              style={{ color: "var(--ink)", border: "1.5px solid var(--border-strong)", background: "var(--card)" }}
-            >
+            <Link href="/plan" className="mly-hero-btn" style={HERO_BURGUNDY}>
               Plan your week
             </Link>
-            <Link
-              href="/suggest"
-              className="mly-hero-btn"
-              style={{ color: "var(--olive-text)", border: "1.5px solid var(--sage-line)", background: "var(--sage-tint)" }}
-            >
+            <Link href="/suggest" className="mly-hero-btn" style={HERO_GREEN}>
               Suggest a recipe
             </Link>
-            <Link
-              href="/games"
-              className="mly-hero-btn"
-              style={{ color: "var(--ink)", border: "1.5px solid var(--border-strong)", background: "var(--card)" }}
-            >
-              Games
+            <Link href="/games" className="mly-hero-btn" style={HERO_BURGUNDY}>
+              Play food games
             </Link>
           </div>
           <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Free to use. No account needed to spin.</p>
