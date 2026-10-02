@@ -366,6 +366,26 @@ button {
   animation: mly-toast 1.6s ease-out forwards;
 }
 
+/* Board size: full width up to 440px, but shrinks on short screens so the
+   orders, board and buttons fit together - never below ~44px squares. */
+.mly-merge-wrap {
+  max-width: min(440px, max(250px, calc(100vh - 376px)));
+}
+
+@supports (height: 100svh) {
+  .mly-merge-wrap {
+    max-width: min(440px, max(250px, calc(100svh - 376px)));
+  }
+}
+
+/* Four action buttons on one line on phones. */
+@media (max-width: 420px) {
+  .mly-merge-controls button {
+    padding: 9px 12px !important;
+    font-size: 14px !important;
+  }
+}
+
 .mly-merge-cell {
   transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
 }

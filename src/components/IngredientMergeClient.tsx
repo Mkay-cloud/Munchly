@@ -53,12 +53,12 @@ function Pill({ label, value }: { label: string; value: string }) {
       style={{
         display: "inline-flex",
         alignItems: "baseline",
-        gap: 6,
-        padding: "7px 14px",
+        gap: 4,
+        padding: "6px 9px",
         borderRadius: 999,
         background: "var(--chip)",
         color: "var(--ink)",
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: 600,
         fontVariantNumeric: "tabular-nums",
       }}
@@ -101,6 +101,9 @@ export default function IngredientMergeClient() {
   const [previousBest, setPreviousBest] = useState<number | null>(null);
   const [confettiKey, setConfettiKey] = useState<number | null>(null);
   const winPanelRef = useRef<HTMLDivElement>(null);
+  // Orders panel down to the controls - what should fit on screen while playing.
+  const playAreaRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
 
   const bestMs = useSyncExternalStore(subscribeBestTime, loadBestTime, () => null);
   // Same site-wide setting as every other mute button on Munchly.
@@ -143,6 +146,24 @@ export default function IngredientMergeClient() {
     const id = setTimeout(() => setToast(null), 1600);
     return () => clearTimeout(id);
   }, [toast]);
+
+  // When a game starts, scroll so the orders, board and buttons all fit
+  // under the sticky header (on phones the title + intro push them down).
+  // Doesn't move when they already fit, e.g. on desktop.
+  useEffect(() => {
+    if (phase !== "playing") return;
+    const top = playAreaRef.current, bottomEl = controlsRef.current;
+    if (!top || !bottomEl) return;
+    const headerGap = 76;
+    const t = top.getBoundingClientRect().top;
+    const b = bottomEl.getBoundingClientRect().bottom;
+    let delta = 0;
+    if (t < headerGap) delta = t - headerGap;
+    else if (b > window.innerHeight - 8) delta = Math.min(t - headerGap, b - window.innerHeight + 8);
+    if (delta === 0) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollBy({ top: delta, behavior: reduce ? "auto" : "smooth" });
+  }, [phase, startedAt]);
 
   // Bring the win panel into view (it sits above the board).
   useEffect(() => {
@@ -188,7 +209,7 @@ export default function IngredientMergeClient() {
     switch (result.kind) {
       case "select": {
         const t = tierOf(state.board[i]!);
-        setHint(`${t.emoji} ${t.name} - tap a matching tile next to it to merge, or an empty square to move it.`);
+        setHint(`${t.emoji} ${t.name}: tap its twin next to it, or an empty square.`);
         playTapSound();
         break;
       }
@@ -215,7 +236,7 @@ export default function IngredientMergeClient() {
         break;
       }
       case "too-far":
-        setHint("Too far apart - move it right next to its twin first (tap an empty square beside it).");
+        setHint("Too far apart - move it next to its twin first.");
         playMismatchSound();
         break;
     }
@@ -249,6 +270,21 @@ export default function IngredientMergeClient() {
     playFlipSound();
   };
 
+  const roundButton: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 36,
+    height: 36,
+    borderRadius: "50%",
+    border: "1.5px solid var(--border)",
+    background: "var(--card)",
+    color: "var(--muted)",
+    cursor: "pointer",
+    fontSize: 16,
+    flexShrink: 0,
+  };
+
   const muteButton = (
     <button
       type="button"
@@ -256,20 +292,7 @@ export default function IngredientMergeClient() {
       aria-pressed={soundOn}
       aria-label={soundOn ? "Mute sound effects" : "Unmute sound effects"}
       title={soundOn ? "Sound on" : "Sound off"}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: 40,
-        height: 40,
-        borderRadius: "50%",
-        border: "1.5px solid var(--border)",
-        background: "var(--card)",
-        color: "var(--muted)",
-        cursor: "pointer",
-        fontSize: 16,
-        flexShrink: 0,
-      }}
+      style={roundButton}
     >
       <span aria-hidden>{soundOn ? "🔊" : "🔇"}</span>
     </button>
@@ -304,7 +327,7 @@ export default function IngredientMergeClient() {
         </div>
       </header>
 
-      <main style={{ maxWidth: 760, margin: "0 auto", padding: "32px 20px 80px", display: "flex", flexDirection: "column", gap: 20 }}>
+      <main style={{ maxWidth: 760, margin: "0 auto", padding: "32px 20px 80px", display: "flex", flexDirection: "column", gap: phase === "start" ? 20 : 14 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <h1
             style={{
@@ -361,11 +384,13 @@ export default function IngredientMergeClient() {
           <>
             {/* Orders */}
             <section
+              ref={playAreaRef}
               aria-label="Orders"
-              style={{ display: "flex", flexDirection: "column", gap: 10, padding: "16px 18px", borderRadius: 20, border: "1px solid var(--border)", background: "var(--card)" }}
+              style={{ display: "flex", flexDirection: "column", gap: 8, padding: "10px 12px", borderRadius: 18, border: "1px solid var(--border)", background: "var(--card)" }}
             >
-              <span style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Orders</span>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Orders</span>
+              {/* Always one row of three, so the board stays near the top on phones. */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 8 }}>
                 {CHAINS.map((c) => {
                   const dish = c.tiers.at(-1)!;
                   const done = Math.min(game.served[c.id], ORDER_SIZE[c.id]);
@@ -376,21 +401,23 @@ export default function IngredientMergeClient() {
                       data-order={c.id}
                       style={{
                         display: "flex",
+                        flexDirection: "column",
                         alignItems: "center",
-                        gap: 10,
-                        padding: "8px 12px",
+                        gap: 2,
+                        padding: "6px 4px",
+                        textAlign: "center",
                         borderRadius: 14,
                         background: complete ? "var(--sage-tint)" : "var(--section)",
                         border: `1.5px solid ${complete ? "var(--sage-line)" : "transparent"}`,
                       }}
                     >
-                      <span aria-hidden="true" style={{ fontSize: 26, lineHeight: 1 }}>
+                      <span aria-hidden="true" style={{ fontSize: 22, lineHeight: 1 }}>
                         {dish.emoji}
                       </span>
                       <span style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-                        <span style={{ fontWeight: 700, fontSize: 14, color: complete ? "var(--olive-text)" : "var(--ink)" }}>{dish.name}</span>
+                        <span style={{ fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", color: complete ? "var(--olive-text)" : "var(--ink)" }}>{dish.name}</span>
                         <span style={{ fontSize: 13, color: complete ? "var(--olive-text)" : "var(--muted)", fontVariantNumeric: "tabular-nums" }}>
-                          {complete ? `✓ ${done}/${ORDER_SIZE[c.id]} done` : `${done}/${ORDER_SIZE[c.id]} served`}
+                          {complete ? `✓ ${done}/${ORDER_SIZE[c.id]}` : `${done}/${ORDER_SIZE[c.id]}`}
                         </span>
                       </span>
                     </div>
@@ -400,16 +427,22 @@ export default function IngredientMergeClient() {
             </section>
 
             {/* Stats */}
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 <Pill label="Time" value={formatClock(elapsedMs)} />
                 <Pill label="Merges" value={String(game.merges)} />
                 <Pill label="Best" value={bestMs === null ? "—" : formatClock(bestMs)} />
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
                 {muteButton}
-                <button type="button" onClick={start} style={{ ...pillButton("outline"), padding: "9px 16px", fontSize: 14 }}>
-                  New game
+                <button
+                  type="button"
+                  onClick={start}
+                  aria-label="New game"
+                  title="New game"
+                  style={{ ...roundButton, color: "var(--ink)", fontSize: 18, fontWeight: 700 }}
+                >
+                  <span aria-hidden>↺</span>
                 </button>
               </div>
             </div>
@@ -452,7 +485,7 @@ export default function IngredientMergeClient() {
             )}
 
             {/* Board */}
-            <div style={{ position: "relative", width: "100%", maxWidth: 440, margin: "0 auto" }}>
+            <div className="mly-merge-wrap" style={{ position: "relative", width: "100%", margin: "0 auto" }}>
               <div
                 role="group"
                 aria-label="Kitchen board, 5 by 5"
@@ -563,7 +596,7 @@ export default function IngredientMergeClient() {
             <div aria-live="polite" style={{ minHeight: 24, textAlign: "center", fontSize: 14, fontWeight: 600 }}>
               {phase === "playing" &&
                 (stuck ? (
-                  <span style={{ color: "var(--danger-ink)" }}>No moves left on a full board - tap Shuffle to mix it up!</span>
+                  <span style={{ color: "var(--danger-ink)" }}>No moves left - tap Shuffle to mix it up!</span>
                 ) : hint ? (
                   <span style={{ color: "var(--ink-2)" }}>{hint}</span>
                 ) : (
@@ -573,7 +606,7 @@ export default function IngredientMergeClient() {
 
             {/* Controls */}
             {phase === "playing" && (
-              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8 }}>
+              <div ref={controlsRef} className="mly-merge-controls" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 6 }}>
                 <button type="button" onClick={addIngredient} style={pillButton("olive")}>
                   + Add
                 </button>
