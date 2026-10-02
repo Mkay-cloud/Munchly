@@ -1,10 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import Confetti from "@/components/Confetti";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
-import { buildDeck, formatElapsed, PAIR_COUNT, type MatchCard } from "@/lib/ingredientMatch";
+import {
+  buildDeck,
+  formatBestTime,
+  formatElapsed,
+  loadBestTime,
+  PAIR_COUNT,
+  recordTime,
+  subscribeBestTime,
+  type MatchCard,
+} from "@/lib/ingredientMatch";
+import {
+  isSoundEnabled,
+  playFlipSound,
+  playMatchSound,
+  playMismatchSound,
+  playWinSound,
+  setSoundEnabled,
+  subscribeSoundSetting,
+} from "@/lib/sound";
 
 // How long a non-matching pair stays face-up before flipping back.
 const MISMATCH_DELAY_MS = 900;
@@ -54,7 +73,19 @@ export default function IngredientMatchClient() {
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [finishedAt, setFinishedAt] = useState<number | null>(null);
   const [now, setNow] = useState(0);
+  // Whether this game's time beat the stored best (for the win panel).
+  const [newBest, setNewBest] = useState(false);
+  // Bumped on each win so a fresh <Confetti> mounts; null = not showing.
+  const [confettiKey, setConfettiKey] = useState<number | null>(null);
   const mismatchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const winPanelRef = useRef<HTMLDivElement>(null);
+
+  // Both read from localStorage, which the server can't see - the server
+  // snapshot (sound on, no best yet) keeps the first client render matching
+  // the HTML, then React swaps in the stored value.
+  const bestMs = useSyncExternalStore(subscribeBestTime, loadBestTime, () => null);
+  // Same site-wide setting as the spin wheel's mute button on the home page.
+  const soundOn = useSyncExternalStore(subscribeSoundSetting, isSoundEnabled, () => true);
 
   const won = finishedAt !== null;
 
@@ -71,6 +102,20 @@ export default function IngredientMatchClient() {
     };
   }, []);
 
+  // The last pair is usually found down at the bottom of the board, below
+  // the fold on phones - bring the "You won!" panel into view.
+  useEffect(() => {
+    if (!won) return;
+    const panel = winPanelRef.current;
+    if (!panel) return;
+    // Clear of the sticky header (~67px) with a little breathing room.
+    const topGap = 84;
+    const rect = panel.getBoundingClientRect();
+    if (rect.top >= topGap && rect.bottom <= window.innerHeight) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollBy({ top: rect.top - topGap, behavior: reduce ? "auto" : "smooth" });
+  }, [won]);
+
   const elapsedMs = startedAt === null ? 0 : (finishedAt ?? now) - startedAt;
 
   const flip = (index: number) => {
@@ -84,6 +129,7 @@ export default function IngredientMatchClient() {
       setNow(t);
     }
     setSeen((prev) => new Set(prev).add(index));
+    playFlipSound();
 
     if (flipped.length === 0) {
       setFlipped([index]);
@@ -98,10 +144,19 @@ export default function IngredientMatchClient() {
       const nextMatched = new Set(matched).add(card.pairKey);
       setMatched(nextMatched);
       setFlipped([]);
-      if (nextMatched.size === PAIR_COUNT) setFinishedAt(t);
+      if (nextMatched.size === PAIR_COUNT) {
+        // startedAt is always set by now (this is at least the 2nd flip).
+        setFinishedAt(t);
+        setNewBest(recordTime(t - (startedAt ?? t)));
+        setConfettiKey(t);
+        playWinSound();
+      } else {
+        playMatchSound();
+      }
       return;
     }
 
+    playMismatchSound();
     setFlipped([first, index]);
     setLocked(true);
     mismatchTimer.current = setTimeout(() => {
@@ -125,10 +180,13 @@ export default function IngredientMatchClient() {
     setStartedAt(null);
     setFinishedAt(null);
     setNow(0);
+    setNewBest(false);
+    setConfettiKey(null);
   };
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)" }}>
+      {confettiKey !== null && <Confetti key={confettiKey} onDone={() => setConfettiKey(null)} />}
       <header
         style={{
           position: "sticky",
@@ -174,28 +232,55 @@ export default function IngredientMatchClient() {
             <StatPill label="Moves" value={String(moves)} />
             <StatPill label="Time" value={formatElapsed(elapsedMs)} />
             <StatPill label="Pairs" value={`${matched.size}/${PAIR_COUNT}`} />
+            <StatPill label="Your best:" value={bestMs === null ? "—" : formatBestTime(bestMs)} />
           </div>
-          <button
-            type="button"
-            onClick={newGame}
-            style={{
-              padding: "10px 18px",
-              borderRadius: 999,
-              border: "1.5px solid var(--border)",
-              background: "var(--card)",
-              color: "var(--ink)",
-              fontWeight: 600,
-              fontSize: 14,
-              cursor: "pointer",
-            }}
-          >
-            New game
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <button
+              type="button"
+              onClick={() => setSoundEnabled(!soundOn)}
+              aria-pressed={soundOn}
+              aria-label={soundOn ? "Mute sound effects" : "Unmute sound effects"}
+              title={soundOn ? "Sound on" : "Sound off"}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                border: "1.5px solid var(--border)",
+                background: "var(--card)",
+                color: "var(--muted)",
+                cursor: "pointer",
+                fontSize: 16,
+                flexShrink: 0,
+              }}
+            >
+              <span aria-hidden>{soundOn ? "🔊" : "🔇"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={newGame}
+              style={{
+                padding: "10px 18px",
+                borderRadius: 999,
+                border: "1.5px solid var(--border)",
+                background: "var(--card)",
+                color: "var(--ink)",
+                fontWeight: 600,
+                fontSize: 14,
+                cursor: "pointer",
+              }}
+            >
+              New game
+            </button>
+          </div>
         </div>
 
         <div aria-live="polite" style={{ display: "contents" }}>
           {won && (
             <div
+              ref={winPanelRef}
               style={{
                 display: "flex",
                 flexWrap: "wrap",
@@ -213,7 +298,14 @@ export default function IngredientMatchClient() {
                   You won! 🎉
                 </span>
                 <span style={{ fontSize: 15, color: "var(--ink-2)" }}>
-                  All {PAIR_COUNT} pairs in {moves} moves, in {formatElapsed(elapsedMs)}.
+                  All {PAIR_COUNT} pairs in {moves} moves, in {formatBestTime(elapsedMs)}.
+                </span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: newBest ? "var(--terra-text)" : "var(--muted)" }}>
+                  {newBest
+                    ? "🏆 New best time!"
+                    : bestMs !== null
+                      ? `Your best is ${formatBestTime(bestMs)} - try to beat it!`
+                      : null}
                 </span>
               </div>
               <button
