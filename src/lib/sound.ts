@@ -231,3 +231,53 @@ export function playWinSound(): void {
     note(context, freq, chordAt + 0.12 + i * 0.11, 0.18, { type: "sine", peak: 0.05 })
   );
 }
+
+// A deflated "wah-wah-wah-waaah" for running out of time on a timed level.
+// Buzzier (filtered sawtooth) and longer than the mismatch sound, so the two
+// can't be confused.
+export function playTimeUpSound(): void {
+  if (!isSoundEnabled()) return;
+  const context = getContext();
+  if (!context) return;
+
+  const t = context.currentTime + 0.05;
+  const steps: [number, number, number, number][] = [
+    // [startFreq, endFreq, offset, duration]
+    [392, 380, 0, 0.26], // G4
+    [370, 358, 0.3, 0.26], // F#4
+    [349.23, 338, 0.6, 0.26], // F4
+    [329.63, 246.94, 0.9, 0.9], // E4 sliding down to B3
+  ];
+  steps.forEach(([from, to, offset, duration], i) => {
+    const start = t + offset;
+    const osc = context.createOscillator();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(from, start);
+    osc.frequency.exponentialRampToValueAtTime(to, start + duration);
+
+    // A little "wah" vibrato on the last, long note.
+    if (i === steps.length - 1) {
+      const lfo = context.createOscillator();
+      const lfoGain = context.createGain();
+      lfo.frequency.value = 6;
+      lfoGain.gain.value = 6;
+      lfo.connect(lfoGain).connect(osc.frequency);
+      lfo.start(start);
+      lfo.stop(start + duration + 0.05);
+    }
+
+    const filter = context.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 1100;
+
+    const gain = context.createGain();
+    gain.gain.setValueAtTime(0, start);
+    gain.gain.linearRampToValueAtTime(0.16, start + 0.02);
+    gain.gain.setValueAtTime(0.16, start + duration * 0.6);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+    osc.connect(filter).connect(gain).connect(context.destination);
+    osc.start(start);
+    osc.stop(start + duration + 0.05);
+  });
+}

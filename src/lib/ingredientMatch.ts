@@ -13,9 +13,26 @@ export type MatchCard = {
   emoji: string;
 };
 
-export const PAIR_COUNT = 8;
+export type Level = "easy" | "medium" | "hard";
 
-// A bigger pool than PAIR_COUNT so each new game draws a different mix.
+export type LevelConfig = {
+  label: string;
+  pairs: number;
+  // Countdown length for timed levels; null = untimed, can't lose.
+  timeLimitMs: number | null;
+};
+
+export const LEVELS: Record<Level, LevelConfig> = {
+  easy: { label: "Easy", pairs: 8, timeLimitMs: null },
+  medium: { label: "Medium", pairs: 12, timeLimitMs: null },
+  hard: { label: "Hard", pairs: 18, timeLimitMs: 90_000 },
+};
+
+export const LEVEL_ORDER: Level[] = ["easy", "medium", "hard"];
+
+// Comfortably bigger than the largest board (Hard, 18 pairs) so every level
+// draws a different mix each game. Emoji are all Unicode 13 or older, so
+// they render on reasonably old phones too.
 const INGREDIENTS: Ingredient[] = [
   { name: "Tomato", emoji: "🍅" },
   { name: "Garlic", emoji: "🧄" },
@@ -33,6 +50,18 @@ const INGREDIENTS: Ingredient[] = [
   { name: "Butter", emoji: "🧈" },
   { name: "Rice", emoji: "🍚" },
   { name: "Bread", emoji: "🍞" },
+  { name: "Pepper", emoji: "🫑" },
+  { name: "Cucumber", emoji: "🥒" },
+  { name: "Olive", emoji: "🫒" },
+  { name: "Apple", emoji: "🍎" },
+  { name: "Shrimp", emoji: "🍤" },
+  { name: "Honey", emoji: "🍯" },
+  { name: "Milk", emoji: "🥛" },
+  { name: "Salt", emoji: "🧂" },
+  { name: "Chicken", emoji: "🍗" },
+  { name: "Peanut", emoji: "🥜" },
+  { name: "Coconut", emoji: "🥥" },
+  { name: "Herbs", emoji: "🌿" },
 ];
 
 // Fisher-Yates - returns a new array, leaves the input alone.
@@ -45,8 +74,8 @@ function shuffle<T>(items: T[]): T[] {
   return out;
 }
 
-export function buildDeck(pairCount: number = PAIR_COUNT): MatchCard[] {
-  const picked = shuffle(INGREDIENTS).slice(0, pairCount);
+export function buildDeck(level: Level): MatchCard[] {
+  const picked = shuffle(INGREDIENTS).slice(0, LEVELS[level].pairs);
   const cards = picked.flatMap((ing) => [
     { pairKey: ing.name, name: ing.name, emoji: ing.emoji },
     { pairKey: ing.name, name: ing.name, emoji: ing.emoji },
@@ -73,14 +102,20 @@ export function formatBestTime(ms: number): string {
 // --- Best time -------------------------------------------------------------
 // Stored in this browser's localStorage only - there's no sign-in for the
 // games, so it's a personal best for this browser/device, not a leaderboard.
+// One key per level so the boards' times never mix. Easy keeps the original
+// pre-levels key so bests set before levels existed carry over.
 
-const BEST_TIME_KEY = "munchly_match_best_v1";
+const BEST_TIME_KEYS: Record<Level, string> = {
+  easy: "munchly_match_best_v1",
+  medium: "munchly_match_best_medium_v1",
+  hard: "munchly_match_best_hard_v1",
+};
 const BEST_TIME_EVENT = "munchly-match-best-change";
 
-export function loadBestTime(): number | null {
+export function loadBestTime(level: Level): number | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = window.localStorage.getItem(BEST_TIME_KEY);
+    const raw = window.localStorage.getItem(BEST_TIME_KEYS[level]);
     const n = raw === null ? NaN : Number(raw);
     return Number.isFinite(n) && n > 0 ? n : null;
   } catch {
@@ -90,11 +125,11 @@ export function loadBestTime(): number | null {
 
 // Saves `ms` if it beats the stored best (or there isn't one yet). Returns
 // whether it was a new best.
-export function recordTime(ms: number): boolean {
-  const best = loadBestTime();
+export function recordTime(level: Level, ms: number): boolean {
+  const best = loadBestTime(level);
   if (best !== null && ms >= best) return false;
   try {
-    window.localStorage.setItem(BEST_TIME_KEY, String(Math.round(ms)));
+    window.localStorage.setItem(BEST_TIME_KEYS[level], String(Math.round(ms)));
   } catch {
     // Storage blocked - still count it as a best for this visit's message,
     // it just won't be remembered.
@@ -107,7 +142,7 @@ export function recordTime(ms: number): boolean {
 // can't know the stored value).
 export function subscribeBestTime(onChange: () => void): () => void {
   const onStorage = (e: StorageEvent) => {
-    if (e.key === BEST_TIME_KEY) onChange();
+    if (e.key !== null && Object.values(BEST_TIME_KEYS).includes(e.key)) onChange();
   };
   window.addEventListener(BEST_TIME_EVENT, onChange);
   window.addEventListener("storage", onStorage);
