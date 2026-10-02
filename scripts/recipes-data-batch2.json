@@ -1,0 +1,248 @@
+[
+  {
+    "slug": "greek-salad",
+    "title": "Greek Chickpea Salad",
+    "cuisine": "Greek",
+    "moods": [],
+    "tags": ["Light & fresh"],
+    "timeMinutes": 15,
+    "note": "crisp, tangy, no cooking",
+    "image": "greek-salad.jpg",
+    "ingredients": [
+      "1 can chickpeas, drained and rinsed",
+      "1 cucumber, diced",
+      "2 tomatoes, diced",
+      "1/2 red onion, thinly sliced",
+      "1/2 cup kalamata olives",
+      "200g feta cheese, cubed",
+      "3 tbsp olive oil",
+      "1 tbsp red wine vinegar",
+      "1 tsp dried oregano",
+      "Salt and pepper to taste"
+    ],
+    "instructions": [
+      "Add the chickpeas, cucumber, tomatoes, red onion, and olives to a large bowl.",
+      "Whisk together the olive oil, red wine vinegar, oregano, salt, and pepper in a small bowl.",
+      "Pour the dressing over the salad and toss gently to combine.",
+      "Scatter the feta cubes on top and give it one more light toss.",
+      "Let it sit for 5 minutes before serving so the flavors mingle."
+    ]
+  },
+  {
+    "slug": "french-onion-soup",
+    "title": "French Onion Soup",
+    "cuisine": "French",
+    "moods": ["Comfort"],
+    "tags": ["Cozy soups"],
+    "timeMinutes": 70,
+    "note": "deeply savory, cheesy top",
+    "image": "french-onion-soup.jpg",
+    "ingredients": [
+      "4 large yellow onions, thinly sliced",
+      "3 tbsp butter",
+      "1 tbsp olive oil",
+      "1 tsp sugar",
+      "2 garlic cloves, minced",
+      "1/2 cup dry white wine",
+      "6 cups beef stock",
+      "2 sprigs fresh thyme",
+      "1 bay leaf",
+      "Baguette slices, toasted",
+      "1.5 cups grated Gruyère cheese",
+      "Salt and pepper to taste"
+    ],
+    "instructions": [
+      "Melt the butter with the olive oil in a large pot over medium heat.",
+      "Add the onions and sugar, and cook low and slow, stirring occasionally, for 35-40 minutes until deep golden brown.",
+      "Stir in the garlic and cook for 1 minute, then pour in the wine, scraping up any browned bits.",
+      "Add the beef stock, thyme, and bay leaf, then simmer uncovered for 20 minutes. Season with salt and pepper.",
+      "Ladle the soup into oven-safe bowls, top each with a toasted baguette slice and a generous handful of Gruyère.",
+      "Broil for 2-3 minutes until the cheese is bubbling and golden, then serve immediately."
+    ]
+  },
+  {
+    "slug": "vietnamese-pho",
+    "title": "Vietnamese Beef Pho",
+    "cuisine": "Vietnamese",
+    "moods": ["Anything"],
+    "tags": ["Cozy soups"],
+    "timeMinutes": 90,
+    "note": "fragrant broth, fresh herbs",
+    "image": "vietnamese-pho.jpg",
+    "ingredients": [
+      "2.5L beef stock",
+      "1 onion, halved",
+      "1 piece ginger, halved lengthwise",
+      "3 star anise",
+      "1 cinnamon stick",
+      "3 whole cloves",
+      "2 tbsp fish sauce",
+      "1 tbsp sugar",
+      "400g flat rice noodles",
+      "300g beef sirloin, thinly sliced",
+      "Bean sprouts, Thai basil, lime wedges, and sliced chili to serve"
+    ],
+    "instructions": [
+      "Char the onion and ginger halves directly over a flame or under a hot broiler until blackened in spots, then rinse off any loose char.",
+      "Toast the star anise, cinnamon, and cloves in a dry pot over medium heat for 1-2 minutes until fragrant.",
+      "Add the beef stock, charred onion, and ginger, then simmer uncovered for 45 minutes.",
+      "Stir in the fish sauce and sugar, then strain the broth to remove the solids and keep it at a gentle simmer.",
+      "Cook the rice noodles according to the package instructions and divide them between bowls.",
+      "Lay the raw sliced beef over the hot noodles, then ladle the boiling broth on top so it cooks the beef instantly.",
+      "Serve with bean sprouts, Thai basil, lime wedges, and chili on the side."
+    ]
+  },
+  {
+    "slug": "shrimp-scampi",
+    "title": "Lemon Garlic Shrimp Scampi",
+    "cuisine": "Italian",
+    "moods": ["Quick"],
+    "tags": [],
+    "timeMinutes": 20,
+    "note": "buttery, garlicky, bright",
+    "image": "shrimp-scampi.jpg",
+    "ingredients": [
+      "350g linguine",
+      "450g large shrimp, peeled and deveined",
+      "4 tbsp butter",
+      "3 tbsp olive oil",
+      "5 garlic cloves, minced",
+      "1/2 tsp red pepper flakes",
+      "1/2 cup dry white wine",
+      "Juice of 1 lemon",
+      "1/4 cup chopped parsley",
+      "Salt and pepper to taste"
+    ],
+    "instructions": [
+      "Cook the linguine in salted boiling water until al dente, then reserve 1/2 cup of the pasta water and drain.",
+      "Heat the olive oil and half the butter in a large skillet over medium-high heat.",
+      "Season the shrimp with salt and pepper, then cook for 1-2 minutes per side until just pink. Remove and set aside.",
+      "Add the garlic and red pepper flakes to the same skillet and cook for 30 seconds until fragrant.",
+      "Pour in the wine and simmer for 2 minutes, then stir in the lemon juice and remaining butter.",
+      "Return the shrimp and drained linguine to the skillet, tossing with a splash of the reserved pasta water until glossy.",
+      "Finish with the chopped parsley and serve immediately."
+    ]
+  },
+  {
+    "slug": "chocolate-lava-cake",
+    "title": "Chocolate Lava Cake",
+    "cuisine": "American",
+    "moods": ["Sweet"],
+    "tags": [],
+    "timeMinutes": 25,
+    "note": "warm, molten center",
+    "image": "chocolate-lava-cake.jpg",
+    "ingredients": [
+      "115g dark chocolate, chopped",
+      "115g butter, plus extra for greasing",
+      "2 large eggs",
+      "2 large egg yolks",
+      "1/4 cup sugar",
+      "2 tbsp all-purpose flour, plus extra for dusting",
+      "Pinch of salt",
+      "Powdered sugar and vanilla ice cream, to serve"
+    ],
+    "instructions": [
+      "Preheat the oven to 220°C (425°F) and butter and flour four ramekins.",
+      "Melt the chocolate and butter together in a heatproof bowl set over simmering water, then let cool slightly.",
+      "Whisk the eggs, egg yolks, and sugar together until pale and slightly thickened.",
+      "Fold the melted chocolate into the egg mixture, then gently fold in the flour and salt until just combined.",
+      "Divide the batter between the ramekins and bake for 10-12 minutes until the sides are set but the center still jiggles slightly.",
+      "Let the cakes rest for 1 minute, then invert onto plates, dust with powdered sugar, and serve with a scoop of ice cream."
+    ]
+  },
+  {
+    "slug": "thai-green-curry",
+    "title": "Thai Green Curry",
+    "cuisine": "Thai",
+    "moods": ["Spicy"],
+    "tags": [],
+    "timeMinutes": 35,
+    "note": "creamy, herbaceous heat",
+    "image": "thai-green-curry.jpg",
+    "ingredients": [
+      "3 tbsp green curry paste",
+      "2 cans coconut milk",
+      "500g chicken thighs, sliced",
+      "1 eggplant, cubed",
+      "1 red bell pepper, sliced",
+      "100g green beans, trimmed",
+      "2 tbsp fish sauce",
+      "1 tbsp brown sugar",
+      "4 kaffir lime leaves",
+      "Thai basil leaves, to serve",
+      "Steamed jasmine rice, to serve"
+    ],
+    "instructions": [
+      "Scoop the thick cream from the top of one coconut milk can into a wok or large pan and heat until it starts to split and sizzle.",
+      "Add the green curry paste and fry for 2-3 minutes until very fragrant.",
+      "Add the chicken and cook for 3-4 minutes until lightly seared on the outside.",
+      "Pour in the remaining coconut milk, then add the eggplant, bell pepper, green beans, and kaffir lime leaves.",
+      "Simmer for 15-18 minutes until the chicken is cooked through and the vegetables are tender.",
+      "Stir in the fish sauce and brown sugar, then taste and adjust seasoning.",
+      "Scatter with Thai basil and serve hot over jasmine rice."
+    ]
+  },
+  {
+    "slug": "falafel-wrap",
+    "title": "Crispy Falafel Wrap",
+    "cuisine": "Middle Eastern",
+    "moods": ["Quick"],
+    "tags": ["Light & fresh"],
+    "timeMinutes": 25,
+    "note": "crunchy outside, fresh inside",
+    "image": "falafel-wrap.jpg",
+    "ingredients": [
+      "1 can chickpeas, drained and patted dry",
+      "1/2 small onion, roughly chopped",
+      "3 garlic cloves",
+      "1/4 cup chopped parsley",
+      "1 tsp ground cumin",
+      "1 tsp ground coriander",
+      "2 tbsp flour",
+      "1/2 tsp baking powder",
+      "Oil, for frying",
+      "4 flatbreads or pita",
+      "1/2 cup hummus",
+      "Shredded lettuce, sliced tomato, and pickled onions, to serve"
+    ],
+    "instructions": [
+      "Pulse the chickpeas, onion, garlic, parsley, cumin, and coriander in a food processor until finely chopped but not pureed.",
+      "Add the flour and baking powder and pulse a few more times until the mixture holds together when pressed.",
+      "Shape the mixture into small patties or balls.",
+      "Heat about 2cm of oil in a skillet over medium heat and fry the falafel in batches for 2-3 minutes per side until golden and crisp.",
+      "Drain the falafel on paper towels.",
+      "Spread hummus over each flatbread, then fill with lettuce, tomato, pickled onions, and the warm falafel before rolling up."
+    ]
+  },
+  {
+    "slug": "buddha-bowl",
+    "title": "Quinoa Buddha Bowl",
+    "cuisine": "Other",
+    "moods": [],
+    "tags": ["Light & fresh"],
+    "timeMinutes": 20,
+    "note": "colorful, nourishing, no cooking skill required",
+    "image": "buddha-bowl.jpg",
+    "ingredients": [
+      "1 cup quinoa, rinsed",
+      "2 cups vegetable stock or water",
+      "1 cup shredded purple cabbage",
+      "1 carrot, julienned",
+      "1 avocado, sliced",
+      "1 cup cherry tomatoes, halved",
+      "1/2 cup edamame, shelled",
+      "2 tbsp tahini",
+      "1 tbsp lemon juice",
+      "1 tbsp soy sauce",
+      "1 tsp maple syrup",
+      "Sesame seeds, to serve"
+    ],
+    "instructions": [
+      "Combine the quinoa and stock in a saucepan, bring to a boil, then cover and simmer for 15 minutes until the liquid is absorbed. Fluff with a fork and let cool slightly.",
+      "Whisk together the tahini, lemon juice, soy sauce, maple syrup, and a splash of water until smooth and pourable.",
+      "Divide the quinoa between bowls and arrange the cabbage, carrot, avocado, tomatoes, and edamame on top in sections.",
+      "Drizzle generously with the tahini dressing and sprinkle with sesame seeds before serving."
+    ]
+  }
+]

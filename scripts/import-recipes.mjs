@@ -19,9 +19,13 @@ const client = createClient({
   useCdn: false,
 });
 
-const ASSETS_DIR = "/home/claude/munchly-assets";
+// Usage: node scripts/import-recipes.mjs [data-file.json] [assets-dir]
+// Defaults import the original 12 starter recipes.
+const dataFile = process.argv[2] || "./recipes-data.json";
+const ASSETS_DIR = process.argv[3] || "/home/claude/munchly-assets";
+
 const recipes = JSON.parse(
-  fs.readFileSync(new URL("./recipes-data.json", import.meta.url), "utf8")
+  fs.readFileSync(new URL(dataFile, import.meta.url), "utf8")
 );
 
 function toPortableText(paragraphs) {
@@ -48,6 +52,7 @@ async function run() {
       image: { _type: "image", asset: { _type: "reference", _ref: asset._id } },
       cuisine: r.cuisine,
       moods: r.moods,
+      tags: r.tags || [],
       timeMinutes: r.timeMinutes,
       note: r.note,
       ingredients: r.ingredients,
