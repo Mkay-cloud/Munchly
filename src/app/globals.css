@@ -187,6 +187,31 @@ button {
   }
 }
 
+/* Dropdowns (first used for the Ingredient Match level picker). The
+   control itself is styled inline; this covers what inline styles can't -
+   the native option list in dark mode, hover and focus. */
+.mly-select {
+  transition: border-color 0.15s;
+}
+
+.mly-select:hover {
+  border-color: var(--primary-text) !important;
+}
+
+.mly-select:focus-visible {
+  outline: 2px solid var(--primary-text);
+  outline-offset: 2px;
+}
+
+.mly-select option {
+  background: var(--card);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .mly-select {
+  color-scheme: dark;
+}
+
 /* Ingredient Match card flip. */
 .mly-match-card {
   transition: transform 0.15s ease;

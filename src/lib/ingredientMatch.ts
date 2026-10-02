@@ -25,10 +25,23 @@ export type LevelConfig = {
 export const LEVELS: Record<Level, LevelConfig> = {
   easy: { label: "Easy", pairs: 8, timeLimitMs: null },
   medium: { label: "Medium", pairs: 12, timeLimitMs: null },
-  hard: { label: "Hard", pairs: 18, timeLimitMs: 90_000 },
+  hard: { label: "Hard", pairs: 18, timeLimitMs: 180_000 },
 };
 
 export const LEVEL_ORDER: Level[] = ["easy", "medium", "hard"];
+
+// The level after this one, or null for the hardest.
+export function nextLevel(level: Level): Level | null {
+  return LEVEL_ORDER[LEVEL_ORDER.indexOf(level) + 1] ?? null;
+}
+
+// "3 minutes" / "90 seconds" - for describing a level's time limit.
+export function describeTimeLimit(ms: number): string {
+  const seconds = Math.round(ms / 1000);
+  if (seconds % 60 !== 0) return `${seconds} seconds`;
+  const minutes = seconds / 60;
+  return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+}
 
 // Comfortably bigger than the largest board (Hard, 18 pairs) so every level
 // draws a different mix each game. Emoji are all Unicode 13 or older, so

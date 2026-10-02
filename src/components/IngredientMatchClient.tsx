@@ -7,11 +7,13 @@ import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
   buildDeck,
+  describeTimeLimit,
   formatBestTime,
   formatElapsed,
   LEVEL_ORDER,
   LEVELS,
   loadBestTime,
+  nextLevel,
   recordTime,
   subscribeBestTime,
   type Level,
@@ -31,8 +33,9 @@ import {
 // How long a non-matching pair stays face-up before flipping back.
 const MISMATCH_DELAY_MS = 900;
 
-// The countdown pill turns urgent for the last stretch of a timed level.
-const URGENT_MS = 10_000;
+// The countdown pill turns urgent for the last stretch of a timed level -
+// 20s reads as a fair heads-up on Hard's 3 minutes (10s felt too late).
+const URGENT_MS = 20_000;
 
 // Wrapped so the React Compiler lint doesn't flag Date.now() inside the
 // click handler (it's only ever called from event handlers / timers, never
@@ -61,21 +64,21 @@ function StatPill({ label, value, urgent = false }: { label: string; value: stri
   );
 }
 
+type EndAction = { label: string; onClick: () => void; primary?: boolean };
+
 // The panel shown when a game ends - a win or (on timed levels) a loss.
 function EndPanel({
   panelRef,
   tone,
   title,
   lines,
-  buttonLabel,
-  onButton,
+  actions,
 }: {
   panelRef: React.Ref<HTMLDivElement>;
   tone: "win" | "loss";
   title: string;
   lines: React.ReactNode;
-  buttonLabel: string;
-  onButton: () => void;
+  actions: EndAction[];
 }) {
   const win = tone === "win";
   return (
@@ -106,22 +109,27 @@ function EndPanel({
         </span>
         {lines}
       </div>
-      <button
-        type="button"
-        onClick={onButton}
-        style={{
-          padding: "13px 22px",
-          borderRadius: 999,
-          background: "var(--primary)",
-          color: "#FBF8F2",
-          fontWeight: 600,
-          fontSize: 15,
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        {buttonLabel}
-      </button>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+        {actions.map((a) => (
+          <button
+            key={a.label}
+            type="button"
+            onClick={a.onClick}
+            style={{
+              padding: "13px 22px",
+              borderRadius: 999,
+              background: a.primary ? "var(--primary)" : "var(--card)",
+              color: a.primary ? "#FBF8F2" : "var(--ink)",
+              fontWeight: 600,
+              fontSize: 15,
+              border: a.primary ? "1.5px solid var(--primary)" : "1.5px solid var(--border-strong)",
+              cursor: "pointer",
+            }}
+          >
+            {a.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -131,6 +139,7 @@ export default function IngredientMatchClient() {
   const [level, setLevel] = useState<Level>("easy");
   const config = LEVELS[level];
   const timeLimitMs = config.timeLimitMs;
+  const upNext = nextLevel(level);
 
   // Lazy initializer - the server and the browser each shuffle their own
   // deck, but that's fine for hydration: a face-down card renders nothing
@@ -332,44 +341,54 @@ export default function IngredientMatchClient() {
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
             Flip two cards at a time and find all {config.pairs} ingredient pairs in as few moves as you can.
-            {timeLimitMs !== null && <> You&apos;ve got {Math.round(timeLimitMs / 1000)} seconds - the clock starts on your first flip.</>}
+            {timeLimitMs !== null && <> You&apos;ve got {describeTimeLimit(timeLimitMs)} - the clock starts on your first flip.</>}
           </p>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <span id="match-level-label" style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)", letterSpacing: "0.02em" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
+          <label htmlFor="match-level" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
             Level
-          </span>
-          <div role="group" aria-labelledby="match-level-label" style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {LEVEL_ORDER.map((l) => {
-              const on = l === level;
-              const c = LEVELS[l];
-              return (
-                <button
-                  key={l}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => !on && newGame(l)}
-                  style={{
-                    padding: "9px 16px",
-                    borderRadius: 999,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    cursor: on ? "default" : "pointer",
-                    border: `1.5px solid ${on ? "var(--primary)" : "var(--border-strong)"}`,
-                    background: on ? "var(--primary)" : "var(--card)",
-                    color: on ? "#FBF8F2" : "var(--ink)",
-                    transition: "all .15s",
-                  }}
-                >
-                  {c.label}
-                  <span style={{ fontWeight: 500, opacity: 0.75 }}>
-                    {" "}
-                    · {c.pairs} pairs{c.timeLimitMs !== null ? `, ${Math.round(c.timeLimitMs / 1000)}s` : ""}
-                  </span>
-                </button>
-              );
-            })}
+          </label>
+          <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+            <select
+              id="match-level"
+              className="mly-select"
+              value={level}
+              onChange={(e) => newGame(e.target.value as Level)}
+              style={{
+                appearance: "none",
+                WebkitAppearance: "none",
+                padding: "11px 44px 11px 18px",
+                borderRadius: 999,
+                border: "1.5px solid var(--border-strong)",
+                background: "var(--card)",
+                color: "var(--ink)",
+                fontFamily: "inherit",
+                fontSize: 15,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              {LEVEL_ORDER.map((l) => {
+                const c = LEVELS[l];
+                return (
+                  <option key={l} value={l}>
+                    {c.label} · {c.pairs} pairs{c.timeLimitMs !== null ? `, ${describeTimeLimit(c.timeLimitMs).replace("minutes", "min")} timer` : ""}
+                  </option>
+                );
+              })}
+            </select>
+            {/* Custom chevron (the native one is hidden by appearance: none so
+                the control looks the same in every browser and both themes). */}
+            <svg
+              aria-hidden="true"
+              width="12"
+              height="8"
+              viewBox="0 0 12 8"
+              style={{ position: "absolute", right: 18, pointerEvents: "none", color: "var(--muted)" }}
+            >
+              <path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </div>
         </div>
 
@@ -439,8 +458,14 @@ export default function IngredientMatchClient() {
               panelRef={endPanelRef}
               tone="win"
               title="You won! 🎉"
-              buttonLabel="Play again"
-              onButton={() => newGame()}
+              actions={
+                upNext
+                  ? [
+                      { label: "Next level →", onClick: () => newGame(upNext), primary: true },
+                      { label: "Play again", onClick: () => newGame() },
+                    ]
+                  : [{ label: "Play again", onClick: () => newGame(), primary: true }]
+              }
               lines={
                 <>
                   <span style={{ fontSize: 15, color: "var(--ink-2)" }}>
@@ -453,6 +478,11 @@ export default function IngredientMatchClient() {
                         ? `Your ${config.label} best is ${formatBestTime(bestMs)} - try to beat it!`
                         : null}
                   </span>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)", marginTop: 4 }}>
+                    {upNext
+                      ? `${level === "easy" ? "Nice work" : "Great job"}! Ready for ${LEVELS[upNext].label}?`
+                      : "You beat the hardest level! 🏆"}
+                  </span>
                 </>
               }
             />
@@ -462,8 +492,7 @@ export default function IngredientMatchClient() {
               panelRef={endPanelRef}
               tone="loss"
               title="Time's up! ⏰"
-              buttonLabel="Try again"
-              onButton={() => newGame()}
+              actions={[{ label: "Try again", onClick: () => newGame(), primary: true }]}
               lines={
                 <span style={{ fontSize: 15, color: "var(--ink-2)" }}>
                   You matched {matched.size} of {config.pairs} pairs. Try again - you&apos;ve got this.
