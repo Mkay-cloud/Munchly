@@ -13,6 +13,7 @@ const APP_LINKS: MenuLink[] = [
   { href: "/fridge", label: "Cook from your fridge" },
   { href: "/community", label: "Community recipes" },
   { href: "/suggest", label: "Suggest a recipe" },
+  { href: "/games", label: "Games" },
 ];
 
 const ACCOUNT_LINKS: MenuLink[] = [

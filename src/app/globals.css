@@ -129,3 +129,167 @@ button {
     animation: none !important;
   }
 }
+
+/* Home hero buttons: always exactly two rows - 3 on top, 2 centred
+   underneath - with every button the same width, height, padding and font.
+   A 6-column grid where each button spans 2 columns; the last two start at
+   columns 2 and 4 to centre them. grid-auto-rows: 1fr keeps both rows the
+   same height even when a label wraps to two lines on narrow phones. Font
+   size follows the group's own width (container query), not the viewport,
+   since the hero sits in a half-width column on desktop. */
+.mly-hero-actions {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 10px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.mly-hero-actions > .mly-hero-btn {
+  grid-column: span 2;
+}
+
+.mly-hero-actions > .mly-hero-btn:nth-child(4) {
+  grid-column: 2 / span 2;
+}
+
+.mly-hero-actions > .mly-hero-btn:nth-child(5) {
+  grid-column: 4 / span 2;
+}
+
+.mly-hero-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
+}
+
+@container (max-width: 359px) {
+  .mly-hero-btn {
+    font-size: 14px;
+  }
+}
+
+/* Wide enough for every label on one line at the original 17px. */
+@container (min-width: 500px) {
+  .mly-hero-btn {
+    padding: 8px 14px;
+    font-size: 17px;
+  }
+}
+
+/* Ingredient Match (/games/ingredient-match) board - columns and card
+   rounding per level, so the bigger boards fit a phone without scrolling
+   sideways. Card text scales off each card's width (cqw), see the component. */
+.mly-match-grid {
+  --match-radius: 18px;
+  display: grid;
+  gap: clamp(8px, 2vw, 14px);
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Easy, 8 pairs: 4 x 4 everywhere. */
+.mly-match-grid--easy {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 560px;
+}
+
+/* Medium, 12 pairs: 4 x 6 on phones, 6 x 4 once there's room. */
+.mly-match-grid--medium {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 560px;
+}
+
+/* Hard, 18 pairs: 6 x 6 on phones and tablets, 9 x 4 on wide screens so the
+   whole board fits on a laptop screen without scrolling. */
+.mly-match-grid--hard {
+  --match-radius: 12px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(5px, 1.5vw, 12px);
+  max-width: 640px;
+}
+
+@media (min-width: 640px) {
+  .mly-match-grid--medium {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    max-width: 760px;
+  }
+  .mly-match-grid--hard {
+    --match-radius: 16px;
+  }
+}
+
+@media (min-width: 900px) {
+  .mly-match-grid--hard {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    max-width: 860px;
+  }
+}
+
+/* Cards too narrow for the longest ingredient names at a readable size
+   (Hard on ~320px phones): emoji only. The card's aria-label still names it. */
+@container (max-width: 45px) {
+  .mly-match-name {
+    display: none;
+  }
+}
+
+/* Dropdowns (first used for the Ingredient Match level picker). The
+   control itself is styled inline; this covers what inline styles can't -
+   the native option list in dark mode, hover and focus. */
+.mly-select {
+  transition: border-color 0.15s;
+}
+
+.mly-select:hover {
+  border-color: var(--primary-text) !important;
+}
+
+.mly-select:focus-visible {
+  outline: 2px solid var(--primary-text);
+  outline-offset: 2px;
+}
+
+.mly-select option {
+  background: var(--card);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .mly-select {
+  color-scheme: dark;
+}
+
+/* Ingredient Match card flip. */
+.mly-match-card {
+  transition: transform 0.15s ease;
+}
+
+.mly-match-card:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.mly-match-card:focus-visible {
+  outline: 2px solid var(--primary-text);
+  outline-offset: 3px;
+}
+
+.mly-flip {
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mly-match-card,
+  .mly-flip {
+    transition: none;
+  }
+}
