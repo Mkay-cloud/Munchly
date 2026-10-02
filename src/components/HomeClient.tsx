@@ -200,71 +200,49 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
             Pick a mood, give the wheel a spin, and Munchly lands on a real meal with a recipe to match. No
             more scrolling through a hundred tabs while you get hungrier.
           </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+          {/* Five equal-size buttons in exactly two rows (3 + 2, second row
+              centred) at every width - sizing lives in globals.css
+              (.mly-hero-actions / .mly-hero-btn); only colours are inline. */}
+          <div className="mly-hero-actions">
             <a
               href="#spinner"
+              className="mly-hero-btn"
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "16px 26px",
-                borderRadius: 999,
                 background: "var(--primary)",
                 color: "#FBF8F2",
-                fontWeight: 600,
-                fontSize: 17,
+                border: "1.5px solid var(--primary)",
                 boxShadow: "0 6px 18px rgba(100,31,43,0.22)",
               }}
             >
-              Spin the wheel <span style={{ fontSize: 18 }}>→</span>
+              Spin the wheel →
             </a>
             <a
               href="#browse"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "16px 22px",
-                borderRadius: 999,
-                color: "var(--ink)",
-                fontWeight: 600,
-                fontSize: 17,
-                border: "1.5px solid var(--border-strong)",
-                background: "var(--card)",
-              }}
+              className="mly-hero-btn"
+              style={{ color: "var(--ink)", border: "1.5px solid var(--border-strong)", background: "var(--card)" }}
             >
               Browse recipes
             </a>
             <Link
               href="/plan"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "16px 22px",
-                borderRadius: 999,
-                color: "var(--ink)",
-                fontWeight: 600,
-                fontSize: 17,
-                border: "1.5px solid var(--border-strong)",
-                background: "var(--card)",
-              }}
+              className="mly-hero-btn"
+              style={{ color: "var(--ink)", border: "1.5px solid var(--border-strong)", background: "var(--card)" }}
             >
               Plan your week
             </Link>
             <Link
               href="/suggest"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "16px 22px",
-                borderRadius: 999,
-                color: "var(--olive-text)",
-                fontWeight: 600,
-                fontSize: 17,
-                border: "1.5px solid var(--sage-line)",
-                background: "var(--sage-tint)",
-              }}
+              className="mly-hero-btn"
+              style={{ color: "var(--olive-text)", border: "1.5px solid var(--sage-line)", background: "var(--sage-tint)" }}
             >
               Suggest a recipe
+            </Link>
+            <Link
+              href="/games"
+              className="mly-hero-btn"
+              style={{ color: "var(--ink)", border: "1.5px solid var(--border-strong)", background: "var(--card)" }}
+            >
+              Games
             </Link>
           </div>
           <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Free to use. No account needed to spin.</p>
