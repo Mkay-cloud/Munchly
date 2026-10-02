@@ -29,6 +29,13 @@
   --terra-ink: #7f3f2f;
   --terra-text: #a65d48;
   --footer-bg: #30231f;
+  /* Right / wrong answer feedback (Food Trivia). */
+  --success-tint: #e3eedb;
+  --success-line: #4a7a34;
+  --success-ink: #2c4f1d;
+  --danger-tint: #f8e0dc;
+  --danger-line: #b3261e;
+  --danger-ink: #8a1c16;
 }
 
 [data-theme="dark"] {
@@ -59,6 +66,12 @@
   --terra-ink: #f0b09b;
   --terra-text: #e39a82;
   --footer-bg: #140f0d;
+  --success-tint: #22311b;
+  --success-line: #7fb062;
+  --success-ink: #c4e2b0;
+  --danger-tint: #3b1d1a;
+  --danger-line: #e5736a;
+  --danger-ink: #f6bdb7;
 }
 
 html {
@@ -267,6 +280,51 @@ button {
 
 [data-theme="dark"] .mly-select {
   color-scheme: dark;
+}
+
+/* Food Trivia: the bar inside "Next" that drains while the quiz waits to
+   auto-advance. The duration is set inline per answer. */
+@keyframes mly-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.mly-drain {
+  transform-origin: left center;
+  animation-name: mly-drain;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.mly-answer {
+  transition: background 0.15s, border-color 0.15s, opacity 0.2s, transform 0.1s;
+}
+
+.mly-answer:not(:disabled):hover {
+  border-color: var(--primary-text) !important;
+}
+
+.mly-answer:not(:disabled):active {
+  transform: scale(0.985);
+}
+
+.mly-answer:focus-visible {
+  outline: 2px solid var(--primary-text);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mly-drain {
+    animation: none;
+    display: none;
+  }
+  .mly-answer {
+    transition: none;
+  }
 }
 
 /* Ingredient Match card flip. */

@@ -281,3 +281,19 @@ export function playTimeUpSound(): void {
     osc.stop(start + duration + 0.05);
   });
 }
+
+// --- Food Trivia (/games/food-trivia) ---------------------------------------
+// The quiz reuses playMatchSound (right answer), playMismatchSound (wrong
+// answer) and playWinSound (new best score); this is its one extra sound.
+
+// A soft, short "tock" for tapping an answer - quieter and rounder than the
+// card-flip flick, so it doesn't compete with the right/wrong sound that
+// follows it.
+export function playTapSound(): void {
+  if (!isSoundEnabled()) return;
+  const context = getContext();
+  if (!context) return;
+
+  const t = context.currentTime;
+  note(context, 880, t, 0.07, { type: "sine", peak: 0.16, endFreq: 660 });
+}
