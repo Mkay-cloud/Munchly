@@ -93,28 +93,9 @@ export default async function AdminPage() {
         {!email ? (
           <SignInGate message="Sign in to review submissions." />
         ) : !isAdmin ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-              You don&rsquo;t have access to this page.
-            </p>
-            {/* TEMPORARY DEBUG - remove once the admin-email mismatch is
-                diagnosed. Shows exactly what's being compared server-side. */}
-            <div
-              style={{
-                padding: "10px 14px",
-                borderRadius: 10,
-                background: "var(--chip)",
-                fontSize: 12,
-                lineHeight: 1.6,
-                color: "var(--muted)",
-                wordBreak: "break-all",
-              }}
-            >
-              <div>Signed in (server claim): &quot;{email}&quot;</div>
-              <div>ADMIN_EMAIL (server): &quot;{process.env.ADMIN_EMAIL ?? "(not set)"}&quot;</div>
-              <div>Equal: {String(email === process.env.ADMIN_EMAIL)}</div>
-            </div>
-          </div>
+          <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
+            You don&rsquo;t have access to this page.
+          </p>
         ) : (
           <AdminReviewClient
             initialPendingSubmissions={pendingSubmissions}
