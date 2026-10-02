@@ -19,7 +19,14 @@ const GAMES: GameEntry[] = [
     title: "Ingredient Match",
     blurb: "Flip the cards and find every matching pair of ingredients.",
     emoji: "🧄",
-    meta: "Memory · 8 pairs",
+    meta: "Memory · 3 levels",
+  },
+  {
+    href: "/games/food-trivia",
+    title: "Food Trivia",
+    blurb: "Ten quick questions on cuisines, ingredients, techniques and food history.",
+    emoji: "🧠",
+    meta: "Quiz · 10 questions",
   },
 ];
 
