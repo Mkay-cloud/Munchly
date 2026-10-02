@@ -18,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/games`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/games/ingredient-match`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/games/food-trivia`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/games/ingredient-merge`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/about`, changeFrequency: "yearly", priority: 0.4 },
     { url: `${SITE_URL}/contact`, changeFrequency: "yearly", priority: 0.4 },
     { url: `${SITE_URL}/privacy`, changeFrequency: "yearly", priority: 0.2 },

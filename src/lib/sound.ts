@@ -297,3 +297,22 @@ export function playTapSound(): void {
   const t = context.currentTime;
   note(context, 880, t, 0.07, { type: "sine", peak: 0.16, endFreq: 660 });
 }
+
+// --- Ingredient Merge (/games/ingredient-merge) ------------------------------
+// Reuses playTapSound (select), playMatchSound (merge), playMismatchSound
+// ("too far apart"), playFlipSound (move / shuffle / bin) and playWinSound
+// (all orders done). This is its one extra sound.
+
+// A bright little "order up!" bell for a finished dish leaving the board -
+// three quick rising notes with a ringing top, distinct from the two-note
+// merge sound.
+export function playServeSound(): void {
+  if (!isSoundEnabled()) return;
+  const context = getContext();
+  if (!context) return;
+
+  const t = context.currentTime + RESULT_OFFSET;
+  note(context, 1318.51, t, 0.14, { type: "triangle", peak: 0.16 }); // E6
+  note(context, 1567.98, t + 0.07, 0.14, { type: "triangle", peak: 0.16 }); // G6
+  note(context, 2093, t + 0.14, 0.6, { type: "sine", peak: 0.13 }); // C7
+}

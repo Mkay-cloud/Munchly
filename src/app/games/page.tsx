@@ -28,6 +28,13 @@ const GAMES: GameEntry[] = [
     emoji: "🧠",
     meta: "Quiz · 10 questions",
   },
+  {
+    href: "/games/ingredient-merge",
+    title: "Ingredient Merge",
+    blurb: "Merge matching ingredients up the recipe chain and serve every order.",
+    emoji: "🍝",
+    meta: "Puzzle · 3 recipes",
+  },
 ];
 
 export default function GamesPage() {
