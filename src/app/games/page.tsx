@@ -35,6 +35,13 @@ const GAMES: GameEntry[] = [
     emoji: "🍝",
     meta: "Puzzle · 3 recipes",
   },
+  {
+    href: "/games/guess-the-dish",
+    title: "Guess the Dish",
+    blurb: "Name the dish from a handful of emoji - dishes from all over the world.",
+    emoji: "🌮",
+    meta: "Guessing · 10 dishes",
+  },
 ];
 
 export default function GamesPage() {
