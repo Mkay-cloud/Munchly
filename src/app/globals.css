@@ -479,3 +479,232 @@ button {
     transform: none;
   }
 }
+
+/* ---- Install prompts (InstallPrompts.tsx) ------------------------------------
+   Stacking: header 20 < install bar 25 < site menu 30 < install popup 35 <
+   confetti 40 < iOS steps modal 90 < sign-in modal 100. */
+
+/* While the bar is showing it publishes its height as --mly-bottom-inset, so
+   the end of every page (footers, game buttons) can scroll clear of it. */
+body {
+  padding-bottom: var(--mly-bottom-inset, 0px);
+}
+
+html {
+  scroll-padding-bottom: var(--mly-bottom-inset, 0px);
+}
+
+.mly-install-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
+  border: none;
+  border-top: 1px solid rgba(251, 248, 242, 0.18);
+  background: var(--primary);
+  color: #fbf8f2;
+  font: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 -6px 18px rgba(30, 20, 15, 0.12);
+}
+
+.mly-install-bar:hover {
+  background: var(--primary-hover);
+}
+
+.mly-install-bar:focus-visible {
+  outline: 3px solid #fbf8f2;
+  outline-offset: -5px;
+}
+
+/* The bar itself stays put (a moving bottom edge would show the page through a
+   gap); its label does a little hop every few seconds. */
+.mly-install-bar__hop {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  animation: mly-install-hop 3.6s ease-in-out 1.2s infinite;
+}
+
+@keyframes mly-install-hop {
+  0%,
+  72%,
+  100% {
+    transform: translateY(0);
+  }
+  80% {
+    transform: translateY(-5px);
+  }
+  86% {
+    transform: translateY(0);
+  }
+  91% {
+    transform: translateY(-2px);
+  }
+  96% {
+    transform: translateY(0);
+  }
+}
+
+/* Notification-style card just above the bar, full-width minus the usual
+   16px gutter on narrow phones. */
+.mly-install-popup {
+  position: fixed;
+  z-index: 35;
+  right: 16px;
+  bottom: calc(var(--mly-bottom-inset, 0px) + 16px);
+  width: min(380px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 18px 44px rgba(30, 20, 15, 0.22);
+  animation: mly-install-in 0.32s ease-out;
+}
+
+/* The popup uses the opposite theme's colours so it stands out from the page:
+   dark card in light mode, light card in dark mode. Only these tokens are
+   swapped, and only inside the popup (values copied from the two theme
+   blocks at the top of this file - keep them in sync). */
+.mly-install-popup {
+  --card: #2b211d;
+  --border: #3d302a;
+  --border-strong: #4c3d36;
+  --chip: #362a25;
+  --ink: #f3ead9;
+  --muted: #b8a898;
+  --primary: #9c3346;
+  --primary-hover: #b2445a;
+  --primary-text: #eba3ae;
+  color-scheme: dark;
+}
+
+[data-theme="dark"] .mly-install-popup {
+  --card: #fffdf9;
+  --border: #eadfcf;
+  --border-strong: #e2d3c0;
+  --chip: #f3ecdf;
+  --ink: #30231f;
+  --muted: #6e5f57;
+  --primary: #641f2b;
+  --primary-hover: #4f1822;
+  --primary-text: #641f2b;
+  color-scheme: light;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 480px) {
+  .mly-install-popup {
+    left: 16px;
+    right: 16px;
+    width: auto;
+  }
+}
+
+@keyframes mly-install-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mly-install-btn {
+  min-height: 44px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 1.5px solid var(--primary);
+  background: var(--primary);
+  color: #fbf8f2;
+  font: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.mly-install-btn:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.mly-install-btn--quiet {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--ink);
+}
+
+.mly-install-btn--quiet:hover {
+  background: var(--chip);
+  border-color: var(--border-strong);
+}
+
+.mly-install-btn:focus-visible {
+  outline: 2px solid var(--primary-text);
+  outline-offset: 2px;
+}
+
+/* The big button on /download (also used as a link for "Open in Chrome"). */
+.mly-download-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 360px;
+  min-height: 54px;
+  padding: 14px 32px;
+  font-size: 17px;
+  text-decoration: none;
+}
+
+.mly-download-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.mly-install-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 14, 10, 0.45);
+}
+
+.mly-install-sheet {
+  width: 100%;
+  max-width: 400px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mly-install-bar__hop,
+  .mly-install-popup {
+    animation: none;
+  }
+}

@@ -24,6 +24,7 @@ import {
   setSoundEnabled,
   subscribeSoundSetting,
 } from "@/lib/sound";
+import { viewportBottom } from "@/lib/viewport";
 
 // How long the answer feedback stays up before moving on by itself. A wrong
 // answer gets longer so there's time to read the correct one; "Next" skips
@@ -111,7 +112,7 @@ export default function FoodTriviaClient() {
     const next = nextButtonRef.current;
     if (!next) return;
     next.focus({ preventScroll: true });
-    const overflow = next.getBoundingClientRect().bottom - (window.innerHeight - 12);
+    const overflow = next.getBoundingClientRect().bottom - (viewportBottom() - 12);
     if (overflow > 0) {
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       window.scrollBy({ top: overflow, behavior: reduce ? "auto" : "smooth" });
@@ -141,7 +142,7 @@ export default function FoodTriviaClient() {
     const bottom = rect.bottom;
     let delta = 0;
     if (rect.top < headerGap) delta = rect.top - headerGap;
-    else if (bottom > window.innerHeight - 12) delta = Math.min(rect.top - headerGap, bottom - window.innerHeight + 12);
+    else if (bottom > viewportBottom() - 12) delta = Math.min(rect.top - headerGap, bottom - viewportBottom() + 12);
     if (delta === 0) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollBy({ top: delta, behavior: reduce ? "auto" : "smooth" });

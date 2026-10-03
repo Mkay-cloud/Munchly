@@ -26,6 +26,7 @@ import {
   setSoundEnabled,
   subscribeSoundSetting,
 } from "@/lib/sound";
+import { viewportBottom } from "@/lib/viewport";
 
 // How long the answer feedback stays up before moving on by itself - same
 // pacing as Food Trivia: a wrong answer gets longer so there's time to read
@@ -118,7 +119,7 @@ export default function GuessTheDishClient() {
     const rect = el.getBoundingClientRect();
     let delta = 0;
     if (rect.top < headerGap) delta = rect.top - headerGap;
-    else if (rect.bottom > window.innerHeight - 12) delta = Math.min(rect.top - headerGap, rect.bottom - window.innerHeight + 12);
+    else if (rect.bottom > viewportBottom() - 12) delta = Math.min(rect.top - headerGap, rect.bottom - viewportBottom() + 12);
     if (delta === 0) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollBy({ top: delta, behavior: reduce ? "auto" : "smooth" });
@@ -132,7 +133,7 @@ export default function GuessTheDishClient() {
     const next = nextButtonRef.current;
     if (!next) return;
     next.focus({ preventScroll: true });
-    const overflow = next.getBoundingClientRect().bottom - (window.innerHeight - 12);
+    const overflow = next.getBoundingClientRect().bottom - (viewportBottom() - 12);
     if (overflow > 0) {
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       window.scrollBy({ top: overflow, behavior: reduce ? "auto" : "smooth" });
