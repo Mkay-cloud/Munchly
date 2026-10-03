@@ -9,16 +9,13 @@ import {
   CATEGORIES,
   categoryLabel,
   dealRound,
-  dishesIn,
   DISHES_PER_ROUND,
-  isCorrectGuess,
   loadBestScore,
-  MAX_TRIES,
   recordScore,
   resultMessage,
   subscribeBestScore,
   type Category,
-  type Dish,
+  type DealtDish,
 } from "@/lib/guessTheDish";
 import {
   isSoundEnabled,
@@ -30,12 +27,15 @@ import {
   subscribeSoundSetting,
 } from "@/lib/sound";
 
-// How long the result stays up before moving on by itself; "Next" skips it.
-const ADVANCE_AFTER_CORRECT_MS = 1600;
-const ADVANCE_AFTER_REVEAL_MS = 3000;
+// How long the answer feedback stays up before moving on by itself - same
+// pacing as Food Trivia: a wrong answer gets longer so there's time to read
+// the right one. "Next" skips the wait.
+const ADVANCE_AFTER_CORRECT_MS = 1200;
+const ADVANCE_AFTER_WRONG_MS = 2000;
+
+const LETTERS = ["A", "B", "C", "D"];
 
 type Phase = "start" | "playing" | "done";
-type Status = "guessing" | "correct" | "revealed";
 
 function Pill({ children }: { children: React.ReactNode }) {
   return (
@@ -75,20 +75,17 @@ export default function GuessTheDishClient() {
   const [category, setCategory] = useState<Category>("all");
   // Dealt on Start (never during render), so the server and the first client
   // render both show the start screen - no hydration mismatch.
-  const [round, setRound] = useState<Dish[]>([]);
+  const [round, setRound] = useState<DealtDish[]>([]);
   const [index, setIndex] = useState(0);
-  const [status, setStatus] = useState<Status>("guessing");
-  const [wrongTries, setWrongTries] = useState(0);
+  // The option picked for the current dish; null = not answered yet.
+  const [picked, setPicked] = useState<string | null>(null);
   const [hintShown, setHintShown] = useState(false);
-  const [guess, setGuess] = useState("");
-  const [lastWrong, setLastWrong] = useState<string | null>(null);
   // One entry per finished dish: guessed right?
   const [results, setResults] = useState<boolean[]>([]);
   const [newBest, setNewBest] = useState(false);
   const [previousBest, setPreviousBest] = useState<number | null>(null);
   const [confettiKey, setConfettiKey] = useState<number | null>(null);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const nextButtonRef = useRef<HTMLButtonElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
 
@@ -101,7 +98,8 @@ export default function GuessTheDishClient() {
   const dish = round[index];
   const score = results.filter(Boolean).length;
   const isLast = index === round.length - 1;
-  const triesLeft = MAX_TRIES - wrongTries;
+  const answered = picked !== null;
+  const answeredCorrectly = answered && dish !== undefined && picked === dish.name;
 
   useEffect(() => {
     return () => {
@@ -109,12 +107,11 @@ export default function GuessTheDishClient() {
     };
   }, []);
 
-  // New dish: put the cursor in the guess box (on phones, this keeps the
-  // keyboard up when the move came from a tap on "Next"), and make sure the
-  // clue, input and Guess button fit under the sticky header.
+  // New dish (or the results): scroll just enough for the clue, all four
+  // answers and the Next row to fit under the sticky header - and not at all
+  // when they already fit.
   useEffect(() => {
     if (phase === "start") return;
-    if (phase === "playing") inputRef.current?.focus({ preventScroll: true });
     const el = stageRef.current;
     if (!el) return;
     const headerGap = 84;
@@ -127,11 +124,20 @@ export default function GuessTheDishClient() {
     window.scrollBy({ top: delta, behavior: reduce ? "auto" : "smooth" });
   }, [phase, index]);
 
-  // Once a dish is settled the input is disabled - hand focus to Next so a
-  // keyboard (or Enter-key) player can carry straight on.
+  // After answering, the answer buttons are disabled - hand keyboard focus to
+  // Next so a keyboard player isn't left stranded. If Next ended up below the
+  // fold on a short phone, nudge it into view.
   useEffect(() => {
-    if (status !== "guessing") nextButtonRef.current?.focus({ preventScroll: true });
-  }, [status]);
+    if (picked === null) return;
+    const next = nextButtonRef.current;
+    if (!next) return;
+    next.focus({ preventScroll: true });
+    const overflow = next.getBoundingClientRect().bottom - (window.innerHeight - 12);
+    if (overflow > 0) {
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollBy({ top: overflow, behavior: reduce ? "auto" : "smooth" });
+    }
+  }, [picked]);
 
   const clearTimer = () => {
     if (advanceTimer.current) {
@@ -144,11 +150,8 @@ export default function GuessTheDishClient() {
     clearTimer();
     setRound(dealRound(category));
     setIndex(0);
-    setStatus("guessing");
-    setWrongTries(0);
+    setPicked(null);
     setHintShown(false);
-    setGuess("");
-    setLastWrong(null);
     setResults([]);
     setNewBest(false);
     setConfettiKey(null);
@@ -163,11 +166,8 @@ export default function GuessTheDishClient() {
     setCategory(next);
     setRound([]);
     setIndex(0);
-    setStatus("guessing");
-    setWrongTries(0);
+    setPicked(null);
     setHintShown(false);
-    setGuess("");
-    setLastWrong(null);
     setResults([]);
     setNewBest(false);
     setConfettiKey(null);
@@ -195,62 +195,26 @@ export default function GuessTheDishClient() {
       return;
     }
     setIndex(index + 1);
-    setStatus("guessing");
-    setWrongTries(0);
+    setPicked(null);
     setHintShown(false);
-    setGuess("");
-    setLastWrong(null);
   };
 
-  const settle = (correct: boolean) => {
+  const choose = (option: string) => {
+    if (picked !== null || !dish) return;
+    const correct = option === dish.name;
     const next = [...results, correct];
+    setPicked(option);
     setResults(next);
-    setStatus(correct ? "correct" : "revealed");
-    advanceTimer.current = setTimeout(() => advance(next), correct ? ADVANCE_AFTER_CORRECT_MS : ADVANCE_AFTER_REVEAL_MS);
-  };
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!dish || status !== "guessing" || !guess.trim()) return;
-    if (isCorrectGuess(guess, dish)) {
-      playMatchSound();
-      settle(true);
-      return;
-    }
-    playMismatchSound();
-    const used = wrongTries + 1;
-    setWrongTries(used);
-    setLastWrong(guess.trim());
-    // A little head-shake on the input. Done with the Web Animations API on
-    // the same element (re-mounting it would drop focus and close the phone
-    // keyboard); skipped for reduced motion.
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      inputRef.current?.animate(
-        [{ transform: "translateX(0)" }, { transform: "translateX(-8px)" }, { transform: "translateX(7px)" }, { transform: "translateX(-4px)" }, { transform: "translateX(0)" }],
-        { duration: 320, easing: "ease-out" }
-      );
-    }
     setHintShown(true);
-    if (used >= MAX_TRIES) {
-      settle(false);
-      return;
-    }
-    // Leave the guess in the box, selected, so it's quick to fix a typo or
-    // type over it.
-    requestAnimationFrame(() => inputRef.current?.select());
-  };
-
-  const skip = () => {
-    if (!dish || status !== "guessing") return;
-    playMismatchSound();
-    setHintShown(true);
-    settle(false);
+    playTapSound();
+    if (correct) playMatchSound();
+    else playMismatchSound();
+    advanceTimer.current = setTimeout(() => advance(next), correct ? ADVANCE_AFTER_CORRECT_MS : ADVANCE_AFTER_WRONG_MS);
   };
 
   const showHint = () => {
     setHintShown(true);
     playTapSound();
-    inputRef.current?.focus({ preventScroll: true });
   };
 
   const muteButton = (
@@ -320,7 +284,7 @@ export default function GuessTheDishClient() {
             Guess the Dish
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            Read the emoji, name the dish. {DISHES_PER_ROUND} dishes from around the world, {MAX_TRIES} tries each.
+            Read the emoji, pick the dish. {DISHES_PER_ROUND} dishes per round, four options each.
           </p>
         </div>
 
@@ -351,7 +315,7 @@ export default function GuessTheDishClient() {
             >
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
-                  {categoryLabel(c)} · {dishesIn(c).length} dishes
+                  {categoryLabel(c)}
                 </option>
               ))}
             </select>
@@ -382,9 +346,9 @@ export default function GuessTheDishClient() {
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>What&apos;s cooking?</span>
               <span style={{ fontSize: 15, color: "var(--ink-2)", lineHeight: 1.5 }}>
-                Each dish is a few emoji. Type your guess - spelling doesn&apos;t have to be perfect. Stuck? Tap Hint, or
-                one wrong guess shows it for you. There are {dishesIn(category).length}{" "}
-                {category === "all" ? "dishes from every cuisine" : `${category} dishes`} in the pot, so every round is a new mix.
+                Each dish is a few emoji - tap the name that matches from four options. Stuck? Tap Show hint before you
+                answer. {category === "all" ? "Dishes come from every cuisine" : `All ${category} dishes`}, and every round is a
+                new mix.
               </span>
             </div>
             <Pill>
@@ -444,21 +408,10 @@ export default function GuessTheDishClient() {
                 <span style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", background: "var(--chip)", padding: "4px 10px", borderRadius: 999 }}>
                   {dish.region}
                 </span>
-                {status === "guessing" && (
-                  <span aria-label={`${triesLeft} ${triesLeft === 1 ? "try" : "tries"} left`} style={{ display: "inline-flex", gap: 4 }}>
-                    {Array.from({ length: MAX_TRIES }, (_, k) => (
-                      <span
-                        key={k}
-                        aria-hidden="true"
-                        style={{ width: 9, height: 9, borderRadius: "50%", background: k < triesLeft ? "var(--primary-text)" : "var(--chip)", border: "1.5px solid var(--primary-text)" }}
-                      />
-                    ))}
-                  </span>
-                )}
               </div>
               <div
-                key={`${dish.id}-${status}`}
-                className={status === "correct" ? "mly-pop" : undefined}
+                key={`${dish.id}-${answeredCorrectly ? "right" : "open"}`}
+                className={answeredCorrectly ? "mly-pop" : undefined}
                 role="img"
                 aria-label={`Emoji clue: ${dish.emoji}`}
                 style={{ fontSize: "clamp(44px, 13vw, 68px)", lineHeight: 1.15, letterSpacing: "0.08em", wordBreak: "break-all" }}
@@ -474,7 +427,6 @@ export default function GuessTheDishClient() {
                 <button
                   type="button"
                   onClick={showHint}
-                  onPointerDown={(e) => e.preventDefault()}
                   style={{ border: "none", background: "none", color: "var(--primary-text)", fontWeight: 600, fontSize: 15, cursor: "pointer", padding: "6px 10px" }}
                 >
                   💡 Show hint
@@ -482,115 +434,103 @@ export default function GuessTheDishClient() {
               )}
             </div>
 
-            {/* Guess / result */}
-            {status === "guessing" ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <form onSubmit={submit} style={{ display: "flex", gap: 8 }}>
-                  <input
-                    ref={inputRef}
-                    className="mly-guess-input"
-                    type="text"
-                    value={guess}
-                    onChange={(e) => setGuess(e.target.value)}
-                    placeholder="Type the dish name…"
-                    aria-label="Your guess"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    spellCheck={false}
-                    enterKeyHint="go"
-                    maxLength={60}
-                    style={{
-                      flex: 1,
-                      minWidth: 0,
-                      height: 52,
-                      padding: "0 18px",
-                      borderRadius: 999,
-                      border: `1.5px solid ${lastWrong ? "var(--danger-line)" : "var(--border-strong)"}`,
-                      // 16px+ stops iOS Safari zooming the page on focus.
-                      fontSize: 17,
-                      fontFamily: "inherit",
-                      background: "var(--card)",
-                      color: "var(--ink)",
-                    }}
-                  />
+            {/* Answers - full-width buttons, stacked (same pattern as Food Trivia) */}
+            <div role="group" aria-label="Which dish is it?" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {dish.options.map((option, i) => {
+                const isAnswer = option === dish.name;
+                const isPick = option === picked;
+                const state = !answered ? "idle" : isAnswer ? "correct" : isPick ? "wrong" : "dim";
+                const colors =
+                  state === "correct"
+                    ? { bg: "var(--success-tint)", line: "var(--success-line)", ink: "var(--success-ink)" }
+                    : state === "wrong"
+                      ? { bg: "var(--danger-tint)", line: "var(--danger-line)", ink: "var(--danger-ink)" }
+                      : { bg: "var(--card)", line: "var(--border-strong)", ink: "var(--ink)" };
+                const marked = state === "correct" || state === "wrong";
+                return (
                   <button
-                    type="submit"
-                    disabled={!guess.trim()}
-                    // Keep focus (and the phone keyboard) in the input when
-                    // the button is tapped.
-                    onPointerDown={(e) => e.preventDefault()}
-                    style={{
-                      ...primaryButton,
-                      height: 52,
-                      padding: "0 22px",
-                      flexShrink: 0,
-                      opacity: guess.trim() ? 1 : 0.55,
-                      cursor: guess.trim() ? "pointer" : "default",
-                    }}
-                  >
-                    Guess
-                  </button>
-                </form>
-                <div aria-live="polite" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8, minHeight: 32 }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: "var(--danger-ink)" }}>
-                    {lastWrong ? `✗ Not "${lastWrong}" - ${triesLeft} ${triesLeft === 1 ? "try" : "tries"} left` : ""}
-                  </span>
-                  <button
+                    key={`${dish.id}-${option}`}
                     type="button"
-                    onClick={skip}
-                    style={{ border: "none", background: "none", color: "var(--muted)", fontSize: 14, fontWeight: 600, cursor: "pointer", padding: "6px 4px", textDecoration: "underline" }}
+                    className="mly-answer"
+                    onClick={() => choose(option)}
+                    disabled={answered}
+                    aria-label={state === "correct" ? `${option} - correct answer` : state === "wrong" ? `${option} - your answer, wrong` : option}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      width: "100%",
+                      minHeight: 58,
+                      padding: "12px 16px",
+                      borderRadius: 16,
+                      border: `${marked ? 2 : 1.5}px solid ${colors.line}`,
+                      background: colors.bg,
+                      color: colors.ink,
+                      fontSize: 16,
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                      textAlign: "left",
+                      cursor: answered ? "default" : "pointer",
+                      opacity: state === "dim" ? 0.5 : 1,
+                    }}
                   >
-                    Skip this one
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        flex: "none",
+                        width: 30,
+                        height: 30,
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: marked ? 16 : 13,
+                        fontWeight: 700,
+                        background: marked ? colors.line : "var(--chip)",
+                        color: marked ? "var(--card)" : "var(--muted)",
+                      }}
+                    >
+                      {state === "correct" ? "✓" : state === "wrong" ? "✗" : LETTERS[i]}
+                    </span>
+                    <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>{option}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Feedback + Next */}
+            <div aria-live="polite" style={{ minHeight: 48 }}>
+              {answered && (
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: answeredCorrectly ? "var(--success-ink)" : "var(--danger-ink)" }}>
+                    {answeredCorrectly ? `✓ Yes - it's ${dish.name}!` : `✗ Not quite - it's ${dish.name}.`}
+                  </span>
+                  <button
+                    ref={nextButtonRef}
+                    type="button"
+                    onClick={() => advance(results)}
+                    style={{ ...primaryButton, position: "relative", overflow: "hidden", padding: "12px 22px", fontSize: 15 }}
+                  >
+                    {isLast ? "See my score →" : "Next →"}
+                    {/* Drains while the game waits to move on by itself. */}
+                    <span
+                      key={index}
+                      aria-hidden="true"
+                      className="mly-drain"
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        bottom: 0,
+                        height: 3,
+                        width: "100%",
+                        background: "rgba(251, 248, 242, 0.55)",
+                        animationDuration: `${answeredCorrectly ? ADVANCE_AFTER_CORRECT_MS : ADVANCE_AFTER_WRONG_MS}ms`,
+                      }}
+                    />
                   </button>
                 </div>
-              </div>
-            ) : (
-              <div
-                aria-live="polite"
-                className="mly-pop"
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 12,
-                  padding: "16px 18px",
-                  borderRadius: 18,
-                  border: `2px solid ${status === "correct" ? "var(--success-line)" : "var(--danger-line)"}`,
-                  background: status === "correct" ? "var(--success-tint)" : "var(--danger-tint)",
-                }}
-              >
-                <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: status === "correct" ? "var(--success-ink)" : "var(--danger-ink)" }}>
-                    {status === "correct" ? (wrongTries === 0 ? "✓ First try!" : `✓ Got it on try ${wrongTries + 1}!`) : "✗ The answer was"}
-                  </span>
-                  <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 26, lineHeight: 1.15, color: "var(--ink)" }}>{dish.name}</span>
-                </div>
-                <button
-                  ref={nextButtonRef}
-                  type="button"
-                  onClick={() => advance(results)}
-                  style={{ ...primaryButton, position: "relative", overflow: "hidden", padding: "12px 22px", fontSize: 15 }}
-                >
-                  {isLast ? "See my score →" : "Next →"}
-                  <span
-                    key={index}
-                    aria-hidden="true"
-                    className="mly-drain"
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      bottom: 0,
-                      height: 3,
-                      width: "100%",
-                      background: "rgba(251, 248, 242, 0.55)",
-                      animationDuration: `${status === "correct" ? ADVANCE_AFTER_CORRECT_MS : ADVANCE_AFTER_REVEAL_MS}ms`,
-                    }}
-                  />
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
@@ -625,7 +565,7 @@ function EndScreen({
 }: {
   stageRef: React.Ref<HTMLDivElement>;
   category: Category;
-  round: Dish[];
+  round: DealtDish[];
   results: boolean[];
   newBest: boolean;
   previousBest: number | null;

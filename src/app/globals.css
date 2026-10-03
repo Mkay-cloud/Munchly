@@ -405,13 +405,6 @@ button {
   }
 }
 
-/* Guess the Dish: on-brand focus ring for the guess box (instead of the
-   browser default). */
-.mly-guess-input:focus {
-  outline: 2px solid var(--primary-text);
-  outline-offset: 2px;
-}
-
 /* Ingredient Match card flip. */
 .mly-match-card {
   transition: transform 0.15s ease;

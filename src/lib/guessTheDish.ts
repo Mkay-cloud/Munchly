@@ -1,6 +1,7 @@
-// Dish bank + answer matching for Guess the Dish (/games/guess-the-dish).
-// Hardcoded and fully client-side, like the other games. No photos - each
-// dish is an emoji clue plus a one-line hint.
+// Rounds, multiple-choice options and best scores for Guess the Dish
+// (/games/guess-the-dish). Hardcoded and fully client-side, like the other
+// games. No photos - each dish is an emoji clue plus a one-line hint; the
+// dishes themselves live in guessTheDishBank.ts.
 
 import { BANK, type Region } from "./guessTheDishBank";
 
@@ -12,15 +13,15 @@ export type Dish = {
   region: Region;
   // The clue shown up front.
   emoji: string;
-  // One line, revealed on request or after the first wrong guess. Never
+  // One line, revealed on request (or once the question is answered). Never
   // contains the dish's name.
   hint: string;
-  // Other names people genuinely use for it - all accepted as correct.
+  // Other names people genuinely use for it. Used so a wrong option can
+  // never be another name for the right dish.
   aliases?: string[];
 };
 
 export const DISHES_PER_ROUND = 10;
-export const MAX_TRIES = 3;
 
 export const REGIONS = Object.keys(BANK) as Region[];
 
@@ -38,82 +39,30 @@ export function dishesIn(category: Category): Dish[] {
 
 export const categoryLabel = (c: Category) => (c === "all" ? "All cuisines" : c);
 
-// --- Answer matching ----------------------------------------------------------
+// --- Answer options ------------------------------------------------------------
 
-// "tacos" -> "taco", "dishes" -> "dish", "pancakes" -> "pancake"; leaves
-// "hummus", "couscous" and short words alone.
-function singular(w: string): string {
-  if (w.length <= 3) return w;
-  if (/(ch|sh|x|z|s)es$/.test(w)) return w.slice(0, -2);
-  if (/[^su]s$/.test(w)) return w.slice(0, -1);
-  return w;
-}
-
-// Lowercase, strip accents and punctuation, "&" -> "and", collapse spaces,
-// drop a leading "a"/"an"/"the", and make each word singular -
-// so "The Crème Brûlée!" and "creme brulee" compare equal, as do "taco"
-// and "tacos".
-export function normalize(text: string): string {
+// Lowercase, strip accents and punctuation, "&" -> "and", collapse spaces.
+// Only used to compare dish names when picking wrong options.
+function normalize(text: string): string {
   return text
     .toLowerCase()
     .replace(/ı/g, "i")
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/&/g, " and ")
-    .replace(/['’]/g, "")
-    .replace(/[^a-z0-9 ]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/^(a|an|the) /, "")
-    .split(" ")
-    .map(singular)
-    .join(" ");
+    .replace(/[^a-z0-9]+/g, "");
 }
 
-// Edit distance where swapping two neighbouring letters counts as one typo
-// ("bahn mi" for "banh mi"), not two - optimal string alignment distance.
-function distance(a: string, b: string): number {
-  if (a === b) return 0;
-  const d: number[][] = Array.from({ length: a.length + 1 }, (_, i) => Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)));
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) {
-      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
-      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
-    }
-  }
-  return d[a.length][b.length];
+// Every name a dish is known by (its name plus aliases), normalised.
+const acceptedNames = (d: Dish) => new Set([d.name, ...(d.aliases ?? [])].map(normalize));
+
+// Could `other` be mistaken for a second right answer to `dish`? True if
+// any name or alias of one is also a name or alias of the other.
+export function sharesAName(dish: Dish, other: Dish): boolean {
+  const mine = acceptedNames(dish);
+  for (const n of acceptedNames(other)) if (mine.has(n)) return true;
+  return false;
 }
-
-// How many typos to forgive, by answer length: none for very short names
-// (so "pho" doesn't accept "pie"), one for typical words, two for long names.
-function allowedTypos(len: number): number {
-  if (len <= 4) return 0;
-  if (len <= 8) return 1;
-  return 2;
-}
-
-const accepted = (d: Dish) => [d.name, ...(d.aliases ?? [])].map(normalize);
-
-// Every accepted name of every dish, so a guess that *is* another dish is
-// never waved through as a typo of this one.
-const ALL_NAMES = new Map<string, string>();
-for (const d of DISHES) for (const n of accepted(d)) ALL_NAMES.set(n, d.id);
-
-export function isCorrectGuess(guess: string, dish: Dish): boolean {
-  const g = normalize(guess);
-  if (!g) return false;
-  const owner = ALL_NAMES.get(g);
-  if (owner !== undefined) return owner === dish.id;
-  return accepted(dish).some((a) => {
-    // Spaces don't matter ("padthai", "hot dog" / "hotdog").
-    const ga = g.replace(/ /g, ""), aa = a.replace(/ /g, "");
-    if (ga === aa) return true;
-    return distance(ga, aa) <= allowedTypos(aa.length);
-  });
-}
-
-// --- Rounds --------------------------------------------------------------------
 
 function shuffle<T>(items: T[]): T[] {
   const out = [...items];
@@ -124,8 +73,37 @@ function shuffle<T>(items: T[]): T[] {
   return out;
 }
 
-export function dealRound(category: Category = "all", count: number = DISHES_PER_ROUND): Dish[] {
-  return shuffle(dishesIn(category)).slice(0, count);
+export type DealtDish = Dish & {
+  // The dish's own name plus three wrong ones, in random order.
+  options: string[];
+};
+
+// Three wrong options for `dish`, drawn fresh at random from `pool` (the
+// cuisine being played, or the whole bank for "All"), so the same dish gets
+// different company every round. Never the dish itself, never a dish that
+// shares any name or alias with it, never two options with the same name.
+// Falls back to the whole bank if the pool is too small.
+export function pickWrongOptions(dish: Dish, pool: Dish[]): string[] {
+  const picked: string[] = [];
+  const used = new Set([normalize(dish.name)]);
+  for (const source of [pool, DISHES]) {
+    for (const other of shuffle(source)) {
+      if (picked.length === 3) return picked;
+      if (other.id === dish.id || sharesAName(dish, other)) continue;
+      const key = normalize(other.name);
+      if (used.has(key)) continue;
+      used.add(key);
+      picked.push(other.name);
+    }
+  }
+  return picked;
+}
+
+export function dealRound(category: Category = "all", count: number = DISHES_PER_ROUND): DealtDish[] {
+  const pool = dishesIn(category);
+  return shuffle(pool)
+    .slice(0, count)
+    .map((d) => ({ ...d, options: shuffle([d.name, ...pickWrongOptions(d, pool)]) }));
 }
 
 export function resultMessage(score: number, total: number): { title: string; body: string } {
