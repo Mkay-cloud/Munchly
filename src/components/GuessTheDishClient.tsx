@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Confetti from "@/components/Confetti";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
+  CATEGORIES,
+  categoryLabel,
   dealRound,
-  DISHES,
+  dishesIn,
   DISHES_PER_ROUND,
   isCorrectGuess,
   loadBestScore,
@@ -15,6 +17,7 @@ import {
   recordScore,
   resultMessage,
   subscribeBestScore,
+  type Category,
   type Dish,
 } from "@/lib/guessTheDish";
 import {
@@ -68,6 +71,8 @@ const primaryButton: React.CSSProperties = {
 
 export default function GuessTheDishClient() {
   const [phase, setPhase] = useState<Phase>("start");
+  // Which cuisine the rounds draw from; starts on "All cuisines".
+  const [category, setCategory] = useState<Category>("all");
   // Dealt on Start (never during render), so the server and the first client
   // render both show the start screen - no hydration mismatch.
   const [round, setRound] = useState<Dish[]>([]);
@@ -87,7 +92,9 @@ export default function GuessTheDishClient() {
   const nextButtonRef = useRef<HTMLButtonElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
 
-  const bestScore = useSyncExternalStore(subscribeBestScore, loadBestScore, () => null);
+  // The best for whichever category is selected (each has its own key).
+  const getBest = useCallback(() => loadBestScore(category), [category]);
+  const bestScore = useSyncExternalStore(subscribeBestScore, getBest, () => null);
   // Same site-wide setting as every other mute button on Munchly.
   const soundOn = useSyncExternalStore(subscribeSoundSetting, isSoundEnabled, () => true);
 
@@ -135,7 +142,7 @@ export default function GuessTheDishClient() {
 
   const start = () => {
     clearTimer();
-    setRound(dealRound());
+    setRound(dealRound(category));
     setIndex(0);
     setStatus("guessing");
     setWrongTries(0);
@@ -149,10 +156,28 @@ export default function GuessTheDishClient() {
     playTapSound();
   };
 
+  // Picking another cuisine drops whatever was in progress and goes back to
+  // a fresh start screen for that selection.
+  const changeCategory = (next: Category) => {
+    clearTimer();
+    setCategory(next);
+    setRound([]);
+    setIndex(0);
+    setStatus("guessing");
+    setWrongTries(0);
+    setHintShown(false);
+    setGuess("");
+    setLastWrong(null);
+    setResults([]);
+    setNewBest(false);
+    setConfettiKey(null);
+    setPhase("start");
+  };
+
   const finish = (finalResults: boolean[]) => {
     const finalScore = finalResults.filter(Boolean).length;
-    setPreviousBest(loadBestScore());
-    const isNew = recordScore(finalScore);
+    setPreviousBest(loadBestScore(category));
+    const isNew = recordScore(category, finalScore);
     setNewBest(isNew);
     setPhase("done");
     if (isNew) {
@@ -299,6 +324,45 @@ export default function GuessTheDishClient() {
           </p>
         </div>
 
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
+          <label htmlFor="dish-category" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
+            Cuisine
+          </label>
+          <div style={{ position: "relative", display: "inline-flex", alignItems: "center", minWidth: 0, maxWidth: "100%" }}>
+            <select
+              id="dish-category"
+              className="mly-select"
+              value={category}
+              onChange={(e) => changeCategory(e.target.value as Category)}
+              style={{
+                appearance: "none",
+                WebkitAppearance: "none",
+                maxWidth: "100%",
+                padding: "11px 44px 11px 18px",
+                borderRadius: 999,
+                border: "1.5px solid var(--border-strong)",
+                background: "var(--card)",
+                color: "var(--ink)",
+                fontFamily: "inherit",
+                fontSize: 15,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {categoryLabel(c)} · {dishesIn(c).length} dishes
+                </option>
+              ))}
+            </select>
+            {/* Custom chevron (the native one is hidden by appearance: none so
+                the control matches the Ingredient Match level picker). */}
+            <svg aria-hidden="true" width="12" height="8" viewBox="0 0 12 8" style={{ position: "absolute", right: 18, pointerEvents: "none", color: "var(--muted)" }}>
+              <path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+        </div>
+
         {phase === "start" && (
           <div
             style={{
@@ -319,11 +383,12 @@ export default function GuessTheDishClient() {
               <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>What&apos;s cooking?</span>
               <span style={{ fontSize: 15, color: "var(--ink-2)", lineHeight: 1.5 }}>
                 Each dish is a few emoji. Type your guess - spelling doesn&apos;t have to be perfect. Stuck? Tap Hint, or
-                one wrong guess shows it for you. There are {DISHES.length} dishes in the pot, so every round is a new mix.
+                one wrong guess shows it for you. There are {dishesIn(category).length}{" "}
+                {category === "all" ? "dishes from every cuisine" : `${category} dishes`} in the pot, so every round is a new mix.
               </span>
             </div>
             <Pill>
-              <span style={{ color: "var(--muted)" }}>Your best:</span> {bestLabel}
+              <span style={{ color: "var(--muted)" }}>Your best{category === "all" ? "" : ` (${category})`}:</span> {bestLabel}
             </Pill>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <button type="button" onClick={start} style={primaryButton}>
@@ -532,6 +597,7 @@ export default function GuessTheDishClient() {
         {phase === "done" && (
           <EndScreen
             stageRef={stageRef}
+            category={category}
             round={round}
             results={results}
             newBest={newBest}
@@ -548,6 +614,7 @@ export default function GuessTheDishClient() {
 
 function EndScreen({
   stageRef,
+  category,
   round,
   results,
   newBest,
@@ -557,6 +624,7 @@ function EndScreen({
   muteButton,
 }: {
   stageRef: React.Ref<HTMLDivElement>;
+  category: Category;
   round: Dish[];
   results: boolean[];
   newBest: boolean;
@@ -569,6 +637,7 @@ function EndScreen({
   const score = results.filter(Boolean).length;
   const { title, body } = resultMessage(score, total);
   const high = score >= Math.ceil(total * 0.7);
+  const scope = category === "all" ? "" : ` ${category}`;
   return (
     <div ref={stageRef} style={{ display: "flex", flexDirection: "column", gap: 16, scrollMarginTop: 84 }}>
       <div
@@ -595,9 +664,9 @@ function EndScreen({
         <span style={{ fontSize: 15, fontWeight: 600, color: newBest ? "var(--terra-text)" : "var(--muted)" }}>
           {newBest
             ? previousBest === null
-              ? `🏆 New best score: ${score}/${total}!`
-              : `🏆 New best score! (was ${previousBest}/${total})`
-            : `Your best: ${bestScore ?? score}/${total}${bestScore !== null && bestScore > score ? " - try to beat it!" : ""}`}
+              ? `🏆 New${scope} best score: ${score}/${total}!`
+              : `🏆 New${scope} best score! (was ${previousBest}/${total})`
+            : `Your${scope} best: ${bestScore ?? score}/${total}${bestScore !== null && bestScore > score ? " - try to beat it!" : ""}`}
         </span>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
           <button type="button" onClick={onPlayAgain} style={primaryButton}>
