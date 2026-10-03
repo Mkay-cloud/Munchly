@@ -429,3 +429,53 @@ button {
     transition: none;
   }
 }
+
+/* Home page games section: 2 x 2, stacking to one column on phones where two
+   cards side by side would squeeze the descriptions into a few words a line. */
+.mly-games-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.mly-game-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: inherit;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.mly-game-card:hover {
+  border-color: var(--primary-text);
+  transform: translateY(-2px);
+}
+
+.mly-game-card:focus-visible {
+  outline: 2px solid var(--primary-text);
+  outline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .mly-games-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .mly-game-card {
+    gap: 14px;
+    padding: 16px;
+    border-radius: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mly-game-card,
+  .mly-game-card:hover {
+    transition: none;
+    transform: none;
+  }
+}

@@ -65,9 +65,8 @@ export default function AboutPage() {
             cook from whatever&apos;s already in your fridge.
           </p>
           <p style={{ margin: 0 }}>
-            Munchly is an independent, still-growing project. It&apos;s built by one person (with a
-            very patient AI co-pilot doing a lot of the typing), so new recipes and features show up
-            in small steps rather than all at once. If there&apos;s something you&apos;d love to see
+            Munchly is an independent, still-growing project. It&apos;s built by one person, so new recipes and
+            features show up in small steps rather than all at once. If there&apos;s something you&apos;d love to see
             next, the <Link href="/contact" style={{ color: "var(--primary)", fontWeight: 600 }}>contact page</Link> goes straight to a real inbox, not a form that disappears into the void.
           </p>
         </div>
