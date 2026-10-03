@@ -556,8 +556,8 @@ html {
   }
 }
 
-/* Notification-style card: above the bar, bottom-right on wide screens and
-   full-width (minus the usual 16px gutter) on phones. */
+/* Notification-style card just above the bar, full-width minus the usual
+   16px gutter on narrow phones. */
 .mly-install-popup {
   position: fixed;
   z-index: 35;
@@ -573,6 +573,37 @@ html {
   background: var(--card);
   box-shadow: 0 18px 44px rgba(30, 20, 15, 0.22);
   animation: mly-install-in 0.32s ease-out;
+}
+
+/* The popup uses the opposite theme's colours so it stands out from the page:
+   dark card in light mode, light card in dark mode. Only these tokens are
+   swapped, and only inside the popup (values copied from the two theme
+   blocks at the top of this file - keep them in sync). */
+.mly-install-popup {
+  --card: #2b211d;
+  --border: #3d302a;
+  --border-strong: #4c3d36;
+  --chip: #362a25;
+  --ink: #f3ead9;
+  --muted: #b8a898;
+  --primary: #9c3346;
+  --primary-hover: #b2445a;
+  --primary-text: #eba3ae;
+  color-scheme: dark;
+}
+
+[data-theme="dark"] .mly-install-popup {
+  --card: #fffdf9;
+  --border: #eadfcf;
+  --border-strong: #e2d3c0;
+  --chip: #f3ecdf;
+  --ink: #30231f;
+  --muted: #6e5f57;
+  --primary: #641f2b;
+  --primary-hover: #4f1822;
+  --primary-text: #641f2b;
+  color-scheme: light;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 480px) {
@@ -626,6 +657,24 @@ html {
 .mly-install-btn:focus-visible {
   outline: 2px solid var(--primary-text);
   outline-offset: 2px;
+}
+
+/* The big button on /download (also used as a link for "Open in Chrome"). */
+.mly-download-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 360px;
+  min-height: 54px;
+  padding: 14px 32px;
+  font-size: 17px;
+  text-decoration: none;
+}
+
+.mly-download-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
 }
 
 .mly-install-backdrop {

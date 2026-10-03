@@ -1,73 +1,72 @@
 "use client";
 
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
-import { getInstallMode, popupDue, promptInstall, snoozePopup, subscribeInstall, type InstallMode } from "@/lib/install";
+import { getInstallMode, promptInstall, subscribeInstall, type InstallMode } from "@/lib/install";
 
-// "Install Munchly App" prompts, mounted once in app/layout.tsx:
-//   - a popup card, a few seconds after the page opens, at most once every
-//     POPUP_SNOOZE_DAYS (lib/install.ts);
-//   - a thin bar fixed to the bottom of every page, always there while
-//     installing is possible.
-// Both run the same install action. When installing isn't possible (or
-// Munchly is already installed) neither renders. See lib/install.ts.
+// "Install Munchly App" prompts, mounted once in app/layout.tsx, on phones
+// only (lib/install.ts):
+//   - a popup card a few seconds after every page load or navigation;
+//     "Not Now" only closes it for that page view;
+//   - a thin bar fixed to the bottom of every page.
+// Both run the same install action, and both stay hidden when installing
+// isn't possible or Munchly is already installed. Inside another app's
+// built-in browser they send people to /download instead.
 
 const POPUP_DELAY_MS = 2500;
 
-// Pages that aren't part of the app people would install.
-const HIDDEN_ON = ["/studio"];
+// Pages without the prompts: Sanity Studio isn't part of the app, and
+// /download has its own install button.
+const HIDDEN_ON = ["/studio", "/download"];
 
 export default function InstallPrompts() {
   const pathname = usePathname();
+  const router = useRouter();
   // Server snapshot is "none", so nothing renders until the client has
   // checked - no hydration mismatch, and nothing flashes for browsers that
   // can't install.
   const mode = useSyncExternalStore(subscribeInstall, getInstallMode, () => "none" as InstallMode);
-  const [popupOpen, setPopupOpen] = useState(false);
   const [iosHelpOpen, setIosHelpOpen] = useState(false);
-  const popupChecked = useRef(false);
 
   const hidden = HIDDEN_ON.some((p) => pathname === p || pathname?.startsWith(`${p}/`));
-  const available = mode !== "none" && !hidden;
-
-  // The popup: once installing becomes possible on this visit, wait a moment,
-  // then show it if it isn't snoozed. Checked once per visit; the snooze is
-  // set as soon as it shows, so it's "once" even if they just ignore it.
-  useEffect(() => {
-    if (!available || popupChecked.current) return;
-    const timer = window.setTimeout(() => {
-      popupChecked.current = true;
-      if (popupDue()) {
-        snoozePopup();
-        setPopupOpen(true);
-      }
-    }, POPUP_DELAY_MS);
-    return () => window.clearTimeout(timer);
-  }, [available]);
+  if (mode === "none" || hidden) return null;
 
   const install = async () => {
-    setPopupOpen(false);
-    if (mode === "ios") {
-      setIosHelpOpen(true);
-      return;
-    }
-    await promptInstall();
+    if (mode === "inapp") router.push("/download");
+    else if (mode === "ios") setIosHelpOpen(true);
+    else await promptInstall();
   };
-
-  const notNow = () => {
-    snoozePopup();
-    setPopupOpen(false);
-  };
-
-  if (!available) return null;
 
   return (
     <>
       <InstallBar onInstall={install} />
-      {popupOpen && <InstallPopup onInstall={install} onDismiss={notNow} />}
+      {/* Keyed by page, so every page load or navigation gets a fresh popup. */}
+      <PagePopup key={pathname} onInstall={install} />
       {iosHelpOpen && mode === "ios" && <IosInstallHelp onClose={() => setIosHelpOpen(false)} />}
     </>
+  );
+}
+
+// The popup for one page view: appears after POPUP_DELAY_MS; once closed
+// ("Not Now", Escape or Install) it stays closed until the next page.
+function PagePopup({ onInstall }: { onInstall: () => void }) {
+  const [state, setState] = useState<"waiting" | "open" | "closed">("waiting");
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setState((s) => (s === "waiting" ? "open" : s)), POPUP_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (state !== "open") return null;
+  return (
+    <InstallPopup
+      onInstall={() => {
+        setState("closed");
+        onInstall();
+      }}
+      onDismiss={() => setState("closed")}
+    />
   );
 }
 
@@ -149,7 +148,7 @@ function InstallPopup({ onInstall, onDismiss }: { onInstall: () => void; onDismi
 
 // --- iOS manual steps ------------------------------------------------------------
 
-function IosInstallHelp({ onClose }: { onClose: () => void }) {
+export function IosInstallHelp({ onClose }: { onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
