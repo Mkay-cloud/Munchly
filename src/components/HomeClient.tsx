@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Recipe } from "@/sanity/queries";
+import { GAMES } from "@/lib/games";
 import AccountNav from "./AccountNav";
 import FavoriteButton from "./FavoriteButton";
 import SiteMenu from "./SiteMenu";
@@ -691,6 +692,78 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
         </div>
       </section>
 
+      {/* Games */}
+      <section id="games" style={{ maxWidth: 1180, margin: "0 auto", padding: "0 20px 80px", display: "flex", flexDirection: "column", gap: 32 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 620 }}>
+            <h2
+              style={{
+                margin: 0,
+                fontFamily: "var(--font-fredoka)",
+                fontWeight: 600,
+                fontSize: "clamp(32px, 4.4vw, 46px)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.015em",
+                color: "var(--ink)",
+              }}
+            >
+              Play food games
+            </h2>
+            <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--ink-2)" }}>
+              Four quick games for when you need a break from deciding what&apos;s for dinner. Free, and no
+              account needed.
+            </p>
+          </div>
+          <Link href="/games" style={{ fontWeight: 600, fontSize: 15, color: "var(--primary-text)" }}>
+            See all games →
+          </Link>
+        </div>
+
+        {/* 2 x 2; stacks to one column on phones (see .mly-games-grid). */}
+        <div className="mly-games-grid">
+          {GAMES.map((g) => (
+            <Link key={g.href} href={g.href} className="mly-game-card">
+              <span
+                aria-hidden="true"
+                style={{
+                  flex: "none",
+                  width: 64,
+                  height: 64,
+                  borderRadius: 18,
+                  background: "var(--primary)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 32,
+                }}
+              >
+                {g.emoji}
+              </span>
+              <span style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                <span
+                  style={{
+                    alignSelf: "flex-start",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: "var(--muted)",
+                    background: "var(--chip)",
+                    padding: "4px 10px",
+                    borderRadius: 999,
+                  }}
+                >
+                  {g.meta}
+                </span>
+                <h3 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 22, lineHeight: 1.15, color: "var(--ink)" }}>
+                  {g.title}
+                </h3>
+                <span style={{ fontSize: 15, lineHeight: 1.5, color: "var(--muted)" }}>{g.blurb}</span>
+                <span style={{ marginTop: 4, fontWeight: 600, fontSize: 15, color: "var(--olive-text)" }}>Play →</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Footer */}
       <footer style={{ background: "var(--footer-bg)", color: "#EADFCF" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "48px 20px 32px", display: "flex", flexDirection: "column", gap: 32 }}>
@@ -751,7 +824,7 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
             <span>© 2026 Munchly</span>
             <div style={{ display: "flex", gap: 18 }}>
               <Link href="/privacy" style={{ color: "#B3A393" }}>Privacy</Link>
-              <a href="#" style={{ color: "#B3A393" }}>Terms</a>
+              <Link href="/terms" style={{ color: "#B3A393" }}>Terms</Link>
             </div>
           </div>
         </div>
