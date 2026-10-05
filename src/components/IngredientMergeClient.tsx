@@ -40,6 +40,7 @@ import {
   setSoundEnabled,
   subscribeSoundSetting,
 } from "@/lib/sound";
+import { viewportBottom } from "@/lib/viewport";
 
 type Phase = "start" | "playing" | "won";
 
@@ -159,7 +160,7 @@ export default function IngredientMergeClient() {
     const b = bottomEl.getBoundingClientRect().bottom;
     let delta = 0;
     if (t < headerGap) delta = t - headerGap;
-    else if (b > window.innerHeight - 8) delta = Math.min(t - headerGap, b - window.innerHeight + 8);
+    else if (b > viewportBottom() - 8) delta = Math.min(t - headerGap, b - viewportBottom() + 8);
     if (delta === 0) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollBy({ top: delta, behavior: reduce ? "auto" : "smooth" });
@@ -171,7 +172,7 @@ export default function IngredientMergeClient() {
     const panel = winPanelRef.current;
     if (!panel) return;
     const rect = panel.getBoundingClientRect();
-    if (rect.top >= 84 && rect.bottom <= window.innerHeight) return;
+    if (rect.top >= 84 && rect.bottom <= viewportBottom()) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollBy({ top: rect.top - 84, behavior: reduce ? "auto" : "smooth" });
   }, [phase]);

@@ -29,6 +29,7 @@ import {
   setSoundEnabled,
   subscribeSoundSetting,
 } from "@/lib/sound";
+import { viewportBottom } from "@/lib/viewport";
 
 // How long a non-matching pair stays face-up before flipping back.
 const MISMATCH_DELAY_MS = 900;
@@ -222,7 +223,7 @@ export default function IngredientMatchClient() {
     // Clear of the sticky header (~67px) with a little breathing room.
     const topGap = 84;
     const rect = panel.getBoundingClientRect();
-    if (rect.top >= topGap && rect.bottom <= window.innerHeight) return;
+    if (rect.top >= topGap && rect.bottom <= viewportBottom()) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollBy({ top: rect.top - topGap, behavior: reduce ? "auto" : "smooth" });
   }, [ended]);

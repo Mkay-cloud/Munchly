@@ -3,6 +3,8 @@ import { Fredoka, DM_Sans } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
 import "./globals.css";
+import InstallPrompts from "@/components/InstallPrompts";
+import { INSTALL_CAPTURE_SCRIPT } from "@/lib/install";
 
 // Applies the saved (or system) theme to <html> before hydration, so pages
 // never flash the wrong theme then swap. Keep this string's storage key
@@ -41,6 +43,12 @@ export const metadata: Metadata = {
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Munchly" }],
     type: "website",
   },
+  // iOS "Add to Home Screen": open full-screen like an app, named Munchly.
+  appleWebApp: {
+    capable: true,
+    title: "Munchly",
+    statusBarStyle: "default",
+  },
   twitter: {
     card: "summary_large_image",
     title: "Munchly",
@@ -63,14 +71,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      {/* Also catches the browser's install event, which can fire before React
+          loads - see src/lib/install.ts. One script rather than two, since
+          each beforeInteractive script here adds a dev-mode warning. */}
       <Script id="theme-init" strategy="beforeInteractive">
-        {THEME_INIT_SCRIPT}
+        {THEME_INIT_SCRIPT + INSTALL_CAPTURE_SCRIPT}
       </Script>
       <body
         className={`${fredoka.variable} ${dmSans.variable}`}
         style={{ fontFamily: "var(--font-dm-sans), system-ui, sans-serif" }}
       >
         {children}
+        <InstallPrompts />
       </body>
       {GA_MEASUREMENT_ID && <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />}
     </html>
