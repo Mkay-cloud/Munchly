@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/i18n/Link";
+import { useTranslations } from "@/i18n/LocaleProvider";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Recipe } from "@/sanity/queries";
 import type { BlogPostSummary } from "@/sanity/blogQueries";
@@ -70,6 +71,7 @@ function buildMoodPool(recipes: Recipe[], mood: Mood): Recipe[] {
 }
 
 export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; posts: BlogPostSummary[] }) {
+  const t = useTranslations();
   const [mood, setMood] = useState<Mood>("Anything");
   const [rot, setRot] = useState(0);
   const [spinning, setSpinning] = useState(false);
@@ -226,11 +228,10 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
               color: "var(--ink)",
             }}
           >
-            Can&apos;t decide what to eat? <span style={{ color: "var(--primary-text)" }}>Spin for it.</span>
+            {t("hero.headline")}
           </h1>
           <p style={{ margin: 0, fontSize: "clamp(17px, 1.6vw, 19px)", lineHeight: 1.55, color: "var(--ink-2)", maxWidth: "30em" }}>
-            Pick a mood, give the wheel a spin, and Munchly lands on a real meal with a recipe to match. No
-            more scrolling through a hundred tabs while you get hungrier.
+            {t("hero.subhead")}
           </p>
           {/* Five equal-size buttons in exactly two rows (3 + 2, second row
               centred) at every width - sizing lives in globals.css
@@ -238,25 +239,25 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
               burgundy / green, with near-white text on both. */}
           <div className="mly-hero-actions">
             <a href="#spinner" className="mly-hero-btn" style={HERO_BURGUNDY}>
-              Spin the wheel →
+              {t("hero.spinTheWheel")}
             </a>
             <a href="#browse" className="mly-hero-btn" style={HERO_GREEN}>
-              Browse recipes
+              {t("hero.browseRecipes")}
             </a>
             <Link href="/plan" className="mly-hero-btn" style={HERO_BURGUNDY}>
-              Plan your week
+              {t("hero.planYourWeek")}
             </Link>
             <Link href="/suggest" className="mly-hero-btn" style={HERO_GREEN}>
-              Suggest a recipe
+              {t("hero.suggestARecipe")}
             </Link>
             <Link href="/games" className="mly-hero-btn" style={HERO_BURGUNDY}>
-              Play food games
+              {t("hero.playFoodGames")}
             </Link>
             <Link href="/blog" className="mly-hero-btn" style={HERO_GREEN}>
-              Read the blog
+              {t("hero.readTheBlog")}
             </Link>
           </div>
-          <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Free to use. No account needed to spin.</p>
+          <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>{t("hero.freeToUse")}</p>
         </div>
 
         <div id="spinner" style={{ flex: "1 1 380px", minWidth: 0, maxWidth: 520, margin: "0 auto", position: "relative", paddingTop: 78 }}>
@@ -735,15 +736,14 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
                 color: "var(--ink)",
               }}
             >
-              Play food games
+              {t("gamesSection.title")}
             </h2>
             <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--ink-2)" }}>
-              Four quick games for when you need a break from deciding what&apos;s for dinner. Free, and no
-              account needed.
+              {t("gamesSection.subtitle")}
             </p>
           </div>
           <Link href="/games" style={{ fontWeight: 600, fontSize: 15, color: "var(--primary-text)" }}>
-            See all games →
+            {t("gamesSection.seeAll")}
           </Link>
         </div>
 
@@ -808,14 +808,14 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
                   color: "var(--ink)",
                 }}
               >
-                From the blog
+                {t("blogSection.title")}
               </h2>
               <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--ink-2)" }}>
-                Recipes, kitchen notes and cooking stories, fresh off the stove.
+                {t("blogSection.subtitle")}
               </p>
             </div>
             <Link href="/blog" style={{ fontWeight: 600, fontSize: 15, color: "var(--primary-text)" }}>
-              Read the blog →
+              {t("blogSection.readMore")}
             </Link>
           </div>
 
@@ -885,19 +885,19 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
             <div style={{ display: "flex", flexWrap: "wrap", gap: 40 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: "#D4AF7C" }}>App</span>
-                <a href="#spinner" style={{ color: "#EADFCF", fontSize: 15 }}>Spin the wheel</a>
+                <a href="#spinner" style={{ color: "#EADFCF", fontSize: 15 }}>{t("nav.spinTheWheel")}</a>
                 <a href="#browse" style={{ color: "#EADFCF", fontSize: 15 }}>Recipes</a>
-                <Link href="/plan" style={{ color: "#EADFCF", fontSize: 15 }}>Plan your week</Link>
-                <Link href="/shopping-list" style={{ color: "#EADFCF", fontSize: 15 }}>Shopping list</Link>
-                <Link href="/fridge" style={{ color: "#EADFCF", fontSize: 15 }}>Cook from your fridge</Link>
-                <Link href="/community" style={{ color: "#EADFCF", fontSize: 15 }}>Community recipes</Link>
+                <Link href="/plan" style={{ color: "#EADFCF", fontSize: 15 }}>{t("nav.planYourWeek")}</Link>
+                <Link href="/shopping-list" style={{ color: "#EADFCF", fontSize: 15 }}>{t("nav.shoppingList")}</Link>
+                <Link href="/fridge" style={{ color: "#EADFCF", fontSize: 15 }}>{t("nav.cookFromFridge")}</Link>
+                <Link href="/community" style={{ color: "#EADFCF", fontSize: 15 }}>{t("nav.communityRecipes")}</Link>
                 <a href="#grows" style={{ color: "#EADFCF", fontSize: 15 }}>What&apos;s next</a>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: "#D4AF7C" }}>Munchly</span>
-                <Link href="/about" style={{ color: "#EADFCF", fontSize: 15 }}>About</Link>
-                <Link href="/suggest" style={{ color: "#EADFCF", fontSize: 15 }}>Suggest a recipe</Link>
-                <Link href="/contact" style={{ color: "#EADFCF", fontSize: 15 }}>Contact</Link>
+                <Link href="/about" style={{ color: "#EADFCF", fontSize: 15 }}>{t("nav.about")}</Link>
+                <Link href="/suggest" style={{ color: "#EADFCF", fontSize: 15 }}>{t("nav.suggestARecipe")}</Link>
+                <Link href="/contact" style={{ color: "#EADFCF", fontSize: 15 }}>{t("nav.contact")}</Link>
               </div>
             </div>
           </div>

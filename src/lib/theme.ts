@@ -46,6 +46,6 @@ export function applyTheme(theme: Theme): void {
   document.documentElement.setAttribute("data-theme", theme);
 }
 
-// Kept in sync by hand with the inline no-flash script in src/app/layout.tsx
+// Kept in sync by hand with the inline no-flash script in src/app/[locale]/layout.tsx
 // (that one can't import this module - it has to run as a standalone
 // string before any JS bundle loads). Same storage key: "munchly_theme_v1".

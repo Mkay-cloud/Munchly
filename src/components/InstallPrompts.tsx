@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { getInstallMode, promptInstall, subscribeInstall, type InstallMode } from "@/lib/install";
 
-// "Install Munchly App" prompts, mounted once in app/layout.tsx, on phones
+// "Install Munchly App" prompts, mounted once in app/[locale]/layout.tsx, on phones
 // only (lib/install.ts):
 //   - a popup card a few seconds after every page load or navigation;
 //     "Not Now" only closes it for that page view;
