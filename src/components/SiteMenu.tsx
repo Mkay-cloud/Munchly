@@ -3,29 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-type MenuLink = { href: string; label: string };
-
-const APP_LINKS: MenuLink[] = [
-  { href: "/", label: "Spin the wheel" },
-  { href: "/recipes", label: "Browse recipes" },
-  { href: "/plan", label: "Plan your week" },
-  { href: "/shopping-list", label: "Shopping list" },
-  { href: "/fridge", label: "Cook from your fridge" },
-  { href: "/community", label: "Community recipes" },
-  { href: "/suggest", label: "Suggest a recipe" },
-  { href: "/games", label: "Games" },
-  { href: "/blog", label: "Blog" },
-];
-
-const ACCOUNT_LINKS: MenuLink[] = [
-  { href: "/favorites", label: "My favorites" },
-  { href: "/profile", label: "My profile" },
-];
-
-const INFO_LINKS: MenuLink[] = [
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-];
+import { APP_LINKS, ACCOUNT_LINKS, INFO_LINKS, type MenuLink } from "@/lib/siteLinks";
+import SiteSearch from "./SiteSearch";
 
 function MenuGroup({ label, links, onNavigate }: { label: string; links: MenuLink[]; onNavigate: () => void }) {
   return (
@@ -84,7 +63,9 @@ export default function SiteMenu() {
   const close = () => setOpen(false);
 
   return (
-    <div ref={wrapperRef} style={{ position: "relative" }}>
+    <>
+      <SiteSearch />
+      <div ref={wrapperRef} style={{ position: "relative" }}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -130,6 +111,7 @@ export default function SiteMenu() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
