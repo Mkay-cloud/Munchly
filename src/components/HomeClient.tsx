@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Recipe } from "@/sanity/queries";
 import { GAMES } from "@/lib/games";
 import AccountNav from "./AccountNav";
@@ -39,12 +39,33 @@ const MOOD_TILES: { match: (r: Recipe) => boolean; title: string; sub: string }[
 const HERO_BURGUNDY = { background: "var(--primary)", color: "#FBF8F2", border: "1.5px solid var(--primary)" } as const;
 const HERO_GREEN = { background: "var(--olive)", color: "#FBF8F2", border: "1.5px solid var(--olive)" } as const;
 
+// Caps how many slices the wheel ever draws. With one labeled slice per
+// recipe and only 4 repeating colors, an uncapped pool gets crowded and
+// unreadable once the recipe library grows past a handful of entries -
+// capping at a fixed size keeps every spin legible while still feeling
+// random (the pool is reshuffled whenever the mood changes).
+const MAX_WHEEL_SLICES = 10;
+
+function shuffled<T>(arr: T[]): T[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 function buildMoodPool(recipes: Recipe[], mood: Mood): Recipe[] {
-  if (mood === "Anything") return recipes;
-  const matching = recipes.filter((r) => r.moods.includes(mood));
-  if (matching.length >= 4) return matching;
-  const rest = recipes.filter((r) => !matching.includes(r));
-  return [...matching, ...rest].slice(0, Math.max(4, matching.length));
+  let base: Recipe[];
+  if (mood === "Anything") {
+    base = recipes;
+  } else {
+    const matching = recipes.filter((r) => r.moods.includes(mood));
+    base = matching.length >= 4
+      ? matching
+      : [...matching, ...recipes.filter((r) => !matching.includes(r))].slice(0, Math.max(4, matching.length));
+  }
+  return base.length > MAX_WHEEL_SLICES ? shuffled(base).slice(0, MAX_WHEEL_SLICES) : base;
 }
 
 export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
@@ -71,7 +92,10 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
     setSoundEnabled(next);
   };
 
-  const pool = buildMoodPool(recipes, mood);
+  // Memoized: without this the pool (and its random slice order) would be
+  // recomputed on every render, including mid-spin re-renders, which would
+  // shuffle the wheel out from under an in-flight animation.
+  const pool = useMemo(() => buildMoodPool(recipes, mood), [recipes, mood]);
   const seg = pool.length ? 360 / pool.length : 360;
   const stops = pool
     .map((_, i) => `${PALETTE[i % PALETTE.length][0]} ${i * seg}deg ${(i + 1) * seg}deg`)
