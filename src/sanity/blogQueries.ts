@@ -70,6 +70,14 @@ export async function getPublishedBlogPosts(): Promise<BlogPostSummary[]> {
   return raw.map(toSummary);
 }
 
+// The newest N published posts, for the homepage's blog preview section.
+export async function getLatestBlogPosts(limit = 3): Promise<BlogPostSummary[]> {
+  const raw: RawSummary[] = await client.fetch(
+    `*[_type == "blogPost" && status == "published"] | order(publishedAt desc) [0...${limit}] { ${SUMMARY_FIELDS} }`
+  );
+  return raw.map(toSummary);
+}
+
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   const raw:
     | (RawSummary & { body?: unknown[] | null })

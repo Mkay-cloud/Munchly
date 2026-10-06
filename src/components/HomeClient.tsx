@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Recipe } from "@/sanity/queries";
+import type { BlogPostSummary } from "@/sanity/blogQueries";
 import { GAMES } from "@/lib/games";
 import AccountNav from "./AccountNav";
 import FavoriteButton from "./FavoriteButton";
@@ -68,7 +69,7 @@ function buildMoodPool(recipes: Recipe[], mood: Mood): Recipe[] {
   return base.length > MAX_WHEEL_SLICES ? shuffled(base).slice(0, MAX_WHEEL_SLICES) : base;
 }
 
-export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
+export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; posts: BlogPostSummary[] }) {
   const [mood, setMood] = useState<Mood>("Anything");
   const [rot, setRot] = useState(0);
   const [spinning, setSpinning] = useState(false);
@@ -250,6 +251,9 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
             </Link>
             <Link href="/games" className="mly-hero-btn" style={HERO_BURGUNDY}>
               Play food games
+            </Link>
+            <Link href="/blog" className="mly-hero-btn" style={HERO_GREEN}>
+              Read the blog
             </Link>
           </div>
           <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>Free to use. No account needed to spin.</p>
@@ -787,6 +791,70 @@ export default function HomeClient({ recipes }: { recipes: Recipe[] }) {
           ))}
         </div>
       </section>
+
+      {/* Blog */}
+      {posts.length > 0 && (
+        <section id="blog" style={{ maxWidth: 1180, margin: "0 auto", padding: "0 20px 80px", display: "flex", flexDirection: "column", gap: 32 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 620 }}>
+              <h2
+                style={{
+                  margin: 0,
+                  fontFamily: "var(--font-fredoka)",
+                  fontWeight: 600,
+                  fontSize: "clamp(32px, 4.4vw, 46px)",
+                  lineHeight: 1.05,
+                  letterSpacing: "-0.015em",
+                  color: "var(--ink)",
+                }}
+              >
+                From the blog
+              </h2>
+              <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--ink-2)" }}>
+                Recipes, kitchen notes and cooking stories, fresh off the stove.
+              </p>
+            </div>
+            <Link href="/blog" style={{ fontWeight: 600, fontSize: 15, color: "var(--primary-text)" }}>
+              Read the blog →
+            </Link>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20 }}>
+            {posts.map((post) => (
+              <Link
+                key={post._id}
+                href={`/${post.slug}`}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                  padding: 16,
+                  borderRadius: 20,
+                  border: "1px solid var(--border)",
+                  background: "var(--card)",
+                  color: "var(--ink)",
+                }}
+              >
+                {post.imageUrl && (
+                  <div style={{ position: "relative", width: "100%", aspectRatio: "4/3", borderRadius: 14, overflow: "hidden" }}>
+                    <Image src={post.imageUrl} alt={post.title} fill sizes="(max-width: 600px) 100vw, 320px" style={{ objectFit: "cover" }} />
+                  </div>
+                )}
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <h3 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 19, lineHeight: 1.25 }}>
+                    {post.title}
+                  </h3>
+                  {post.excerpt && (
+                    <p style={{ margin: 0, fontSize: 14, color: "var(--muted)", lineHeight: 1.5 }}>
+                      {post.excerpt}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Footer */}
       <footer style={{ background: "var(--footer-bg)", color: "#EADFCF" }}>

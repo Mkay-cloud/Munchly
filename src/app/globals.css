@@ -143,13 +143,13 @@ button {
   }
 }
 
-/* Home hero buttons: always exactly two rows - 3 on top, 2 centred
-   underneath - with every button the same width, height, padding and font.
-   A 6-column grid where each button spans 2 columns; the last two start at
-   columns 2 and 4 to centre them. grid-auto-rows: 1fr keeps both rows the
-   same height even when a label wraps to two lines on narrow phones. Font
-   size follows the group's own width (container query), not the viewport,
-   since the hero sits in a half-width column on desktop. */
+/* Home hero buttons: always exactly two rows of 3, with every button the
+   same width, height, padding and font. A 6-column grid where each of the
+   6 buttons spans 2 columns, so they fill both rows evenly with no manual
+   centring needed. grid-auto-rows: 1fr keeps both rows the same height
+   even when a label wraps to two lines on narrow phones. Font size follows
+   the group's own width (container query), not the viewport, since the
+   hero sits in a half-width column on desktop. */
 .mly-hero-actions {
   container-type: inline-size;
   display: grid;
@@ -162,14 +162,6 @@ button {
 
 .mly-hero-actions > .mly-hero-btn {
   grid-column: span 2;
-}
-
-.mly-hero-actions > .mly-hero-btn:nth-child(4) {
-  grid-column: 2 / span 2;
-}
-
-.mly-hero-actions > .mly-hero-btn:nth-child(5) {
-  grid-column: 4 / span 2;
 }
 
 .mly-hero-btn {
