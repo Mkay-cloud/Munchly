@@ -3,6 +3,7 @@ import LocaleLink from "@/i18n/Link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getRecipesBySlugs } from "@/sanity/queries";
+import { translateRecipes } from "@/lib/contentTranslations";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import FavoritesGate from "./FavoritesGate";
@@ -40,7 +41,7 @@ export default async function FavoritesPage({
       .select("recipe_slug")
       .order("created_at", { ascending: false });
     const slugs = (rows ?? []).map((r) => r.recipe_slug as string);
-    recipes = await getRecipesBySlugs(slugs);
+    recipes = await translateRecipes(await getRecipesBySlugs(slugs), locale);
   }
 
   return (

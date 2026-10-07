@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -7,41 +6,52 @@ import BlogBody from "@/components/BlogBody";
 import AccountNav from "@/components/AccountNav";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
+import LocaleLink from "@/i18n/Link";
+import { getTranslations } from "@/i18n/getTranslations";
+import { isLocale, DEFAULT_LOCALE, BCP47_TAG } from "@/i18n/locales";
+import { translateBlogPost } from "@/lib/contentTranslations";
 
 export const revalidate = 60;
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
-  if (!post) return {};
+  const { slug, locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const raw = await getBlogPostBySlug(slug);
+  if (!raw) return {};
+  const post = await translateBlogPost(raw, locale);
+  const path = locale === DEFAULT_LOCALE ? `/${slug}` : `/${locale}/${slug}`;
 
   return {
     title: `${post.title} — Munchly Blog`,
     description: post.excerpt || post.title,
-    alternates: { canonical: `/${slug}` },
+    alternates: { canonical: path },
     openGraph: post.imageUrl ? { images: [{ url: post.imageUrl }] } : undefined,
   };
 }
 
-function formatDate(iso: string | null) {
+function formatDate(iso: string | null, locale: string): string | null {
   if (!iso) return null;
-  return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+  const tag = (BCP47_TAG as Record<string, string>)[locale] ?? "en-US";
+  return new Date(iso).toLocaleDateString(tag, { year: "numeric", month: "long", day: "numeric" });
 }
 
 export default async function BlogPostPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) {
-  const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
-  if (!post) notFound();
+  const { slug, locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = getTranslations(locale);
+  const raw = await getBlogPostBySlug(slug);
+  if (!raw) notFound();
+  const post = await translateBlogPost(raw, locale);
 
-  const dateLabel = formatDate(post.publishedAt);
+  const dateLabel = formatDate(post.publishedAt, locale);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)" }}>
@@ -56,9 +66,9 @@ export default async function BlogPostPage({
         }}
       >
         <div style={{ maxWidth: 800, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/blog" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Blog
-          </Link>
+          <LocaleLink href="/blog" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("blogPostPage.backLink")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />

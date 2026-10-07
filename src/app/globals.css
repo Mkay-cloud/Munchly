@@ -553,7 +553,10 @@ html {
 .mly-install-popup {
   position: fixed;
   z-index: 35;
-  right: 16px;
+  /* Logical property, not "right" - in an RTL page (Arabic) this sticks to
+     the physical left edge instead, which is the "end" side of the layout
+     there, same corner placement logic as an LTR page. */
+  inset-inline-end: 16px;
   bottom: calc(var(--mly-bottom-inset, 0px) + 16px);
   width: min(380px, calc(100vw - 32px));
   display: flex;
@@ -600,8 +603,7 @@ html {
 
 @media (max-width: 480px) {
   .mly-install-popup {
-    left: 16px;
-    right: 16px;
+    inset-inline: 16px;
     width: auto;
   }
 }

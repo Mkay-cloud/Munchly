@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import { getAllRecipes } from "@/sanity/queries";
+import { translateRecipes } from "@/lib/contentTranslations";
 import AccountNav from "@/components/AccountNav";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -27,7 +28,7 @@ export default async function AllRecipesPage({
   const { locale: rawLocale } = await params;
   const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const t = getTranslations(locale);
-  const recipes = await getAllRecipes();
+  const recipes = await translateRecipes(await getAllRecipes(), locale);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)" }}>

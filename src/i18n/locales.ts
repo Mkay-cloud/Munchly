@@ -31,6 +31,19 @@ export function isRtl(locale: Locale): boolean {
   return RTL_LOCALES.includes(locale);
 }
 
+// BCP-47 tags for Intl.*(...) calls (date/number formatting) - distinct from
+// the locale codes above, which are just our own URL/routing keys.
+export const BCP47_TAG: Record<Locale, string> = {
+  en: "en-US",
+  es: "es",
+  fr: "fr",
+  pt: "pt-BR",
+  it: "it",
+  de: "de",
+  hi: "hi",
+  ar: "ar",
+};
+
 export function isLocale(value: string): value is Locale {
   return (LOCALES as string[]).includes(value);
 }

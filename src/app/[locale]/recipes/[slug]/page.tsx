@@ -9,23 +9,27 @@ import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import { getTranslations } from "@/i18n/getTranslations";
 import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
+import { translateRecipe } from "@/lib/contentTranslations";
 
 export const revalidate = 60;
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const recipe = await getRecipeBySlug(slug);
-  if (!recipe) return {};
+  const { slug, locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const raw = await getRecipeBySlug(slug);
+  if (!raw) return {};
+  const recipe = await translateRecipe(raw, locale);
+  const path = locale === DEFAULT_LOCALE ? `/recipes/${slug}` : `/${locale}/recipes/${slug}`;
 
   return {
     title: `${recipe.title} — Munchly`,
     description: recipe.note || `${recipe.title}${recipe.cuisine ? ` — a ${recipe.cuisine} recipe` : ""} on Munchly.`,
     alternates: {
-      canonical: `/recipes/${slug}`,
+      canonical: path,
     },
     openGraph: recipe.imageUrl
       ? { images: [{ url: recipe.imageUrl }] }
@@ -41,8 +45,9 @@ export default async function RecipePage({
   const { slug, locale: rawLocale } = await params;
   const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const t = getTranslations(locale);
-  const recipe = await getRecipeBySlug(slug);
-  if (!recipe) notFound();
+  const raw = await getRecipeBySlug(slug);
+  if (!raw) notFound();
+  const recipe = await translateRecipe(raw, locale);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)" }}>
