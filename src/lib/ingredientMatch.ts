@@ -35,12 +35,12 @@ export function nextLevel(level: Level): Level | null {
   return LEVEL_ORDER[LEVEL_ORDER.indexOf(level) + 1] ?? null;
 }
 
-// "3 minutes" / "90 seconds" - for describing a level's time limit.
-export function describeTimeLimit(ms: number): string {
+// For describing a level's time limit - the caller picks the localized unit
+// word (minutes vs. seconds) and plural form for `amount`.
+export function timeLimitParts(ms: number): { amount: number; unit: "minutes" | "seconds" } {
   const seconds = Math.round(ms / 1000);
-  if (seconds % 60 !== 0) return `${seconds} seconds`;
-  const minutes = seconds / 60;
-  return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+  if (seconds % 60 !== 0) return { amount: seconds, unit: "seconds" };
+  return { amount: seconds / 60, unit: "minutes" };
 }
 
 // Comfortably bigger than the largest board (Hard, 18 pairs) so every level

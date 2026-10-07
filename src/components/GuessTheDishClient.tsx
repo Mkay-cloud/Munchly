@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import LocaleLink from "@/i18n/Link";
+import { useTranslations } from "@/i18n/LocaleProvider";
 import Confetti from "@/components/Confetti";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -12,7 +13,7 @@ import {
   DISHES_PER_ROUND,
   loadBestScore,
   recordScore,
-  resultMessage,
+  resultTier,
   subscribeBestScore,
   type Category,
   type DealtDish,
@@ -71,6 +72,7 @@ const primaryButton: React.CSSProperties = {
 };
 
 export default function GuessTheDishClient() {
+  const t = useTranslations();
   const [phase, setPhase] = useState<Phase>("start");
   // Which cuisine the rounds draw from; starts on "All cuisines".
   const [category, setCategory] = useState<Category>("all");
@@ -223,8 +225,8 @@ export default function GuessTheDishClient() {
       type="button"
       onClick={() => setSoundEnabled(!soundOn)}
       aria-pressed={soundOn}
-      aria-label={soundOn ? "Mute sound effects" : "Unmute sound effects"}
-      title={soundOn ? "Sound on" : "Sound off"}
+      aria-label={soundOn ? t("gamesCommon.muteAriaOn") : t("gamesCommon.muteAriaOff")}
+      title={soundOn ? t("gamesCommon.muteTitleOn") : t("gamesCommon.muteTitleOff")}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -260,9 +262,9 @@ export default function GuessTheDishClient() {
         }}
       >
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/games" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to games
-          </Link>
+          <LocaleLink href="/games" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("gamesCommon.backToGames")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -282,16 +284,16 @@ export default function GuessTheDishClient() {
               letterSpacing: "-0.015em",
             }}
           >
-            Guess the Dish
+            {t("guessTheDishGame.title")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            Read the emoji, pick the dish. {DISHES_PER_ROUND} dishes per round, four options each.
+            {t("guessTheDishGame.subtitle", { count: String(DISHES_PER_ROUND) })}
           </p>
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
           <label htmlFor="dish-category" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
-            Cuisine
+            {t("guessTheDishGame.cuisineLabel")}
           </label>
           <div style={{ position: "relative", display: "inline-flex", alignItems: "center", minWidth: 0, maxWidth: "100%" }}>
             <select
@@ -316,7 +318,7 @@ export default function GuessTheDishClient() {
             >
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
-                  {categoryLabel(c)}
+                  {c === "all" ? t("guessTheDishGame.allCuisines") : categoryLabel(c)}
                 </option>
               ))}
             </select>
@@ -345,19 +347,22 @@ export default function GuessTheDishClient() {
               🍜🥜🦐🍋
             </span>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>What&apos;s cooking?</span>
+              <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>{t("guessTheDishGame.startTitle")}</span>
               <span style={{ fontSize: 15, color: "var(--ink-2)", lineHeight: 1.5 }}>
-                Each dish is a few emoji - tap the name that matches from four options. Stuck? Tap Show hint before you
-                answer. {category === "all" ? "Dishes come from every cuisine" : `All ${category} dishes`}, and every round is a
-                new mix.
+                {category === "all"
+                  ? t("guessTheDishGame.startBodyAll")
+                  : t("guessTheDishGame.startBodyCategory", { category })}
               </span>
             </div>
             <Pill>
-              <span style={{ color: "var(--muted)" }}>Your best{category === "all" ? "" : ` (${category})`}:</span> {bestLabel}
+              <span style={{ color: "var(--muted)" }}>
+                {t("guessTheDishGame.yourBestLabel", { scope: category === "all" ? "" : ` (${category})` })}
+              </span>{" "}
+              {bestLabel}
             </Pill>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <button type="button" onClick={start} style={primaryButton}>
-                Start game
+                {t("guessTheDishGame.startGame")}
               </button>
               {muteButton}
             </div>
@@ -370,18 +375,18 @@ export default function GuessTheDishClient() {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
                 <span style={{ fontWeight: 700, fontSize: 15 }} aria-live="polite">
-                  Dish {index + 1} of {round.length}
+                  {t("guessTheDishGame.dishProgress", { current: String(index + 1), total: String(round.length) })}
                 </span>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <Pill>
-                    <span style={{ color: "var(--muted)" }}>Score</span> {score}
+                    <span style={{ color: "var(--muted)" }}>{t("gamesCommon.score")}</span> {score}
                   </Pill>
                   {muteButton}
                 </div>
               </div>
               <div
                 role="progressbar"
-                aria-label="Round progress"
+                aria-label={t("guessTheDishGame.progressAria")}
                 aria-valuemin={0}
                 aria-valuemax={round.length}
                 aria-valuenow={results.length}
@@ -430,13 +435,13 @@ export default function GuessTheDishClient() {
                   onClick={showHint}
                   style={{ border: "none", background: "none", color: "var(--primary-text)", fontWeight: 600, fontSize: 15, cursor: "pointer", padding: "6px 10px" }}
                 >
-                  💡 Show hint
+                  {t("guessTheDishGame.showHint")}
                 </button>
               )}
             </div>
 
             {/* Answers - full-width buttons, stacked (same pattern as Food Trivia) */}
-            <div role="group" aria-label="Which dish is it?" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div role="group" aria-label={t("guessTheDishGame.answerGroupAria")} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {dish.options.map((option, i) => {
                 const isAnswer = option === dish.name;
                 const isPick = option === picked;
@@ -455,7 +460,13 @@ export default function GuessTheDishClient() {
                     className="mly-answer"
                     onClick={() => choose(option)}
                     disabled={answered}
-                    aria-label={state === "correct" ? `${option} - correct answer` : state === "wrong" ? `${option} - your answer, wrong` : option}
+                    aria-label={
+                      state === "correct"
+                        ? `${option} ${t("gamesCommon.correctAnswerSuffix")}`
+                        : state === "wrong"
+                          ? `${option} ${t("gamesCommon.wrongAnswerSuffix")}`
+                          : option
+                    }
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -504,7 +515,9 @@ export default function GuessTheDishClient() {
               {answered && (
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                   <span style={{ fontSize: 16, fontWeight: 700, color: answeredCorrectly ? "var(--success-ink)" : "var(--danger-ink)" }}>
-                    {answeredCorrectly ? `✓ Yes - it's ${dish.name}!` : `✗ Not quite - it's ${dish.name}.`}
+                    {answeredCorrectly
+                      ? t("guessTheDishGame.correctFeedback", { name: dish.name })
+                      : t("guessTheDishGame.wrongFeedback", { name: dish.name })}
                   </span>
                   <button
                     ref={nextButtonRef}
@@ -512,7 +525,7 @@ export default function GuessTheDishClient() {
                     onClick={() => advance(results)}
                     style={{ ...primaryButton, position: "relative", overflow: "hidden", padding: "12px 22px", fontSize: 15 }}
                   >
-                    {isLast ? "See my score →" : "Next →"}
+                    {isLast ? t("gamesCommon.seeScore") : t("gamesCommon.next")}
                     {/* Drains while the game waits to move on by itself. */}
                     <span
                       key={index}
@@ -574,9 +587,26 @@ function EndScreen({
   onPlayAgain: () => void;
   muteButton: React.ReactNode;
 }) {
+  const t = useTranslations();
   const total = DISHES_PER_ROUND;
   const score = results.filter(Boolean).length;
-  const { title, body } = resultMessage(score, total);
+  const tier = resultTier(score, total);
+  const title =
+    tier === "perfect"
+      ? t("guessTheDishGame.resultPerfectTitle")
+      : tier === "master"
+        ? t("guessTheDishGame.resultMasterTitle")
+        : tier === "tasty"
+          ? t("guessTheDishGame.resultTastyTitle")
+          : t("guessTheDishGame.resultHungryTitle");
+  const body =
+    tier === "perfect"
+      ? t("guessTheDishGame.resultPerfectBody")
+      : tier === "master"
+        ? t("guessTheDishGame.resultMasterBody")
+        : tier === "tasty"
+          ? t("guessTheDishGame.resultTastyBody")
+          : t("guessTheDishGame.resultHungryBody");
   const high = score >= Math.ceil(total * 0.7);
   const scope = category === "all" ? "" : ` ${category}`;
   return (
@@ -594,7 +624,7 @@ function EndScreen({
           background: high ? "var(--sage-tint)" : "var(--card)",
         }}
       >
-        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--muted)" }}>Your score</span>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--muted)" }}>{t("gamesCommon.yourScoreLabel")}</span>
         <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: "clamp(56px, 14vw, 80px)", lineHeight: 1, color: "var(--primary-text)", fontVariantNumeric: "tabular-nums" }}>
           {score}/{total}
         </span>
@@ -605,27 +635,28 @@ function EndScreen({
         <span style={{ fontSize: 15, fontWeight: 600, color: newBest ? "var(--terra-text)" : "var(--muted)" }}>
           {newBest
             ? previousBest === null
-              ? `🏆 New${scope} best score: ${score}/${total}!`
-              : `🏆 New${scope} best score! (was ${previousBest}/${total})`
-            : `Your${scope} best: ${bestScore ?? score}/${total}${bestScore !== null && bestScore > score ? " - try to beat it!" : ""}`}
+              ? t("guessTheDishGame.newBestLine", { scope, score: String(score), total: String(total) })
+              : t("guessTheDishGame.newBestLinePrevious", { scope, previous: String(previousBest), total: String(total) })
+            : t("guessTheDishGame.yourBestResultLine", { scope, best: String(bestScore ?? score), total: String(total) }) +
+              (bestScore !== null && bestScore > score ? t("gamesCommon.tryToBeatIt") : "")}
         </span>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
           <button type="button" onClick={onPlayAgain} style={primaryButton}>
-            Play again
+            {t("gamesCommon.playAgain")}
           </button>
-          <Link
+          <LocaleLink
             href="/games"
             style={{ padding: "14px 22px", borderRadius: 999, border: "1.5px solid var(--border-strong)", background: "var(--card)", color: "var(--ink)", fontWeight: 600, fontSize: 16 }}
           >
-            More games
-          </Link>
+            {t("gamesCommon.moreGames")}
+          </LocaleLink>
           {muteButton}
         </div>
       </div>
 
       {/* Round recap - see the answers you missed. */}
       <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "16px 18px", borderRadius: 20, border: "1px solid var(--border)", background: "var(--card)" }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>This round</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("guessTheDishGame.thisRound")}</span>
         <ol style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 6 }}>
           {round.map((d, i) => (
             <li key={d.id} data-recap={results[i] ? "right" : "wrong"} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 15 }}>
@@ -637,7 +668,9 @@ function EndScreen({
               </span>
               <span style={{ fontWeight: 600, minWidth: 0 }}>
                 {d.name}
-                <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>{results[i] ? " - guessed" : " - missed"}</span>
+                <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>
+                  {results[i] ? t("guessTheDishGame.guessedSuffix") : t("guessTheDishGame.missedSuffix")}
+                </span>
               </span>
             </li>
           ))}

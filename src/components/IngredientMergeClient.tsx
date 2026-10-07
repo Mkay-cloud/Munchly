@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import LocaleLink from "@/i18n/Link";
+import { useTranslations } from "@/i18n/LocaleProvider";
 import Confetti from "@/components/Confetti";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -85,6 +86,7 @@ const pillButton = (variant: "primary" | "olive" | "outline"): React.CSSProperti
 });
 
 export default function IngredientMergeClient() {
+  const t = useTranslations();
   const [phase, setPhase] = useState<Phase>("start");
   // The board is only dealt when a game starts, so the server and the first
   // client render both show the start screen - no hydration mismatch.
@@ -209,8 +211,8 @@ export default function IngredientMergeClient() {
     commit(state);
     switch (result.kind) {
       case "select": {
-        const t = tierOf(state.board[i]!);
-        setHint(`${t.emoji} ${t.name}: tap its twin next to it, or an empty square.`);
+        const tier = tierOf(state.board[i]!);
+        setHint(t("ingredientMergeGame.selectHint", { emoji: tier.emoji, name: tier.name }));
         playTapSound();
         break;
       }
@@ -222,22 +224,27 @@ export default function IngredientMergeClient() {
         playFlipSound();
         break;
       case "merge": {
-        const t = tierOf(result.tile);
+        const tier = tierOf(result.tile);
         setHint(null);
-        setToast({ id: state.merges, text: `${t.emoji} ${t.name}!` });
+        setToast({ id: state.merges, text: t("ingredientMergeGame.toastMerge", { emoji: tier.emoji, name: tier.name }) });
         playMatchSound();
         break;
       }
       case "serve": {
         const dish = CHAIN_BY_ID[result.chain].tiers.at(-1)!;
         setHint(null);
-        setToast({ id: state.merges, text: result.bonus ? `${dish.emoji} Bonus ${dish.name} served!` : `${dish.emoji} ${dish.name} served!` });
+        setToast({
+          id: state.merges,
+          text: result.bonus
+            ? t("ingredientMergeGame.toastBonusServe", { emoji: dish.emoji, name: dish.name })
+            : t("ingredientMergeGame.toastServe", { emoji: dish.emoji, name: dish.name }),
+        });
         if (ordersDone(state)) win(timestamp());
         else playServeSound();
         break;
       }
       case "too-far":
-        setHint("Too far apart - move it next to its twin first.");
+        setHint(t("ingredientMergeGame.tooFarHint"));
         playMismatchSound();
         break;
     }
@@ -247,7 +254,7 @@ export default function IngredientMergeClient() {
     const g = gameRef.current;
     if (!g || phase !== "playing") return;
     if (!emptyCells(g).length) {
-      setHint("The board's full - merge something, or use Shuffle / Bin.");
+      setHint(t("ingredientMergeGame.boardFullHint"));
       playMismatchSound();
       return;
     }
@@ -291,8 +298,8 @@ export default function IngredientMergeClient() {
       type="button"
       onClick={() => setSoundEnabled(!soundOn)}
       aria-pressed={soundOn}
-      aria-label={soundOn ? "Mute sound effects" : "Unmute sound effects"}
-      title={soundOn ? "Sound on" : "Sound off"}
+      aria-label={soundOn ? t("gamesCommon.muteAriaOn") : t("gamesCommon.muteAriaOff")}
+      title={soundOn ? t("gamesCommon.muteTitleOn") : t("gamesCommon.muteTitleOff")}
       style={roundButton}
     >
       <span aria-hidden>{soundOn ? "🔊" : "🔇"}</span>
@@ -318,9 +325,9 @@ export default function IngredientMergeClient() {
         }}
       >
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/games" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to games
-          </Link>
+          <LocaleLink href="/games" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("gamesCommon.backToGames")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -340,11 +347,10 @@ export default function IngredientMergeClient() {
               letterSpacing: "-0.015em",
             }}
           >
-            Ingredient Merge
+            {t("ingredientMergeGame.title")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            Merge matching ingredients into finished dishes and fill every order. Tap a tile, then tap its twin right next to
-            it.
+            {t("ingredientMergeGame.subtitle")}
           </p>
         </div>
 
@@ -361,20 +367,20 @@ export default function IngredientMergeClient() {
               background: "var(--card)",
             }}
           >
-            <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>How to cook</span>
+            <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>{t("ingredientMergeGame.howToCookTitle")}</span>
             <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 6, fontSize: 15, lineHeight: 1.5, color: "var(--ink-2)" }}>
-              <li>Tap a tile to pick it up, then tap an <strong>identical tile right next to it</strong> to merge them into the next step.</li>
-              <li>Tap an <strong>empty square</strong> to move the tile you picked up.</li>
-              <li>Fresh ingredients drop in every couple of seconds - or tap <strong>+ Add</strong> for more.</li>
-              <li>Finished dishes go straight to the orders. Fill them all to win!</li>
+              <li>{t("ingredientMergeGame.step1Before")}<strong>{t("ingredientMergeGame.step1Bold")}</strong>{t("ingredientMergeGame.step1After")}</li>
+              <li>{t("ingredientMergeGame.step2Before")}<strong>{t("ingredientMergeGame.step2Bold")}</strong>{t("ingredientMergeGame.step2After")}</li>
+              <li>{t("ingredientMergeGame.step3Before")}<strong>{t("ingredientMergeGame.step3Bold")}</strong>{t("ingredientMergeGame.step3After")}</li>
+              <li>{t("ingredientMergeGame.step4")}</li>
             </ul>
             <RecipeBook />
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              <Pill label="Your best:" value={bestMs === null ? "—" : formatClock(bestMs)} />
+              <Pill label={t("gamesCommon.yourBest")} value={bestMs === null ? "—" : formatClock(bestMs)} />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <button type="button" onClick={start} style={{ ...pillButton("primary"), padding: "14px 26px", fontSize: 16 }}>
-                Start cooking
+                {t("ingredientMergeGame.startCooking")}
               </button>
               {muteButton}
             </div>
@@ -389,7 +395,7 @@ export default function IngredientMergeClient() {
               aria-label="Orders"
               style={{ display: "flex", flexDirection: "column", gap: 8, padding: "10px 12px", borderRadius: 18, border: "1px solid var(--border)", background: "var(--card)" }}
             >
-              <span style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Orders</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("ingredientMergeGame.ordersLabel")}</span>
               {/* Always one row of three, so the board stays near the top on phones. */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 8 }}>
                 {CHAINS.map((c) => {
@@ -430,17 +436,17 @@ export default function IngredientMergeClient() {
             {/* Stats */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                <Pill label="Time" value={formatClock(elapsedMs)} />
-                <Pill label="Merges" value={String(game.merges)} />
-                <Pill label="Best" value={bestMs === null ? "—" : formatClock(bestMs)} />
+                <Pill label={t("gamesCommon.time")} value={formatClock(elapsedMs)} />
+                <Pill label={t("ingredientMergeGame.mergesLabel")} value={String(game.merges)} />
+                <Pill label={t("ingredientMergeGame.bestLabel")} value={bestMs === null ? "—" : formatClock(bestMs)} />
               </div>
               <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
                 {muteButton}
                 <button
                   type="button"
                   onClick={start}
-                  aria-label="New game"
-                  title="New game"
+                  aria-label={t("gamesCommon.newGame")}
+                  title={t("gamesCommon.newGame")}
                   style={{ ...roundButton, color: "var(--ink)", fontSize: 18, fontWeight: 700 }}
                 >
                   <span aria-hidden>↺</span>
@@ -465,22 +471,22 @@ export default function IngredientMergeClient() {
                 }}
               >
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 28, color: "var(--olive-text)" }}>Order up! 🎉</span>
+                  <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 28, color: "var(--olive-text)" }}>{t("ingredientMergeGame.orderUpTitle")}</span>
                   <span style={{ fontSize: 15, color: "var(--ink-2)" }}>
-                    Every dish served in {formatClock(elapsedMs)}, with {game.merges} merges.
+                    {t("ingredientMergeGame.wonSummary", { time: formatClock(elapsedMs), merges: String(game.merges) })}
                   </span>
                   <span style={{ fontSize: 14, fontWeight: 600, color: newBest ? "var(--terra-text)" : "var(--muted)" }}>
                     {newBest
                       ? previousBest === null
-                        ? "🏆 New best time!"
-                        : `🏆 New best time! (was ${formatClock(previousBest)})`
+                        ? t("ingredientMergeGame.wonNewBest")
+                        : t("ingredientMergeGame.wonNewBestPrevious", { previous: formatClock(previousBest) })
                       : bestMs !== null
-                        ? `Your best is ${formatClock(bestMs)} - try to beat it!`
+                        ? t("ingredientMergeGame.wonBestLine", { time: formatClock(bestMs) })
                         : null}
                   </span>
                 </div>
                 <button type="button" onClick={start} style={{ ...pillButton("primary"), padding: "13px 22px" }}>
-                  Play again
+                  {t("gamesCommon.playAgain")}
                 </button>
               </div>
             )}
@@ -507,7 +513,7 @@ export default function IngredientMergeClient() {
                   const isTwin = !isSel && selectedTile !== null && sameKind(selectedTile, tile);
                   const canMerge = isTwin && selected !== null && isAdjacent(selected, i);
                   const moveTarget = !tile && selectedTile !== null;
-                  const t = tile ? tierOf(tile) : null;
+                  const tier = tile ? tierOf(tile) : null;
                   const row = Math.floor(i / COLS) + 1, col = (i % COLS) + 1;
                   return (
                     <button
@@ -520,7 +526,7 @@ export default function IngredientMergeClient() {
                       disabled={phase !== "playing"}
                       aria-label={
                         tile
-                          ? `${t!.name}${isSel ? ", selected" : canMerge ? ", tap to merge" : ""}, row ${row} column ${col}`
+                          ? `${tier!.name}${isSel ? ", selected" : canMerge ? ", tap to merge" : ""}, row ${row} column ${col}`
                           : `Empty, row ${row} column ${col}${moveTarget ? ", tap to move here" : ""}`
                       }
                       aria-pressed={tile ? isSel : undefined}
@@ -553,7 +559,7 @@ export default function IngredientMergeClient() {
                     >
                       {tile && (
                         <span key={tile.id} className="mly-pop" aria-hidden="true" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2cqw" }}>
-                          <span style={{ fontSize: "clamp(22px, 48cqw, 36px)", lineHeight: 1 }}>{t!.emoji}</span>
+                          <span style={{ fontSize: "clamp(22px, 48cqw, 36px)", lineHeight: 1 }}>{tier!.emoji}</span>
                           {/* Tier pips: one per step up the chain. */}
                           <span style={{ display: "flex", gap: 2 }}>
                             {Array.from({ length: tile.tier + 1 }, (_, k) => (
@@ -597,11 +603,11 @@ export default function IngredientMergeClient() {
             <div aria-live="polite" style={{ minHeight: 24, textAlign: "center", fontSize: 14, fontWeight: 600 }}>
               {phase === "playing" &&
                 (stuck ? (
-                  <span style={{ color: "var(--danger-ink)" }}>No moves left - tap Shuffle to mix it up!</span>
+                  <span style={{ color: "var(--danger-ink)" }}>{t("ingredientMergeGame.stuckNotice")}</span>
                 ) : hint ? (
                   <span style={{ color: "var(--ink-2)" }}>{hint}</span>
                 ) : (
-                  <span style={{ color: "var(--muted)" }}>Tap a tile to pick it up.</span>
+                  <span style={{ color: "var(--muted)" }}>{t("ingredientMergeGame.defaultHint")}</span>
                 ))}
             </div>
 
@@ -609,19 +615,19 @@ export default function IngredientMergeClient() {
             {phase === "playing" && (
               <div ref={controlsRef} className="mly-merge-controls" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 6 }}>
                 <button type="button" onClick={addIngredient} style={pillButton("olive")}>
-                  + Add
+                  {t("ingredientMergeGame.addButton")}
                 </button>
                 <button type="button" onClick={shuffle} style={pillButton(stuck ? "primary" : "outline")}>
-                  🔀 Shuffle
+                  {t("ingredientMergeGame.shuffleButton")}
                 </button>
                 <button
                   type="button"
                   onClick={bin}
                   disabled={selected === null}
-                  title="Throw away the tile you've picked up"
+                  title={t("ingredientMergeGame.binTitle")}
                   style={{ ...pillButton("outline"), opacity: selected === null ? 0.45 : 1, cursor: selected === null ? "default" : "pointer" }}
                 >
-                  🗑️ Bin
+                  {t("ingredientMergeGame.binButton")}
                 </button>
               </div>
             )}
@@ -636,9 +642,10 @@ export default function IngredientMergeClient() {
 
 // The three chains, so players can see what merges into what.
 function RecipeBook() {
+  const t = useTranslations();
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6, width: "100%" }}>
-      <span style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Recipes</span>
+      <span style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{t("ingredientMergeGame.recipesLabel")}</span>
       {CHAINS.map((c) => (
         <div
           key={c.id}
