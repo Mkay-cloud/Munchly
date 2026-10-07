@@ -27,13 +27,13 @@ const PALETTES: [string, string][][] = [
 ];
 const PALETTE = PALETTES[0];
 
-const MOOD_TILES: { match: (r: Recipe) => boolean; title: string; sub: string }[] = [
-  { match: (r) => r.moods.includes("Comfort"), title: "Comfort food", sub: "Hearty classics" },
-  { match: (r) => r.moods.includes("Quick"), title: "Quick meals", sub: "Ready in 20 min" },
-  { match: (r) => r.moods.includes("Spicy"), title: "Spicy", sub: "Bring the heat" },
-  { match: (r) => r.moods.includes("Sweet"), title: "Sweet", sub: "Desserts and treats" },
-  { match: (r) => r.tags.includes("Light & fresh"), title: "Light & fresh", sub: "Salads and bowls" },
-  { match: (r) => r.tags.includes("Cozy soups"), title: "Cozy soups", sub: "One pot, big spoon" },
+const MOOD_TILES: { match: (r: Recipe) => boolean; titleKey: string; subKey: string }[] = [
+  { match: (r) => r.moods.includes("Comfort"), titleKey: "homePage.comfortTileTitle", subKey: "homePage.comfortTileSub" },
+  { match: (r) => r.moods.includes("Quick"), titleKey: "homePage.quickTileTitle", subKey: "homePage.quickTileSub" },
+  { match: (r) => r.moods.includes("Spicy"), titleKey: "homePage.spicyTileTitle", subKey: "homePage.spicyTileSub" },
+  { match: (r) => r.moods.includes("Sweet"), titleKey: "homePage.sweetTileTitle", subKey: "homePage.sweetTileSub" },
+  { match: (r) => r.tags.includes("Light & fresh"), titleKey: "homePage.lightFreshTileTitle", subKey: "homePage.lightFreshTileSub" },
+  { match: (r) => r.tags.includes("Cozy soups"), titleKey: "homePage.cozySoupsTileTitle", subKey: "homePage.cozySoupsTileSub" },
 ];
 
 // Hero button fills. The green is the same --olive as the Play button on
@@ -130,9 +130,9 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
     return { cuisine, rep };
   });
 
-  const moodTilesResolved = MOOD_TILES.map((t) => {
-    const rep = recipes.find(t.match);
-    return { ...t, rep };
+  const moodTilesResolved = MOOD_TILES.map((tile) => {
+    const rep = recipes.find(tile.match);
+    return { ...tile, rep };
   });
 
   return (
@@ -264,7 +264,7 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
         <div id="spinner" style={{ flex: "1 1 380px", minWidth: 0, maxWidth: 520, margin: "0 auto", position: "relative", paddingTop: 78 }}>
           <Image
             src="/panda.png"
-            alt="Munchly the panda chef"
+            alt={t("homePage.pandaAlt")}
             width={150}
             height={150}
             className="mly-mascot"
@@ -301,14 +301,14 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
                 <span style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)", letterSpacing: "0.02em" }}>
-                  I&apos;m in the mood for
+                  {t("homePage.moodPrompt")}
                 </span>
                 <button
                   type="button"
                   onClick={toggleSound}
                   aria-pressed={soundOn}
-                  aria-label={soundOn ? "Mute spin sound effects" : "Unmute spin sound effects"}
-                  title={soundOn ? "Sound on" : "Sound off"}
+                  aria-label={soundOn ? t("homePage.muteSoundAria") : t("homePage.unmuteSoundAria")}
+                  title={soundOn ? t("homePage.soundOnTitle") : t("homePage.soundOffTitle")}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -355,7 +355,7 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
 
             {pool.length === 0 ? (
               <p style={{ margin: 0, textAlign: "center", fontSize: 15, color: "var(--muted)" }}>
-                No recipes yet — add some in the Sanity Studio.
+                {t("homePage.noRecipesYet")}
               </p>
             ) : (
               <div style={{ position: "relative", width: "min(100%, 360px)", aspectRatio: "1", margin: "4px auto 0" }}>
@@ -454,7 +454,7 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
                     zIndex: 4,
                   }}
                 >
-                  {spinning ? "…" : "Spin"}
+                  {spinning ? "…" : t("homePage.spinButton")}
                 </button>
               </div>
             )}
@@ -472,7 +472,7 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
                 }}
               >
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--olive-text)" }}>Tonight you&apos;re having</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--olive-text)" }}>{t("homePage.tonightYoureHaving")}</span>
                   <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 26, lineHeight: 1.1, color: "var(--ink)" }}>
                     {result.title}
                   </span>
@@ -497,7 +497,7 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
                       fontSize: 15,
                     }}
                   >
-                    See the recipe →
+                    {t("homePage.seeTheRecipe")}
                   </Link>
                   <button
                     onClick={spin}
@@ -513,13 +513,13 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
                       cursor: "pointer",
                     }}
                   >
-                    Spin again
+                    {t("homePage.spinAgain")}
                   </button>
                 </div>
               </div>
             ) : pool.length > 0 ? (
               <p style={{ margin: 0, textAlign: "center", fontSize: 15, color: "var(--muted)" }}>
-                {spinning ? "Munchly is thinking…" : "Tap Spin. We'll pick, you eat."}
+                {spinning ? t("homePage.thinking") : t("homePage.tapSpinPrompt")}
               </p>
             ) : null}
           </div>
@@ -545,18 +545,17 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
                   color: "var(--ink)",
                 }}
               >
-                Browse by mood or cuisine
+                {t("homePage.browseTitle")}
               </h2>
               <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--ink-2)" }}>
-                Already know the feeling, just not the dish? Start here. We&apos;re adding shelves to the library
-                every week.
+                {t("homePage.browseSubtitle")}
               </p>
             </div>
             <div style={{ display: "flex", padding: 5, borderRadius: 999, background: "var(--card)", border: "1px solid var(--border-strong)", gap: 4 }}>
-              {(["Mood", "Cuisine"] as const).map((t) => (
+              {(["Mood", "Cuisine"] as const).map((tabKey) => (
                 <button
-                  key={t}
-                  onClick={() => setTab(t)}
+                  key={tabKey}
+                  onClick={() => setTab(tabKey)}
                   style={{
                     padding: "10px 20px",
                     borderRadius: 999,
@@ -564,11 +563,11 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
                     fontSize: 15,
                     fontWeight: 600,
                     cursor: "pointer",
-                    background: t === tab ? "var(--primary)" : "transparent",
-                    color: t === tab ? "#FBF8F2" : "var(--ink)",
+                    background: tabKey === tab ? "var(--primary)" : "transparent",
+                    color: tabKey === tab ? "#FBF8F2" : "var(--ink)",
                   }}
                 >
-                  {t === "Mood" ? "By mood" : "By cuisine"}
+                  {tabKey === "Mood" ? t("homePage.byMood") : t("homePage.byCuisine")}
                 </button>
               ))}
             </div>
@@ -576,11 +575,11 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 240px), 1fr))", gap: 16 }}>
             {tab === "Mood"
-              ? moodTilesResolved.map((t) => (
-                  <BrowseCard key={t.title} title={t.title} sub={t.sub} rep={t.rep} />
+              ? moodTilesResolved.map((tile) => (
+                  <BrowseCard key={tile.titleKey} title={t(tile.titleKey)} sub={t(tile.subKey)} rep={tile.rep} />
                 ))
-              : cuisineTiles.map((t) => (
-                  <BrowseCard key={t.cuisine} title={t.cuisine} sub={`${t.rep.title} and more`} rep={t.rep} />
+              : cuisineTiles.map((tc) => (
+                  <BrowseCard key={tc.cuisine} title={tc.cuisine} sub={t("homePage.cuisineTileSub", { title: tc.rep.title })} rep={tc.rep} />
                 ))}
           </div>
 
@@ -596,7 +595,7 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
               paddingBottom: 2,
             }}
           >
-            See all {recipes.length} recipes →
+            {t("homePage.seeAllRecipes", { count: String(recipes.length) })}
           </Link>
         </div>
       </section>
@@ -615,20 +614,19 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
               color: "var(--ink)",
             }}
           >
-            Munchly grows with you
+            {t("homePage.growsTitle")}
           </h2>
           <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--ink-2)" }}>
-            The wheel, your week plan, your shopping list, and cooking from what&apos;s in the kitchen - all
-            live today, all free, no account required beyond saving favorites.
+            {t("homePage.growsSubtitle")}
           </p>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 250px), 1fr))", gap: 16 }}>
           {[
-            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Save favorites", body: "Sign in free and tap the heart on any recipe to keep it in your list.", href: "/favorites", image: "/mascots/favorites.png", delay: "0s" },
-            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Plan your week", body: "Spin once for the whole week. Skip the days you're eating out.", href: "/plan", image: "/mascots/plan.png", delay: "0.3s" },
-            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Build a shopping list", body: "Your planned meals turn into one combined list you can check off.", href: "/shopping-list", image: "/mascots/shopping-list.png", delay: "0.6s" },
-            { tag: "Live", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", title: "Cook from your fridge", body: "Tell us what's in the kitchen and we'll find what you can make with it.", href: "/fridge", image: "/mascots/fridge.png", delay: "0.9s" },
+            { tagKey: "homePage.liveTag", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", titleKey: "homePage.favSaveTitle", bodyKey: "homePage.favSaveBody", href: "/favorites", image: "/mascots/favorites.png", delay: "0s" },
+            { tagKey: "homePage.liveTag", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", titleKey: "homePage.planWeekTitle", bodyKey: "homePage.planWeekBody", href: "/plan", image: "/mascots/plan.png", delay: "0.3s" },
+            { tagKey: "homePage.liveTag", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", titleKey: "homePage.shoppingListTitle", bodyKey: "homePage.shoppingListBody", href: "/shopping-list", image: "/mascots/shopping-list.png", delay: "0.6s" },
+            { tagKey: "homePage.liveTag", tagBg: "var(--terra-tint)", tagColor: "var(--terra-text)", titleKey: "homePage.fridgeTitle", bodyKey: "homePage.fridgeBody", href: "/fridge", image: "/mascots/fridge.png", delay: "0.9s" },
           ].map((f) => {
             const cardStyle = {
               background: "var(--card)",
@@ -680,21 +678,21 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
                       borderRadius: 999,
                     }}
                   >
-                    {f.tag}
+                    {t(f.tagKey)}
                   </span>
                   <h3 style={{ margin: "4px 0 0", fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 22, color: "var(--ink)" }}>
-                    {f.title}
+                    {t(f.titleKey)}
                   </h3>
-                  <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5, color: "var(--muted)" }}>{f.body}</p>
+                  <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5, color: "var(--muted)" }}>{t(f.bodyKey)}</p>
                 </div>
               </>
             );
             return f.href ? (
-              <Link key={f.title} href={f.href} style={cardStyle}>
+              <Link key={f.titleKey} href={f.href} style={cardStyle}>
                 {content}
               </Link>
             ) : (
-              <div key={f.title} style={cardStyle}>
+              <div key={f.titleKey} style={cardStyle}>
                 {content}
               </div>
             );
@@ -716,7 +714,7 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
           }}
         >
           <p style={{ margin: 0, fontSize: 16, color: "var(--olive-text)", fontWeight: 500, maxWidth: "34em" }}>
-            Sign in free and tap the heart on any recipe to keep it in your favorites.
+            {t("homePage.favoritesCtaPrompt")}
           </p>
           <AccountNav />
         </div>
@@ -916,8 +914,8 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
           >
             <span>© 2026 Munchly</span>
             <div style={{ display: "flex", gap: 18 }}>
-              <Link href="/privacy" style={{ color: "#B3A393" }}>Privacy</Link>
-              <Link href="/terms" style={{ color: "#B3A393" }}>Terms</Link>
+              <Link href="/privacy" style={{ color: "#B3A393" }}>{t("homePage.footerPrivacy")}</Link>
+              <Link href="/terms" style={{ color: "#B3A393" }}>{t("homePage.footerTerms")}</Link>
             </div>
           </div>
         </div>
@@ -927,6 +925,7 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
 }
 
 function BrowseCard({ title, sub, rep }: { title: string; sub: string; rep?: Recipe }) {
+  const t = useTranslations();
   const live = !!rep;
   const content = (
     <>
@@ -953,7 +952,7 @@ function BrowseCard({ title, sub, rep }: { title: string; sub: string; rep?: Rec
             color: live ? "#FBF8F2" : "var(--muted)",
           }}
         >
-          {live ? "Live" : "Soon"}
+          {live ? t("homePage.liveTag") : t("homePage.soonTag")}
         </span>
       </div>
       <div style={{ padding: "16px 18px 18px", display: "flex", flexDirection: "column", gap: 3 }}>

@@ -1,10 +1,13 @@
-import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { getPublishedBlogPosts } from "@/sanity/blogQueries";
 import AccountNav from "@/components/AccountNav";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
+import LocaleLink from "@/i18n/Link";
+import { getTranslations } from "@/i18n/getTranslations";
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
+import { translateBlogPostSummaries } from "@/lib/contentTranslations";
 
 export const revalidate = 60;
 
@@ -14,8 +17,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/blog" },
 };
 
-export default async function BlogIndexPage() {
-  const posts = await getPublishedBlogPosts();
+export default async function BlogIndexPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = getTranslations(locale);
+  const posts = await translateBlogPostSummaries(await getPublishedBlogPosts(), locale);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)" }}>
@@ -30,9 +40,9 @@ export default async function BlogIndexPage() {
         }}
       >
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Munchly
-          </Link>
+          <LocaleLink href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("common.backToMunchly")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -53,16 +63,16 @@ export default async function BlogIndexPage() {
               letterSpacing: "-0.015em",
             }}
           >
-            Blog
+            {t("blogIndexPage.title")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            Recipes, kitchen notes and cooking stories.
+            {t("blogIndexPage.subtitle")}
           </p>
         </div>
 
         {posts.length === 0 ? (
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            New posts are on their way — check back soon.
+            {t("blogIndexPage.emptyPrompt")}
           </p>
         ) : (
           <div
@@ -73,7 +83,7 @@ export default async function BlogIndexPage() {
             }}
           >
             {posts.map((post) => (
-              <Link
+              <LocaleLink
                 key={post._id}
                 href={`/${post.slug}`}
                 style={{
@@ -102,7 +112,7 @@ export default async function BlogIndexPage() {
                     </p>
                   )}
                 </div>
-              </Link>
+              </LocaleLink>
             ))}
           </div>
         )}
