@@ -1,12 +1,24 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/i18n/Link";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 import { APP_LINKS, ACCOUNT_LINKS, INFO_LINKS, type MenuLink } from "@/lib/siteLinks";
 import SiteSearch from "./SiteSearch";
+import LocaleSwitcher from "./LocaleSwitcher";
 
-function MenuGroup({ label, links, onNavigate }: { label: string; links: MenuLink[]; onNavigate: () => void }) {
+function MenuGroup({
+  label,
+  links,
+  onNavigate,
+  t,
+}: {
+  label: string;
+  links: MenuLink[];
+  onNavigate: () => void;
+  t: (key: string) => string;
+}) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <span
@@ -28,7 +40,7 @@ function MenuGroup({ label, links, onNavigate }: { label: string; links: MenuLin
           onClick={onNavigate}
           style={{ padding: "11px 16px", borderRadius: 12, fontWeight: 600, fontSize: 15, color: "var(--ink)" }}
         >
-          {l.label}
+          {t(l.labelKey)}
         </Link>
       ))}
     </div>
@@ -43,6 +55,7 @@ function MenuGroup({ label, links, onNavigate }: { label: string; links: MenuLin
 export default function SiteMenu() {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations();
 
   useEffect(() => {
     if (!open) return;
@@ -65,6 +78,7 @@ export default function SiteMenu() {
   return (
     <>
       <SiteSearch />
+      <LocaleSwitcher />
       <div ref={wrapperRef} style={{ position: "relative" }}>
       <button
         type="button"
@@ -105,9 +119,9 @@ export default function SiteMenu() {
           }}
         >
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: 10, display: "flex", flexDirection: "column", gap: 10 }}>
-            <MenuGroup label="Munchly" links={APP_LINKS} onNavigate={close} />
-            <MenuGroup label="Your account" links={ACCOUNT_LINKS} onNavigate={close} />
-            <MenuGroup label="Info" links={INFO_LINKS} onNavigate={close} />
+            <MenuGroup label={t("nav.munchlyGroup")} links={APP_LINKS} onNavigate={close} t={t} />
+            <MenuGroup label={t("nav.accountGroup")} links={ACCOUNT_LINKS} onNavigate={close} t={t} />
+            <MenuGroup label={t("nav.infoGroup")} links={INFO_LINKS} onNavigate={close} t={t} />
           </div>
         </div>
       )}

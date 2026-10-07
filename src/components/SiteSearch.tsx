@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/i18n/Link";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 type ResultItem = { title: string; href: string; sub?: string };
 type SearchResponse = {
@@ -13,11 +14,11 @@ type SearchResponse = {
 
 const EMPTY: SearchResponse = { recipes: [], posts: [], games: [], pages: [] };
 
-const GROUPS: { key: keyof SearchResponse; label: string }[] = [
-  { key: "recipes", label: "Recipes" },
-  { key: "posts", label: "Blog posts" },
-  { key: "games", label: "Games" },
-  { key: "pages", label: "Pages" },
+const GROUP_KEYS: { key: keyof SearchResponse; labelKey: string }[] = [
+  { key: "recipes", labelKey: "search.groupRecipes" },
+  { key: "posts", labelKey: "search.groupPosts" },
+  { key: "games", labelKey: "search.groupGames" },
+  { key: "pages", labelKey: "search.groupPages" },
 ];
 
 // A site-wide search: one icon button (rendered inside SiteMenu, so it
@@ -32,6 +33,7 @@ export default function SiteSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestIdRef = useRef(0);
+  const t = useTranslations();
 
   const close = () => {
     setOpen(false);
@@ -97,8 +99,8 @@ export default function SiteSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Search Munchly"
-        title="Search"
+        aria-label={t("search.ariaLabel")}
+        title={t("search.ariaLabel")}
         style={{
           width: 42,
           height: 42,
@@ -122,7 +124,7 @@ export default function SiteSearch() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Search Munchly"
+          aria-label={t("search.ariaLabel")}
           onClick={close}
           style={{
             position: "fixed",
@@ -168,7 +170,7 @@ export default function SiteSearch() {
                 type="text"
                 value={query}
                 onChange={(e) => handleQueryChange(e.target.value)}
-                placeholder="Search recipes, blog posts, games, pages..."
+                placeholder={t("search.placeholder")}
                 style={{
                   flex: 1,
                   minWidth: 0,
@@ -194,26 +196,26 @@ export default function SiteSearch() {
                   padding: "4px 6px",
                 }}
               >
-                Esc
+                {t("search.close")}
               </button>
             </div>
 
             <div style={{ overflowY: "auto", padding: hasAnyResults ? "8px" : "0" }}>
               {query.trim().length < 2 && (
                 <p style={{ margin: 0, padding: "20px 16px", fontSize: 14, color: "var(--muted)" }}>
-                  Type at least 2 characters to search the whole site.
+                  {t("search.hint")}
                 </p>
               )}
               {loading && query.trim().length >= 2 && (
-                <p style={{ margin: 0, padding: "20px 16px", fontSize: 14, color: "var(--muted)" }}>Searching...</p>
+                <p style={{ margin: 0, padding: "20px 16px", fontSize: 14, color: "var(--muted)" }}>{t("search.searching")}</p>
               )}
               {showEmptyState && (
                 <p style={{ margin: 0, padding: "20px 16px", fontSize: 14, color: "var(--muted)" }}>
-                  No matches for &ldquo;{query.trim()}&rdquo;.
+                  {t("search.noResults", { query: query.trim() })}
                 </p>
               )}
               {!loading &&
-                GROUPS.map(({ key, label }) => {
+                GROUP_KEYS.map(({ key, labelKey }) => {
                   const items = results[key];
                   if (items.length === 0) return null;
                   return (
@@ -228,7 +230,7 @@ export default function SiteSearch() {
                           letterSpacing: "0.04em",
                         }}
                       >
-                        {label}
+                        {t(labelKey)}
                       </span>
                       {items.map((item) => (
                         <Link

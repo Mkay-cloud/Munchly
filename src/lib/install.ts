@@ -15,7 +15,7 @@
 // standalone mode - all of it is hidden for good on this browser.
 
 // The event can fire before React has hydrated, so a tiny inline script in
-// app/layout.tsx (INSTALL_CAPTURE_SCRIPT) catches it first and parks it on
+// app/[locale]/layout.tsx (INSTALL_CAPTURE_SCRIPT) catches it first and parks it on
 // window.__mlyInstall. Keep the names in that script in sync with these.
 export const INSTALL_CAPTURE_SCRIPT = `(function(){var w=window;w.__mlyInstall=w.__mlyInstall||{event:null,installed:false};w.addEventListener('beforeinstallprompt',function(e){e.preventDefault();w.__mlyInstall.event=e;w.dispatchEvent(new Event('mly-install-change'));});w.addEventListener('appinstalled',function(){w.__mlyInstall.event=null;w.__mlyInstall.installed=true;try{localStorage.setItem('munchly_installed_v1','1');}catch(e){}w.dispatchEvent(new Event('mly-install-change'));});})();`;
 

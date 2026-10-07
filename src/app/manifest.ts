@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 // Makes Munchly installable (Chrome/Edge/Android "Install app", and what the
 // install prompts in components/InstallPrompts.tsx trigger). iOS uses
-// app/apple-icon.png and the appleWebApp metadata in app/layout.tsx instead;
+// app/apple-icon.png and the appleWebApp metadata in app/[locale]/layout.tsx instead;
 // browser tabs use app/favicon.ico and app/icon.png. All icons are cropped
 // from public/munchly-logo.png.
 export default function manifest(): MetadataRoute.Manifest {
