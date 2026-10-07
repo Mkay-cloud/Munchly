@@ -16,6 +16,8 @@ import {
   clearWeekPlan,
   rerollDay,
   toggleSkipDay,
+  DAY_LABEL_KEYS,
+  MOOD_LABEL_KEYS,
 } from "@/lib/weekPlan";
 import { useTranslations } from "@/i18n/LocaleProvider";
 
@@ -113,7 +115,7 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
                 color: m === mood ? "#FBF8F2" : "var(--ink)",
               }}
             >
-              {m}
+              {t(MOOD_LABEL_KEYS[m])}
             </button>
           ))}
         </div>
@@ -198,7 +200,7 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
                       color: "var(--muted)",
                     }}
                   >
-                    {d.day}
+                    {t(DAY_LABEL_KEYS[d.day])}
                   </span>
 
                   {d.skip ? (
@@ -253,7 +255,7 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
                       <button
                         type="button"
                         onClick={() => handleReroll(i)}
-                        aria-label={t("planPage.rerollAria", { day: d.day })}
+                        aria-label={t("planPage.rerollAria", { day: t(DAY_LABEL_KEYS[d.day]) })}
                         title={t("planPage.rerollTitle")}
                         style={{
                           width: 38,
@@ -297,7 +299,7 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
 
         {!plan && (
           <p style={{ color: "var(--muted)", fontSize: 15 }}>
-            {t("planPage.emptyPrompt")}
+            {t("planPage.emptyPrompt", { anythingLabel: t(MOOD_LABEL_KEYS.Anything) })}
           </p>
         )}
       </main>

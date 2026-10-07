@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { IosInstallHelp } from "@/components/InstallPrompts";
+import LocaleLink from "@/i18n/Link";
+import { useTranslations } from "@/i18n/LocaleProvider";
 import {
   chromeIntentUrl,
   getInstallCapability,
@@ -30,18 +31,10 @@ const HANDOFF_KEY = "munchly_download_handoff_v1";
 // same in-app browser) - this flag stops a second attempt.
 const FALLBACK_PATH = "/download?from=inapp";
 
-// The steps to leave each app's browser on iOS. Best-effort: apps move these
-// menus around between versions.
-const IOS_LEAVE_STEPS: Record<string, string> = {
-  Instagram: "Tap ••• in the top-right corner, then Open in external browser.",
-  Facebook: "Tap ••• in the top-right (or bottom-right) corner, then Open in external browser.",
-  TikTok: "Tap ••• in the top-right corner, then Open in browser.",
-};
-const IOS_LEAVE_DEFAULT = "Look for a ••• or Share button and choose Open in Safari (or Open in browser).";
-
 type Status = InstallCapability | "pending";
 
 export default function DownloadClient() {
+  const t = useTranslations();
   // "pending" on the server and during hydration, so the server HTML and the
   // first client render match; the real answer arrives right after.
   const capability = useSyncExternalStore<Status>(subscribeInstall, getInstallCapability, () => "pending");
@@ -86,39 +79,38 @@ export default function DownloadClient() {
             letterSpacing: "-0.015em",
           }}
         >
-          Get the Munchly app
+          {t("downloadPage.title")}
         </h1>
         <p style={{ margin: 0, fontSize: 17, lineHeight: 1.55, color: "var(--ink-2)" }}>
-          Install Munchly on your phone and decide what&apos;s for dinner in one tap. It opens from your home screen
-          like any other app - no app store, nothing to update.
+          {t("downloadPage.subtitle")}
         </p>
       </div>
 
       <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
         {capability === "pending" && (
           <button type="button" className="mly-install-btn mly-download-btn" disabled aria-busy="true">
-            Install Munchly App
+            {t("downloadPage.installButton")}
           </button>
         )}
 
         {capability === "prompt" && (
           <button type="button" className="mly-install-btn mly-download-btn" onClick={() => promptInstall()}>
-            Install Munchly App
+            {t("downloadPage.installButton")}
           </button>
         )}
 
         {capability === "ios" && (
           <button type="button" className="mly-install-btn mly-download-btn" onClick={() => setIosHelpOpen(true)}>
-            Install Munchly App
+            {t("downloadPage.installButton")}
           </button>
         )}
 
         {capability === "installed" && (
-          <Notice title="✓ Munchly is installed">
-            Open it from your home screen - or{" "}
-            <Link href="/" style={{ color: "var(--primary-text)", fontWeight: 600 }}>
-              keep going here
-            </Link>
+          <Notice title={t("downloadPage.installedTitle")}>
+            {t("downloadPage.installedBodyBefore")}
+            <LocaleLink href="/" style={{ color: "var(--primary-text)", fontWeight: 600 }}>
+              {t("downloadPage.installedBodyLink")}
+            </LocaleLink>
             .
           </Notice>
         )}
@@ -158,49 +150,54 @@ function Notice({ title, children }: { title: string; children: React.ReactNode 
 // A normal browser that can't install from this page (desktop Firefox or
 // Safari, Chrome on iPhone, Android before the browser is ready, ...).
 function NotInstallableHere() {
+  const t = useTranslations();
   const ua = navigator.userAgent;
   const iOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   if (iOS) {
     return (
-      <Notice title="Open this page in Safari">
-        <span>On iPhone and iPad, apps like Munchly are installed from Safari. Copy the link and paste it into Safari.</span>
+      <Notice title={t("downloadPage.notInstallableIosTitle")}>
+        <span>{t("downloadPage.notInstallableIosBody")}</span>
         <CopyLink />
       </Notice>
     );
   }
   if (isAndroid()) {
     return (
-      <Notice title="Install from your browser menu">
+      <Notice title={t("downloadPage.notInstallableAndroidTitle")}>
         <span>
-          Tap your browser&apos;s <strong>⋮</strong> menu and choose <strong>Install app</strong> or{" "}
-          <strong>Add to Home screen</strong>. It works best in Chrome.
+          {t("downloadPage.notInstallableAndroidBodyBefore")}
+          <strong>{t("downloadPage.notInstallableAndroidBodyMenu")}</strong>
+          {t("downloadPage.notInstallableAndroidBodyOr")}
+          <strong>{t("downloadPage.notInstallableAndroidBodyHome")}</strong>
+          {t("downloadPage.notInstallableAndroidBodyAfter")}
         </span>
       </Notice>
     );
   }
   return (
-    <Notice title="Install it on your phone">
+    <Notice title={t("downloadPage.notInstallableDesktopTitle")}>
       <span>
-        Open <strong>munchly.online/download</strong> on your phone - in Chrome on Android or Safari on iPhone - and
-        tap Install.
+        {t("downloadPage.notInstallableDesktopBodyBefore")}
+        <strong>{t("downloadPage.notInstallableDesktopBodyUrl")}</strong>
+        {t("downloadPage.notInstallableDesktopBodyAfter")}
       </span>
     </Notice>
   );
 }
 
 function AndroidInApp({ handingOff }: { handingOff: boolean }) {
+  const t = useTranslations();
   const app = inAppBrowserName();
-  const where = app && app !== "app" ? `${app}'s built-in browser` : "this app's built-in browser";
+  const where = app && app !== "app" ? t("downloadPage.builtInBrowserOf", { app }) : t("downloadPage.builtInBrowserGeneric");
   return (
-    <Notice title="Open in Chrome to install">
+    <Notice title={t("downloadPage.androidInAppTitle")}>
       <span>
-        You&apos;re in {where}, which can&apos;t install apps.{" "}
-        {handingOff ? "We're opening this page in Chrome for you. " : ""}
-        If Chrome doesn&apos;t open, tap the button below - or use the <strong>⋮</strong> menu and choose{" "}
-        <strong>Open in Chrome</strong> (or <strong>Open in browser</strong>).
+        {t("downloadPage.androidInAppBodyBefore", { where })}
+        {handingOff ? t("downloadPage.androidInAppAutoNotice") : ""}
+        {t("downloadPage.androidInAppBodyAfter")}
       </span>
       <a href={chromeIntentUrl("/download", FALLBACK_PATH)} className="mly-install-btn mly-download-btn" style={{ alignSelf: "stretch", textAlign: "center" }}>
-        Open in Chrome
+        {t("downloadPage.openInChrome")}
       </a>
       <CopyLink />
     </Notice>
@@ -208,14 +205,22 @@ function AndroidInApp({ handingOff }: { handingOff: boolean }) {
 }
 
 function IosInApp() {
+  const t = useTranslations();
   const app = inAppBrowserName();
-  const steps = (app && IOS_LEAVE_STEPS[app]) || IOS_LEAVE_DEFAULT;
-  const where = app && app !== "app" ? `${app}'s built-in browser` : "this app's built-in browser";
+  const steps =
+    app === "Instagram"
+      ? t("downloadPage.iosStepsInstagram")
+      : app === "Facebook"
+        ? t("downloadPage.iosStepsFacebook")
+        : app === "TikTok"
+          ? t("downloadPage.iosStepsTikTok")
+          : t("downloadPage.iosStepsDefault");
+  const where = app && app !== "app" ? t("downloadPage.builtInBrowserOf", { app }) : t("downloadPage.builtInBrowserGeneric");
   return (
-    <Notice title="Open in Safari to install">
-      <span>You&apos;re in {where}, which can&apos;t add apps to your Home Screen. Open this page in Safari first:</span>
+    <Notice title={t("downloadPage.iosInAppTitle")}>
+      <span>{t("downloadPage.iosInAppBody", { where })}</span>
       <span style={{ fontWeight: 600, color: "var(--ink)" }}>{steps}</span>
-      <span>Or copy the link and paste it into Safari:</span>
+      <span>{t("downloadPage.orCopyLink")}</span>
       <CopyLink />
     </Notice>
   );
@@ -225,6 +230,7 @@ function IosInApp() {
 // (and the old execCommand copy) where the clipboard API isn't allowed, as
 // in some in-app browsers.
 function CopyLink() {
+  const t = useTranslations();
   const inputRef = useRef<HTMLInputElement>(null);
   const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
   const url = `${window.location.origin}/download`;
@@ -262,7 +268,7 @@ function CopyLink() {
           ref={inputRef}
           readOnly
           value={url}
-          aria-label="Link to this page"
+          aria-label={t("downloadPage.linkAria")}
           onFocus={(e) => e.currentTarget.select()}
           style={{
             flex: 1,
@@ -277,11 +283,11 @@ function CopyLink() {
           }}
         />
         <button type="button" onClick={copy} className="mly-install-btn" style={{ flex: "none", padding: "10px 18px" }}>
-          {state === "copied" ? "Copied!" : "Copy link"}
+          {state === "copied" ? t("downloadPage.copied") : t("downloadPage.copyLink")}
         </button>
       </div>
       <span aria-live="polite" style={{ fontSize: 14, color: "var(--muted)", minHeight: 20 }}>
-        {state === "copied" ? "Link copied - now paste it into your browser." : state === "failed" ? "Couldn't copy automatically - press and hold the link to copy it." : ""}
+        {state === "copied" ? t("downloadPage.copiedHint") : state === "failed" ? t("downloadPage.failedHint") : ""}
       </span>
     </div>
   );

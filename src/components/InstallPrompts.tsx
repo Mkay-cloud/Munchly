@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useTranslations } from "@/i18n/LocaleProvider";
 import { getInstallMode, promptInstall, subscribeInstall, type InstallMode } from "@/lib/install";
 
 // "Install Munchly App" prompts, mounted once in app/[locale]/layout.tsx, on phones
@@ -73,6 +74,7 @@ function PagePopup({ onInstall }: { onInstall: () => void }) {
 // --- Bottom bar ------------------------------------------------------------------
 
 function InstallBar({ onInstall }: { onInstall: () => void }) {
+  const t = useTranslations();
   const ref = useRef<HTMLButtonElement>(null);
 
   // Publish the bar's height (including the iPhone home-indicator area) so the
@@ -96,7 +98,7 @@ function InstallBar({ onInstall }: { onInstall: () => void }) {
     <button ref={ref} type="button" className="mly-install-bar" onClick={onInstall}>
       <span className="mly-install-bar__hop">
         <Image src="/icon-192.png" alt="" width={24} height={24} style={{ borderRadius: 6, display: "block" }} />
-        <span>Install Munchly App</span>
+        <span>{t("installPrompts.installAppTitle")}</span>
         <DownloadIcon />
       </span>
     </button>
@@ -106,6 +108,7 @@ function InstallBar({ onInstall }: { onInstall: () => void }) {
 // --- Popup card ------------------------------------------------------------------
 
 function InstallPopup({ onInstall, onDismiss }: { onInstall: () => void; onDismiss: () => void }) {
+  const t = useTranslations();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onDismiss();
@@ -127,19 +130,19 @@ function InstallPopup({ onInstall, onDismiss }: { onInstall: () => void; onDismi
         <Image src="/icon-192.png" alt="" width={52} height={52} style={{ flex: "none", borderRadius: 14, display: "block" }} />
         <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
           <h2 id="mly-install-title" style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 20, lineHeight: 1.2, color: "var(--ink)" }}>
-            Install Munchly App
+            {t("installPrompts.installAppTitle")}
           </h2>
           <p id="mly-install-body" style={{ margin: 0, fontSize: 15, lineHeight: 1.45, color: "var(--muted)" }}>
-            Add Munchly to your home screen and decide what&apos;s for dinner in one tap - no app store needed.
+            {t("installPrompts.installAppBody")}
           </p>
         </div>
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
         <button type="button" onClick={onDismiss} className="mly-install-btn mly-install-btn--quiet">
-          Not Now
+          {t("installPrompts.notNow")}
         </button>
         <button type="button" onClick={onInstall} className="mly-install-btn">
-          Install
+          {t("installPrompts.install")}
         </button>
       </div>
     </div>
@@ -149,6 +152,7 @@ function InstallPopup({ onInstall, onDismiss }: { onInstall: () => void; onDismi
 // --- iOS manual steps ------------------------------------------------------------
 
 export function IosInstallHelp({ onClose }: { onClose: () => void }) {
+  const t = useTranslations();
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -187,13 +191,13 @@ export function IosInstallHelp({ onClose }: { onClose: () => void }) {
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
           <h2 id="mly-ios-title" style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 22, color: "var(--ink)" }}>
-            Add Munchly to your Home Screen
+            {t("installPrompts.addToHomeScreenTitle")}
           </h2>
           <button
             ref={closeRef}
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t("installPrompts.closeAria")}
             style={{ flex: "none", width: 36, height: 36, border: "none", borderRadius: "50%", background: "var(--chip)", fontSize: 20, lineHeight: 1, cursor: "pointer", color: "var(--muted)" }}
           >
             ×
@@ -203,24 +207,30 @@ export function IosInstallHelp({ onClose }: { onClose: () => void }) {
           {step(
             1,
             <>
-              Tap the <strong>Share</strong> button <ShareIcon /> in Safari&apos;s toolbar.
+              {t("installPrompts.step1Before")}
+              <strong>Share</strong> <ShareIcon />
+              {t("installPrompts.step1After")}
             </>
           )}
           {step(
             2,
             <>
-              Scroll down and tap <strong>Add to Home Screen</strong> <AddIcon />.
+              {t("installPrompts.step2Before")}
+              <strong>Add to Home Screen</strong> <AddIcon />
+              {t("installPrompts.step2After")}
             </>
           )}
           {step(
             3,
             <>
-              Tap <strong>Add</strong> - Munchly will open from your Home Screen like an app.
+              {t("installPrompts.step3Before")}
+              <strong>Add</strong>
+              {t("installPrompts.step3After")}
             </>
           )}
         </ol>
         <button type="button" onClick={onClose} className="mly-install-btn" style={{ alignSelf: "stretch" }}>
-          Got it
+          {t("installPrompts.gotIt")}
         </button>
       </div>
     </div>

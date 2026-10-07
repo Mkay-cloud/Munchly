@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
@@ -9,6 +8,9 @@ import LikeButton from "@/components/LikeButton";
 import SignInGate from "@/components/SignInGate";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
+import LocaleLink from "@/i18n/Link";
+import { getTranslations } from "@/i18n/getTranslations";
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
 import CommentForm from "./CommentForm";
 import { splitLines, type CommunityComment, type CommunityProfile, type CommunityRecipe } from "@/lib/community";
 
@@ -45,9 +47,11 @@ export async function generateMetadata({
 export default async function CommunityRecipePage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }) {
-  const { id } = await params;
+  const { id, locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = getTranslations(locale);
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   const viewerId = claims?.claims?.sub as string | undefined;
@@ -100,9 +104,9 @@ export default async function CommunityRecipePage({
         }}
       >
         <div style={{ maxWidth: 800, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/community" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to community recipes
-          </Link>
+          <LocaleLink href="/community" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("communityDetailPage.backLink")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -124,8 +128,8 @@ export default async function CommunityRecipePage({
             }}
           >
             {recipe.status === "pending"
-              ? "This is only visible to you until it's approved."
-              : "This submission wasn't approved, and is only visible to you."}
+              ? t("communityDetailPage.pendingNotice")
+              : t("communityDetailPage.rejectedNotice")}
           </div>
         )}
 
@@ -140,7 +144,7 @@ export default async function CommunityRecipePage({
               fontWeight: 600,
             }}
           >
-            Your edit is under review. Everyone else still sees the version below until it&rsquo;s approved.
+            {t("communityDetailPage.pendingEditNotice")}
           </div>
         )}
 
@@ -168,16 +172,18 @@ export default async function CommunityRecipePage({
             <div style={{ position: "relative", width: 28, height: 28, borderRadius: "50%", overflow: "hidden", background: "var(--chip)", flexShrink: 0 }}>
               <Image src={author?.avatar_url || "/panda-head.png"} alt="" fill sizes="28px" style={{ objectFit: "cover" }} />
             </div>
-            <span style={{ fontSize: 14, color: "var(--muted)" }}>by {author?.display_name ?? "Someone"}</span>
+            <span style={{ fontSize: 14, color: "var(--muted)" }}>
+              {t("communityDetailPage.byLabel", { name: author?.display_name ?? t("communityPage.someone") })}
+            </span>
           </div>
 
           <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
             <LikeButton recipeId={recipe.id} initialLiked={likedByViewer} initialCount={likeCount} />
             {isOwner && (
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <Link href={`/suggest?edit=${recipe.id}`} style={{ fontSize: 14, fontWeight: 700, color: "var(--primary)" }}>
-                  Edit recipe
-                </Link>
+                <LocaleLink href={`/suggest?edit=${recipe.id}`} style={{ fontSize: 14, fontWeight: 700, color: "var(--primary)" }}>
+                  {t("communityDetailPage.editRecipe")}
+                </LocaleLink>
                 <DeleteRecipeButton recipeId={recipe.id} redirectTo="/suggest" />
               </div>
             )}
@@ -185,7 +191,7 @@ export default async function CommunityRecipePage({
         </div>
 
         <section style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <h2 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>Ingredients</h2>
+          <h2 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>{t("communityDetailPage.ingredients")}</h2>
           <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
             {splitLines(recipe.ingredients).map((ing, i) => (
               <li key={i} style={{ padding: "12px 16px", background: "var(--card)", border: "1px solid var(--border)", borderRadius: 14, fontSize: 15 }}>
@@ -196,7 +202,7 @@ export default async function CommunityRecipePage({
         </section>
 
         <section style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <h2 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>Instructions</h2>
+          <h2 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>{t("communityDetailPage.instructions")}</h2>
           <ol style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 14 }}>
             {splitLines(recipe.instructions).map((step, i) => (
               <li key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
@@ -225,7 +231,7 @@ export default async function CommunityRecipePage({
 
         <section style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>
-            Comments {comments.length > 0 && `(${comments.length})`}
+            {t("communityDetailPage.comments")} {comments.length > 0 && `(${comments.length})`}
           </h2>
 
           {comments.length > 0 && (
@@ -238,7 +244,7 @@ export default async function CommunityRecipePage({
                       <Image src={commenter?.avatar_url || "/panda-head.png"} alt="" fill sizes="32px" style={{ objectFit: "cover" }} />
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                      <span style={{ fontSize: 14, fontWeight: 700 }}>{commenter?.display_name ?? "Someone"}</span>
+                      <span style={{ fontSize: 14, fontWeight: 700 }}>{commenter?.display_name ?? t("communityPage.someone")}</span>
                       <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5, color: "var(--ink)" }}>{c.body}</p>
                     </div>
                   </div>
@@ -250,7 +256,7 @@ export default async function CommunityRecipePage({
           {viewerId ? (
             <CommentForm recipeId={recipe.id} />
           ) : (
-            <SignInGate message="Sign in to leave a comment." />
+            <SignInGate message={t("communityDetailPage.signInToComment")} />
           )}
         </section>
       </main>

@@ -6,6 +6,29 @@ export type WeekDay = (typeof WEEK_DAYS)[number];
 export const PLAN_MOODS = ["Anything", "Comfort", "Quick", "Spicy", "Sweet"] as const;
 export type PlanMood = (typeof PLAN_MOODS)[number];
 
+// English values above are internal matching/storage keys (recipe.moods in
+// Sanity, and past week plans in localStorage, both use these literal
+// strings) - never translate them directly. These maps give each one a
+// translation-key for display only, same pattern as categoryLabel in
+// lib/guessTheDish.ts.
+export const DAY_LABEL_KEYS: Record<WeekDay, string> = {
+  Mon: "planPage.dayMon",
+  Tue: "planPage.dayTue",
+  Wed: "planPage.dayWed",
+  Thu: "planPage.dayThu",
+  Fri: "planPage.dayFri",
+  Sat: "planPage.daySat",
+  Sun: "planPage.daySun",
+};
+
+export const MOOD_LABEL_KEYS: Record<PlanMood, string> = {
+  Anything: "planPage.moodAnything",
+  Comfort: "planPage.moodComfort",
+  Quick: "planPage.moodQuick",
+  Spicy: "planPage.moodSpicy",
+  Sweet: "planPage.moodSweet",
+};
+
 export type DayPlan = {
   day: WeekDay;
   slug: string | null;
