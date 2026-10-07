@@ -1,6 +1,5 @@
 "use client";
 
-import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { DEFAULT_LOCALE, LOCALES, LOCALE_LABELS, isLocale, type Locale } from "@/i18n/locales";
@@ -37,6 +36,18 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 function setLocaleCookie(locale: Locale) {
   if (typeof document === "undefined") return;
   document.cookie = `${COOKIE_NAME}=${locale}; path=/; max-age=${COOKIE_MAX_AGE}`;
+}
+
+// Switching locale always does a real, full navigation rather than
+// Next's client-side router. next/link prefetches its target in the
+// background using whatever NEXT_LOCALE cookie existed at prefetch
+// time, and a click can be served from that stale prefetch instead of
+// issuing a fresh request - so the cookie we just set above can arrive
+// too late to matter. A plain browser navigation always hits the server
+// fresh, guaranteeing the proxy sees the cookie we just stamped.
+function goToLocale(locale: Locale, href: string) {
+  setLocaleCookie(locale);
+  window.location.assign(href);
 }
 
 // A language dropdown, rendered inside SiteMenu (so it shows up next to
@@ -115,26 +126,36 @@ export default function LocaleSwitcher() {
             padding: 6,
           }}
         >
-          {LOCALES.map((locale) => (
-            <NextLink
-              key={locale}
-              href={hrefFor(locale, barePath)}
-              onClick={() => {
-                setLocaleCookie(locale);
-                setOpen(false);
-              }}
-              style={{
-                padding: "9px 12px",
-                borderRadius: 10,
-                fontSize: 14,
-                fontWeight: locale === currentLocale ? 700 : 600,
-                color: locale === currentLocale ? "var(--primary-text)" : "var(--ink)",
-                background: locale === currentLocale ? "var(--chip)" : "transparent",
-              }}
-            >
-              {LOCALE_LABELS[locale]}
-            </NextLink>
-          ))}
+          {LOCALES.map((locale) => {
+            const href = hrefFor(locale, barePath);
+            return (
+              <a
+                key={locale}
+                href={href}
+                onClick={(e) => {
+                  // Modifier/middle clicks should behave like a normal link
+                  // (open in a new tab, etc.) - only hijack a plain left
+                  // click to force the full-navigation + cookie-stamp path.
+                  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+                    return;
+                  }
+                  e.preventDefault();
+                  setOpen(false);
+                  goToLocale(locale, href);
+                }}
+                style={{
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontSize: 14,
+                  fontWeight: locale === currentLocale ? 700 : 600,
+                  color: locale === currentLocale ? "var(--primary-text)" : "var(--ink)",
+                  background: locale === currentLocale ? "var(--chip)" : "transparent",
+                }}
+              >
+                {LOCALE_LABELS[locale]}
+              </a>
+            );
+          })}
         </div>
       )}
     </div>
