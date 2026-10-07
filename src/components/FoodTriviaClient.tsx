@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import LocaleLink from "@/i18n/Link";
+import { useTranslations } from "@/i18n/LocaleProvider";
 import Confetti from "@/components/Confetti";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -11,7 +12,7 @@ import {
   QUESTIONS,
   QUESTIONS_PER_QUIZ,
   recordScore,
-  resultMessage,
+  resultTier,
   subscribeBestScore,
   type DealtQuestion,
 } from "@/lib/foodTrivia";
@@ -69,6 +70,7 @@ const primaryButton: React.CSSProperties = {
 };
 
 export default function FoodTriviaClient() {
+  const t = useTranslations();
   const [phase, setPhase] = useState<Phase>("start");
   // Dealt when a quiz starts (never during render), so the server and the
   // first client render both show the start screen - no hydration mismatch.
@@ -205,8 +207,8 @@ export default function FoodTriviaClient() {
       type="button"
       onClick={() => setSoundEnabled(!soundOn)}
       aria-pressed={soundOn}
-      aria-label={soundOn ? "Mute sound effects" : "Unmute sound effects"}
-      title={soundOn ? "Sound on" : "Sound off"}
+      aria-label={soundOn ? t("gamesCommon.muteAriaOn") : t("gamesCommon.muteAriaOff")}
+      title={soundOn ? t("gamesCommon.muteTitleOn") : t("gamesCommon.muteTitleOff")}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -243,9 +245,9 @@ export default function FoodTriviaClient() {
         }}
       >
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/games" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to games
-          </Link>
+          <LocaleLink href="/games" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("gamesCommon.backToGames")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -267,11 +269,10 @@ export default function FoodTriviaClient() {
               letterSpacing: "-0.015em",
             }}
           >
-            Food Trivia
+            {t("foodTriviaGame.title")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            {QUESTIONS_PER_QUIZ} random questions on world cuisines, ingredients, cooking techniques and food history.
-            How many can you get?
+            {t("foodTriviaGame.subtitle", { count: String(QUESTIONS_PER_QUIZ) })}
           </p>
         </div>
 
@@ -292,20 +293,19 @@ export default function FoodTriviaClient() {
               🧠
             </span>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>Ready to test your food smarts?</span>
+              <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>{t("foodTriviaGame.startTitle")}</span>
               <span style={{ fontSize: 15, color: "var(--ink-2)", lineHeight: 1.5 }}>
-                Pick one answer per question - you&apos;ll see straight away if you got it. There are {QUESTIONS.length} questions in
-                the pot, so every round is a different mix.
+                {t("foodTriviaGame.startBody", { count: String(QUESTIONS.length) })}
               </span>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               <Pill>
-                <span style={{ color: "var(--muted)" }}>Your best:</span> {bestLabel}
+                <span style={{ color: "var(--muted)" }}>{t("gamesCommon.yourBest")}</span> {bestLabel}
               </Pill>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <button type="button" onClick={start} style={primaryButton}>
-                Start quiz
+                {t("foodTriviaGame.startQuiz")}
               </button>
               {muteButton}
             </div>
@@ -318,18 +318,18 @@ export default function FoodTriviaClient() {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
                 <span style={{ fontWeight: 700, fontSize: 15 }} aria-live="polite">
-                  Question {index + 1} of {quiz.length}
+                  {t("foodTriviaGame.questionProgress", { current: String(index + 1), total: String(quiz.length) })}
                 </span>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <Pill>
-                    <span style={{ color: "var(--muted)" }}>Score</span> {score}
+                    <span style={{ color: "var(--muted)" }}>{t("gamesCommon.score")}</span> {score}
                   </Pill>
                   {muteButton}
                 </div>
               </div>
               <div
                 role="progressbar"
-                aria-label="Quiz progress"
+                aria-label={t("foodTriviaGame.progressAria")}
                 aria-valuemin={0}
                 aria-valuemax={quiz.length}
                 aria-valuenow={results.length}
@@ -386,7 +386,7 @@ export default function FoodTriviaClient() {
             </div>
 
             {/* Answers - full-width buttons, stacked */}
-            <div role="group" aria-label="Answers" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div role="group" aria-label={t("foodTriviaGame.answersAria")} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {current.options.map((option, i) => {
                 const answered = picked !== null;
                 const isAnswer = option === current.answer;
@@ -407,9 +407,9 @@ export default function FoodTriviaClient() {
                     disabled={answered}
                     aria-label={
                       state === "correct"
-                        ? `${option} - correct answer`
+                        ? `${option} ${t("gamesCommon.correctAnswerSuffix")}`
                         : state === "wrong"
-                          ? `${option} - your answer, wrong`
+                          ? `${option} ${t("gamesCommon.wrongAnswerSuffix")}`
                           : option
                     }
                     style={{
@@ -466,7 +466,7 @@ export default function FoodTriviaClient() {
                       color: answeredCorrectly ? "var(--success-ink)" : "var(--danger-ink)",
                     }}
                   >
-                    {answeredCorrectly ? "✓ Correct!" : `✗ Not quite - it's ${current.answer}.`}
+                    {answeredCorrectly ? t("foodTriviaGame.correctFeedback") : t("foodTriviaGame.wrongFeedback", { answer: current.answer })}
                   </span>
                   <button
                     ref={nextButtonRef}
@@ -474,7 +474,7 @@ export default function FoodTriviaClient() {
                     onClick={() => advance(results)}
                     style={{ ...primaryButton, position: "relative", overflow: "hidden", padding: "12px 22px", fontSize: 15 }}
                   >
-                    {isLast ? "See my score →" : "Next →"}
+                    {isLast ? t("gamesCommon.seeScore") : t("gamesCommon.next")}
                     {/* Drains while the quiz waits to move on by itself. */}
                     <span
                       key={index}
@@ -530,8 +530,25 @@ function EndScreen({
   onPlayAgain: () => void;
   muteButton: React.ReactNode;
 }) {
+  const t = useTranslations();
   const total = QUESTIONS_PER_QUIZ;
-  const { title, body } = resultMessage(score, total);
+  const tier = resultTier(score, total);
+  const title =
+    tier === "perfect"
+      ? t("foodTriviaGame.resultPerfectTitle")
+      : tier === "master"
+        ? t("foodTriviaGame.resultMasterTitle")
+        : tier === "tasty"
+          ? t("foodTriviaGame.resultTastyTitle")
+          : t("foodTriviaGame.resultHungryTitle");
+  const body =
+    tier === "perfect"
+      ? t("foodTriviaGame.resultPerfectBody")
+      : tier === "master"
+        ? t("foodTriviaGame.resultMasterBody")
+        : tier === "tasty"
+          ? t("foodTriviaGame.resultTastyBody")
+          : t("foodTriviaGame.resultHungryBody");
   const high = score >= Math.ceil(total * 0.7);
   return (
     <div
@@ -548,7 +565,7 @@ function EndScreen({
         background: high ? "var(--sage-tint)" : "var(--card)",
       }}
     >
-      <span style={{ fontSize: 15, fontWeight: 700, color: "var(--muted)" }}>Your score</span>
+      <span style={{ fontSize: 15, fontWeight: 700, color: "var(--muted)" }}>{t("gamesCommon.yourScoreLabel")}</span>
       <span
         style={{
           fontFamily: "var(--font-fredoka)",
@@ -570,15 +587,16 @@ function EndScreen({
       <span style={{ fontSize: 15, fontWeight: 600, color: newBest ? "var(--terra-text)" : "var(--muted)" }}>
         {newBest
           ? previousBest === null
-            ? `🏆 New best score: ${score}/${total}!`
-            : `🏆 New best score! (was ${previousBest}/${total})`
-          : `Your best: ${bestScore ?? score}/${total}${bestScore !== null && bestScore > score ? " - try to beat it!" : ""}`}
+            ? t("foodTriviaGame.newBestLine", { score: String(score), total: String(total) })
+            : t("foodTriviaGame.newBestLinePrevious", { previous: String(previousBest), total: String(total) })
+          : t("foodTriviaGame.yourBestResultLine", { best: String(bestScore ?? score), total: String(total) }) +
+            (bestScore !== null && bestScore > score ? t("gamesCommon.tryToBeatIt") : "")}
       </span>
       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
         <button type="button" onClick={onPlayAgain} style={primaryButton}>
-          Play again
+          {t("gamesCommon.playAgain")}
         </button>
-        <Link
+        <LocaleLink
           href="/games"
           style={{
             padding: "14px 22px",
@@ -590,8 +608,8 @@ function EndScreen({
             fontSize: 16,
           }}
         >
-          More games
-        </Link>
+          {t("gamesCommon.moreGames")}
+        </LocaleLink>
         {muteButton}
       </div>
     </div>

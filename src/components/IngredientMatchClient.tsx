@@ -1,13 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import LocaleLink from "@/i18n/Link";
+import { useTranslations } from "@/i18n/LocaleProvider";
 import Confetti from "@/components/Confetti";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
   buildDeck,
-  describeTimeLimit,
+  timeLimitParts,
   formatBestTime,
   formatElapsed,
   LEVEL_ORDER,
@@ -136,11 +137,37 @@ function EndPanel({
 }
 
 export default function IngredientMatchClient() {
+  const t = useTranslations();
   // Always starts on Easy; picking a level deals a fresh board.
   const [level, setLevel] = useState<Level>("easy");
   const config = LEVELS[level];
   const timeLimitMs = config.timeLimitMs;
   const upNext = nextLevel(level);
+
+  // Translated level name - LEVELS[level].label stays as an internal English
+  // id for storage keys etc, but the player always sees the translated word.
+  const levelLabel = useCallback(
+    (l: Level) => (l === "easy" ? t("ingredientMatchGame.levelEasy") : l === "medium" ? t("ingredientMatchGame.levelMedium") : t("ingredientMatchGame.levelHard")),
+    [t]
+  );
+  // "3 minutes" / "90 seconds", localized.
+  const describeTime = useCallback(
+    (ms: number) => {
+      const { amount, unit } = timeLimitParts(ms);
+      if (unit === "seconds") return t(amount === 1 ? "ingredientMatchGame.secondsOne" : "ingredientMatchGame.secondsOther", { count: String(amount) });
+      return t(amount === 1 ? "ingredientMatchGame.minutesOne" : "ingredientMatchGame.minutesOther", { count: String(amount) });
+    },
+    [t]
+  );
+  // Same but abbreviated ("3 min") for the compact level-select option text.
+  const describeTimeShort = useCallback(
+    (ms: number) => {
+      const { amount, unit } = timeLimitParts(ms);
+      if (unit === "seconds") return t(amount === 1 ? "ingredientMatchGame.secondsOne" : "ingredientMatchGame.secondsOther", { count: String(amount) });
+      return `${amount} min`;
+    },
+    [t]
+  );
 
   // Lazy initializer - the server and the browser each shuffle their own
   // deck, but that's fine for hydration: a face-down card renders nothing
@@ -316,9 +343,9 @@ export default function IngredientMatchClient() {
         }}
       >
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/games" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to games
-          </Link>
+          <LocaleLink href="/games" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("gamesCommon.backToGames")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -338,17 +365,17 @@ export default function IngredientMatchClient() {
               letterSpacing: "-0.015em",
             }}
           >
-            Ingredient Match
+            {t("ingredientMatchGame.title")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            Flip two cards at a time and find all {config.pairs} ingredient pairs in as few moves as you can.
-            {timeLimitMs !== null && <> You&apos;ve got {describeTimeLimit(timeLimitMs)} - the clock starts on your first flip.</>}
+            {t("ingredientMatchGame.subtitle", { pairs: String(config.pairs) })}
+            {timeLimitMs !== null && <>{t("ingredientMatchGame.subtitleTimed", { time: describeTime(timeLimitMs) })}</>}
           </p>
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
           <label htmlFor="match-level" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
-            Level
+            {t("ingredientMatchGame.levelLabel")}
           </label>
           <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
             <select
@@ -374,7 +401,8 @@ export default function IngredientMatchClient() {
                 const c = LEVELS[l];
                 return (
                   <option key={l} value={l}>
-                    {c.label} · {c.pairs} pairs{c.timeLimitMs !== null ? `, ${describeTimeLimit(c.timeLimitMs).replace("minutes", "min")} timer` : ""}
+                    {levelLabel(l)} · {t("ingredientMatchGame.pairsCount", { count: String(c.pairs) })}
+                    {c.timeLimitMs !== null ? t("ingredientMatchGame.timerSuffix", { time: describeTimeShort(c.timeLimitMs) }) : ""}
                   </option>
                 );
               })}
@@ -395,28 +423,28 @@ export default function IngredientMatchClient() {
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            <StatPill label="Moves" value={String(moves)} />
+            <StatPill label={t("ingredientMatchGame.movesLabel")} value={String(moves)} />
             {remainingMs === null ? (
-              <StatPill label="Time" value={formatElapsed(elapsedMs)} />
+              <StatPill label={t("gamesCommon.time")} value={formatElapsed(elapsedMs)} />
             ) : (
               <StatPill
-                label="Time left"
+                label={t("ingredientMatchGame.timeLeftLabel")}
                 // Round up, so it reads 0:01 until the very end and only
                 // shows 0:00 once time is actually up.
                 value={formatElapsed(Math.ceil(remainingMs / 1000) * 1000)}
                 urgent={startedAt !== null && remainingMs <= URGENT_MS}
               />
             )}
-            <StatPill label="Pairs" value={`${matched.size}/${config.pairs}`} />
-            <StatPill label="Your best:" value={bestMs === null ? "—" : formatBestTime(bestMs)} />
+            <StatPill label={t("ingredientMatchGame.pairsLabel")} value={`${matched.size}/${config.pairs}`} />
+            <StatPill label={t("gamesCommon.yourBest")} value={bestMs === null ? "—" : formatBestTime(bestMs)} />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundOn)}
               aria-pressed={soundOn}
-              aria-label={soundOn ? "Mute sound effects" : "Unmute sound effects"}
-              title={soundOn ? "Sound on" : "Sound off"}
+              aria-label={soundOn ? t("gamesCommon.muteAriaOn") : t("gamesCommon.muteAriaOff")}
+              title={soundOn ? t("gamesCommon.muteTitleOn") : t("gamesCommon.muteTitleOff")}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -448,7 +476,7 @@ export default function IngredientMatchClient() {
                 cursor: "pointer",
               }}
             >
-              New game
+              {t("gamesCommon.newGame")}
             </button>
           </div>
         </div>
@@ -458,31 +486,31 @@ export default function IngredientMatchClient() {
             <EndPanel
               panelRef={endPanelRef}
               tone="win"
-              title="You won! 🎉"
+              title={t("ingredientMatchGame.wonTitle")}
               actions={
                 upNext
                   ? [
-                      { label: "Next level →", onClick: () => newGame(upNext), primary: true },
-                      { label: "Play again", onClick: () => newGame() },
+                      { label: t("ingredientMatchGame.nextLevelButton"), onClick: () => newGame(upNext), primary: true },
+                      { label: t("gamesCommon.playAgain"), onClick: () => newGame() },
                     ]
-                  : [{ label: "Play again", onClick: () => newGame(), primary: true }]
+                  : [{ label: t("gamesCommon.playAgain"), onClick: () => newGame(), primary: true }]
               }
               lines={
                 <>
                   <span style={{ fontSize: 15, color: "var(--ink-2)" }}>
-                    All {config.pairs} pairs in {moves} moves, in {formatBestTime(elapsedMs)}.
+                    {t("ingredientMatchGame.wonSummary", { pairs: String(config.pairs), moves: String(moves), time: formatBestTime(elapsedMs) })}
                   </span>
                   <span style={{ fontSize: 14, fontWeight: 600, color: newBest ? "var(--terra-text)" : "var(--muted)" }}>
                     {newBest
-                      ? `🏆 New best time on ${config.label}!`
+                      ? t("ingredientMatchGame.wonNewBest", { level: levelLabel(level) })
                       : bestMs !== null
-                        ? `Your ${config.label} best is ${formatBestTime(bestMs)} - try to beat it!`
+                        ? t("ingredientMatchGame.wonBestLine", { level: levelLabel(level), time: formatBestTime(bestMs) })
                         : null}
                   </span>
                   <span style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)", marginTop: 4 }}>
                     {upNext
-                      ? `${level === "easy" ? "Nice work" : "Great job"}! Ready for ${LEVELS[upNext].label}?`
-                      : "You beat the hardest level! 🏆"}
+                      ? t(level === "easy" ? "ingredientMatchGame.wonNextPromptEasy" : "ingredientMatchGame.wonNextPromptHarder", { level: levelLabel(upNext) })
+                      : t("ingredientMatchGame.wonAllDone")}
                   </span>
                 </>
               }
@@ -492,11 +520,11 @@ export default function IngredientMatchClient() {
             <EndPanel
               panelRef={endPanelRef}
               tone="loss"
-              title="Time's up! ⏰"
-              actions={[{ label: "Try again", onClick: () => newGame(), primary: true }]}
+              title={t("ingredientMatchGame.lostTitle")}
+              actions={[{ label: t("ingredientMatchGame.tryAgain"), onClick: () => newGame(), primary: true }]}
               lines={
                 <span style={{ fontSize: 15, color: "var(--ink-2)" }}>
-                  You matched {matched.size} of {config.pairs} pairs. Try again - you&apos;ve got this.
+                  {t("ingredientMatchGame.lostSummary", { matched: String(matched.size), total: String(config.pairs) })}
                 </span>
               }
             />
@@ -514,7 +542,7 @@ export default function IngredientMatchClient() {
                 className="mly-match-card"
                 onClick={() => flip(i)}
                 disabled={isMatched || lost}
-                aria-label={faceUp ? `${card.name}${isMatched ? ", matched" : ""}` : `Card ${i + 1}, face down`}
+                aria-label={faceUp ? (isMatched ? t("ingredientMatchGame.matchedAria", { name: card.name }) : card.name) : t("ingredientMatchGame.faceDownAria", { number: String(i + 1) })}
                 style={{
                   position: "relative",
                   aspectRatio: "4 / 5",

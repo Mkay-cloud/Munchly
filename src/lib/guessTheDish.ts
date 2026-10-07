@@ -106,11 +106,13 @@ export function dealRound(category: Category = "all", count: number = DISHES_PER
     .map((d) => ({ ...d, options: shuffle([d.name, ...pickWrongOptions(d, pool)]) }));
 }
 
-export function resultMessage(score: number, total: number): { title: string; body: string } {
-  if (score === total) return { title: "Perfect plate! 🏆", body: "Ten for ten - you know your food." };
-  if (score >= Math.ceil(total * 0.7)) return { title: "Master taster! 🧑‍🍳", body: "You can spot a dish from a few emoji. Impressive." };
-  if (score >= Math.ceil(total * 0.4)) return { title: "Tasty work! 🍽️", body: "A good feed - a few more rounds and you'll clear the table." };
-  return { title: "Hungry for more! 🥄", body: "Some of these are tricky. Have another go!" };
+export type ResultTier = "perfect" | "master" | "tasty" | "hungry";
+
+export function resultTier(score: number, total: number): ResultTier {
+  if (score === total) return "perfect";
+  if (score >= Math.ceil(total * 0.7)) return "master";
+  if (score >= Math.ceil(total * 0.4)) return "tasty";
+  return "hungry";
 }
 
 // --- Best score ----------------------------------------------------------------

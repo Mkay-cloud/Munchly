@@ -151,11 +151,13 @@ export function dealQuiz(count: number = QUESTIONS_PER_QUIZ): DealtQuestion[] {
 }
 
 // End-screen message, scaled to how well it went.
-export function resultMessage(score: number, total: number): { title: string; body: string } {
-  if (score === total) return { title: "Perfect score! 🏆", body: "Every single one. You could teach this class." };
-  if (score >= Math.ceil(total * 0.7)) return { title: "Kitchen genius! 🧑‍🍳", body: "Seriously impressive food knowledge." };
-  if (score >= Math.ceil(total * 0.4)) return { title: "Nicely done! 🍽️", body: "A solid showing - a couple more rounds and you'll ace it." };
-  return { title: "Good effort! 🥄", body: "Every chef starts somewhere. Have another go!" };
+export type ResultTier = "perfect" | "master" | "tasty" | "hungry";
+
+export function resultTier(score: number, total: number): ResultTier {
+  if (score === total) return "perfect";
+  if (score >= Math.ceil(total * 0.7)) return "master";
+  if (score >= Math.ceil(total * 0.4)) return "tasty";
+  return "hungry";
 }
 
 // --- Best score -----------------------------------------------------------
