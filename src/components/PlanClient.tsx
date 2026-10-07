@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import LocaleLink from "@/i18n/Link";
 import { useState } from "react";
 import type { Recipe } from "@/sanity/queries";
 import SiteMenu from "@/components/SiteMenu";
@@ -17,8 +17,10 @@ import {
   rerollDay,
   toggleSkipDay,
 } from "@/lib/weekPlan";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
+  const t = useTranslations();
   const [mood, setMood] = useState<PlanMood>("Anything");
   // Lazy initializer, not an effect: this runs once on mount, after
   // hydration, when `window` is real. During SSR `typeof window` is
@@ -65,9 +67,9 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
         }}
       >
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Munchly
-          </Link>
+          <LocaleLink href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("common.backToMunchly")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -87,11 +89,10 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
               letterSpacing: "-0.015em",
             }}
           >
-            Plan your week
+            {t("planPage.title")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            Spin once for all seven days instead of deciding one meal at a time. Saved only in this
-            browser - no account needed.
+            {t("planPage.subtitle")}
           </p>
         </div>
 
@@ -132,10 +133,10 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
               cursor: "pointer",
             }}
           >
-            {plan ? "Re-plan my week →" : "Plan my week →"}
+            {plan ? t("planPage.rePlan") : t("planPage.planMyWeek")}
           </button>
           {plan && (
-            <Link
+            <LocaleLink
               href="/shopping-list"
               style={{
                 padding: "14px 18px",
@@ -147,8 +148,8 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
                 border: "1.5px solid var(--border-strong)",
               }}
             >
-              Shopping list →
-            </Link>
+              {t("planPage.shoppingListLink")}
+            </LocaleLink>
           )}
           {plan && (
             <button
@@ -165,7 +166,7 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
                 cursor: "pointer",
               }}
             >
-              Clear week
+              {t("planPage.clearWeek")}
             </button>
           )}
         </div>
@@ -202,10 +203,10 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
 
                   {d.skip ? (
                     <span style={{ flex: 1, fontSize: 15, color: "var(--faint)", fontStyle: "italic" }}>
-                      Eating out
+                      {t("planPage.eatingOut")}
                     </span>
                   ) : recipe ? (
-                    <Link
+                    <LocaleLink
                       href={`/recipes/${recipe.slug}`}
                       style={{ flex: 1, display: "flex", alignItems: "center", gap: 12, minWidth: 0, color: "var(--ink)" }}
                     >
@@ -242,9 +243,9 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
                             .join(" · ")}
                         </span>
                       </span>
-                    </Link>
+                    </LocaleLink>
                   ) : (
-                    <span style={{ flex: 1, fontSize: 15, color: "var(--faint)" }}>No recipe available</span>
+                    <span style={{ flex: 1, fontSize: 15, color: "var(--faint)" }}>{t("planPage.noRecipeAvailable")}</span>
                   )}
 
                   <div style={{ flex: "none", display: "flex", gap: 6 }}>
@@ -252,8 +253,8 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
                       <button
                         type="button"
                         onClick={() => handleReroll(i)}
-                        aria-label={`Pick a different recipe for ${d.day}`}
-                        title="Reroll this day"
+                        aria-label={t("planPage.rerollAria", { day: d.day })}
+                        title={t("planPage.rerollTitle")}
                         style={{
                           width: 38,
                           height: 38,
@@ -271,7 +272,7 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
                       type="button"
                       onClick={() => handleToggleSkip(i)}
                       aria-pressed={d.skip}
-                      title={d.skip ? "I'm cooking this day after all" : "I'm eating out this day"}
+                      title={d.skip ? t("planPage.cookingAfterAllTitle") : t("planPage.eatingOutTitle")}
                       style={{
                         padding: "0 14px",
                         height: 38,
@@ -285,7 +286,7 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {d.skip ? "Eating out" : "Eat out?"}
+                      {d.skip ? t("planPage.eatingOut") : t("planPage.eatOutQuestion")}
                     </button>
                   </div>
                 </div>
@@ -296,7 +297,7 @@ export default function PlanClient({ recipes }: { recipes: Recipe[] }) {
 
         {!plan && (
           <p style={{ color: "var(--muted)", fontSize: 15 }}>
-            Pick a mood above (or leave it on &quot;Anything&quot;) and plan your week to get started.
+            {t("planPage.emptyPrompt")}
           </p>
         )}
       </main>

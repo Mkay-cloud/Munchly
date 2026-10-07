@@ -1,14 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import LocaleLink from "@/i18n/Link";
 import { useState } from "react";
 import type { Recipe } from "@/sanity/queries";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import { loadPantry, savePantry, addPantryItem, removePantryItem, matchFridgeRecipes } from "@/lib/fridge";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 export default function FridgeClient({ recipes }: { recipes: Recipe[] }) {
+  const t = useTranslations();
   // Lazy initializer, not an effect - loadPantry() guards on
   // `typeof window === "undefined"` so this is safe during SSR.
   const [pantry, setPantry] = useState<string[]>(() => loadPantry());
@@ -48,9 +50,9 @@ export default function FridgeClient({ recipes }: { recipes: Recipe[] }) {
         }}
       >
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Munchly
-          </Link>
+          <LocaleLink href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("common.backToMunchly")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -70,11 +72,10 @@ export default function FridgeClient({ recipes }: { recipes: Recipe[] }) {
               letterSpacing: "-0.015em",
             }}
           >
-            Cook from your fridge
+            {t("fridgePage.title")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            Tell us what&apos;s in the kitchen and we&apos;ll find what you can make with it. Saved only in
-            this browser - no account needed.
+            {t("fridgePage.subtitle")}
           </p>
         </div>
 
@@ -83,7 +84,7 @@ export default function FridgeClient({ recipes }: { recipes: Recipe[] }) {
             type="text"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="e.g. chicken, garlic, rice"
+            placeholder={t("fridgePage.placeholder")}
             style={{
               flex: 1,
               padding: "12px 16px",
@@ -109,7 +110,7 @@ export default function FridgeClient({ recipes }: { recipes: Recipe[] }) {
               opacity: draft.trim() ? 1 : 0.6,
             }}
           >
-            Add
+            {t("fridgePage.add")}
           </button>
         </form>
 
@@ -135,7 +136,7 @@ export default function FridgeClient({ recipes }: { recipes: Recipe[] }) {
                   <button
                     type="button"
                     onClick={() => handleRemove(item)}
-                    aria-label={`Remove ${item} from pantry`}
+                    aria-label={t("fridgePage.removeAria", { item })}
                     style={{
                       width: 20,
                       height: 20,
@@ -169,27 +170,26 @@ export default function FridgeClient({ recipes }: { recipes: Recipe[] }) {
                 padding: 0,
               }}
             >
-              Clear pantry
+              {t("fridgePage.clearPantry")}
             </button>
           </div>
         )}
 
         {pantry.length === 0 ? (
           <p style={{ color: "var(--muted)", fontSize: 15 }}>
-            Add a few ingredients above and we&apos;ll show recipes ranked by how much of what they need you
-            already have.
+            {t("fridgePage.emptyPrompt")}
           </p>
         ) : matches.length === 0 ? (
           <p style={{ color: "var(--muted)", fontSize: 15 }}>
-            No recipes overlap with what&apos;s in your list yet - try adding a few more ingredients.
+            {t("fridgePage.noMatches")}
           </p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>
-              {matches.length} recipe{matches.length === 1 ? "" : "s"} ranked by what you have
+              {t(matches.length === 1 ? "fridgePage.countOne" : "fridgePage.countOther", { count: String(matches.length) })}
             </p>
             {matches.map(({ recipe, matched, total, missing }) => (
-              <Link
+              <LocaleLink
                 key={recipe.slug}
                 href={`/recipes/${recipe.slug}`}
                 style={{
@@ -231,7 +231,7 @@ export default function FridgeClient({ recipes }: { recipes: Recipe[] }) {
                         borderRadius: 999,
                       }}
                     >
-                      {matched === total ? "Ready to cook" : `${matched} of ${total} ingredients`}
+                      {matched === total ? t("fridgePage.readyToCook") : t("fridgePage.ofIngredients", { matched: String(matched), total: String(total) })}
                     </span>
                   </span>
                   {missing.length > 0 && (
@@ -244,11 +244,11 @@ export default function FridgeClient({ recipes }: { recipes: Recipe[] }) {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      Missing: {missing.join(", ")}
+                      {t("fridgePage.missingPrefix")}{missing.join(", ")}
                     </span>
                   )}
                 </span>
-              </Link>
+              </LocaleLink>
             ))}
           </div>
         )}

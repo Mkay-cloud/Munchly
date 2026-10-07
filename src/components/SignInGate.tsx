@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import AuthModal from "./AuthModal";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 // Shared "you need to sign in to see this" prompt - used by any page gated
 // behind auth (favorites, profile, and the community recipe pages coming
 // next). Takes just a message so each page can explain why it's gated.
 export default function SignInGate({ message }: { message: string }) {
+  const t = useTranslations();
   const [showAuth, setShowAuth] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
 
   if (signedIn) {
     return (
       <p style={{ color: "var(--muted)" }}>
-        You&apos;re signed in — refreshing…
+        {t("auth.signedInRefreshing")}
         <ReloadOnMount />
       </p>
     );
@@ -35,7 +37,7 @@ export default function SignInGate({ message }: { message: string }) {
           cursor: "pointer",
         }}
       >
-        Sign in
+        {t("auth.signIn")}
       </button>
       {showAuth && (
         <AuthModal onClose={() => setShowAuth(false)} onSuccess={() => setSignedIn(true)} />

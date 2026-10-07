@@ -89,4 +89,77 @@ export type Messages = {
     emailLabel: string;
     note: string;
   };
+  auth: {
+    signIn: string;
+    signedInRefreshing: string;
+  };
+  fridgePage: {
+    title: string;
+    subtitle: string;
+    placeholder: string;
+    add: string;
+    removeAria: string;
+    clearPantry: string;
+    emptyPrompt: string;
+    noMatches: string;
+    countOne: string;
+    countOther: string;
+    readyToCook: string;
+    ofIngredients: string;
+    missingPrefix: string;
+  };
+  planPage: {
+    title: string;
+    subtitle: string;
+    rePlan: string;
+    planMyWeek: string;
+    shoppingListLink: string;
+    clearWeek: string;
+    eatingOut: string;
+    noRecipeAvailable: string;
+    rerollAria: string;
+    rerollTitle: string;
+    eatOutQuestion: string;
+    cookingAfterAllTitle: string;
+    eatingOutTitle: string;
+    emptyPrompt: string;
+  };
+  shoppingListPage: {
+    subtitle: string;
+    noPlanPrompt: string;
+    planWeek: string;
+    emptyIngredients: string;
+    countOne: string;
+    countOther: string;
+    editWeekPlan: string;
+    uncheckAll: string;
+  };
+  profilePage: {
+    title: string;
+    subtitle: string;
+    signInMessage: string;
+  };
+  profileForm: {
+    changeAvatarAria: string;
+    uploading: string;
+    changePhoto: string;
+    photoHint: string;
+    displayNameLabel: string;
+    displayNamePlaceholder: string;
+    displayNameHint: string;
+    savedMessage: string;
+    saving: string;
+    saveProfile: string;
+    loading: string;
+    errorImageType: string;
+    errorImageSize: string;
+    errorDisplayNameRequired: string;
+  };
+  favoritesPage: {
+    title: string;
+    countOne: string;
+    countOther: string;
+    emptyPrompt: string;
+    signInMessage: string;
+  };
 };

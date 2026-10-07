@@ -1,14 +1,16 @@
 "use client";
 
-import Link from "next/link";
+import LocaleLink from "@/i18n/Link";
 import { useState } from "react";
 import type { Recipe } from "@/sanity/queries";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import { loadWeekPlan, type WeekPlan } from "@/lib/weekPlan";
 import { buildShoppingList, loadCheckedIds, saveCheckedIds } from "@/lib/shoppingList";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 export default function ShoppingListClient({ recipes }: { recipes: Recipe[] }) {
+  const t = useTranslations();
   // Lazy initializers (not effects) - safe during SSR since loadWeekPlan /
   // loadCheckedIds both guard on `typeof window === "undefined"`.
   const [plan] = useState<WeekPlan | null>(() => loadWeekPlan());
@@ -48,9 +50,9 @@ export default function ShoppingListClient({ recipes }: { recipes: Recipe[] }) {
         }}
       >
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Munchly
-          </Link>
+          <LocaleLink href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("common.backToMunchly")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -70,10 +72,10 @@ export default function ShoppingListClient({ recipes }: { recipes: Recipe[] }) {
               letterSpacing: "-0.015em",
             }}
           >
-            Shopping list
+            {t("nav.shoppingList")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            Pulled straight from your planned week. Saved only in this browser - no account needed.
+            {t("shoppingListPage.subtitle")}
           </p>
         </div>
 
@@ -90,10 +92,9 @@ export default function ShoppingListClient({ recipes }: { recipes: Recipe[] }) {
             }}
           >
             <p style={{ margin: 0, fontSize: 15, color: "var(--muted)" }}>
-              You don&apos;t have a week planned yet. Plan your week first and your shopping list will build
-              itself from it.
+              {t("shoppingListPage.noPlanPrompt")}
             </p>
-            <Link
+            <LocaleLink
               href="/plan"
               style={{
                 alignSelf: "flex-start",
@@ -105,22 +106,21 @@ export default function ShoppingListClient({ recipes }: { recipes: Recipe[] }) {
                 fontSize: 15,
               }}
             >
-              Plan your week →
-            </Link>
+              {t("shoppingListPage.planWeek")}
+            </LocaleLink>
           </div>
         ) : items.length === 0 ? (
           <p style={{ color: "var(--muted)", fontSize: 15 }}>
-            Your planned week doesn&apos;t have any ingredients yet - either every day is set to &quot;eating
-            out&quot;, or the planned recipes don&apos;t list ingredients.
+            {t("shoppingListPage.emptyIngredients")}
           </p>
         ) : (
           <>
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
               <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>
-                {items.length} item{items.length === 1 ? "" : "s"} from this week&apos;s plan
+                {t(items.length === 1 ? "shoppingListPage.countOne" : "shoppingListPage.countOther", { count: String(items.length) })}
               </p>
               <div style={{ display: "flex", gap: 10 }}>
-                <Link
+                <LocaleLink
                   href="/plan"
                   style={{
                     padding: "10px 16px",
@@ -132,8 +132,8 @@ export default function ShoppingListClient({ recipes }: { recipes: Recipe[] }) {
                     border: "1.5px solid var(--border-strong)",
                   }}
                 >
-                  Edit week plan
-                </Link>
+                  {t("shoppingListPage.editWeekPlan")}
+                </LocaleLink>
                 {anyChecked && (
                   <button
                     type="button"
@@ -149,7 +149,7 @@ export default function ShoppingListClient({ recipes }: { recipes: Recipe[] }) {
                       cursor: "pointer",
                     }}
                   >
-                    Uncheck all
+                    {t("shoppingListPage.uncheckAll")}
                   </button>
                 )}
               </div>
