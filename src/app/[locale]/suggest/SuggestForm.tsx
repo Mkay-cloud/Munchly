@@ -1,21 +1,29 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@/lib/supabase/useSession";
 import DeleteRecipeButton from "@/components/DeleteRecipeButton";
+import LocaleLink from "@/i18n/Link";
+import { useTranslations } from "@/i18n/LocaleProvider";
 import type { CommunityRecipe, CommunityRecipeStatus } from "@/lib/community";
 
-const STATUS_STYLE: Record<CommunityRecipeStatus, { bg: string; fg: string; label: string }> = {
-  pending: { bg: "var(--chip)", fg: "var(--muted)", label: "Pending review" },
-  approved: { bg: "var(--sage-tint)", fg: "var(--olive-text)", label: "Approved" },
-  rejected: { bg: "#FBEAEA", fg: "#B3261E", label: "Not approved" },
+const STATUS_STYLE: Record<CommunityRecipeStatus, { bg: string; fg: string }> = {
+  pending: { bg: "var(--chip)", fg: "var(--muted)" },
+  approved: { bg: "var(--sage-tint)", fg: "var(--olive-text)" },
+  rejected: { bg: "#FBEAEA", fg: "#B3261E" },
 };
 
 function StatusBadge({ status }: { status: CommunityRecipeStatus }) {
+  const t = useTranslations();
   const s = STATUS_STYLE[status];
+  const label =
+    status === "pending"
+      ? t("suggestForm.statusPending")
+      : status === "approved"
+        ? t("suggestForm.statusApproved")
+        : t("suggestForm.statusRejected");
   return (
     <span
       style={{
@@ -28,7 +36,7 @@ function StatusBadge({ status }: { status: CommunityRecipeStatus }) {
         color: s.fg,
       }}
     >
-      {s.label}
+      {label}
     </span>
   );
 }
@@ -61,6 +69,7 @@ export default function SuggestForm({
   initialSubmissions: CommunityRecipe[];
   editingRecipe: CommunityRecipe | null;
 }) {
+  const t = useTranslations();
   const { session } = useSession();
   const router = useRouter();
   const [submissions, setSubmissions] = useState(initialSubmissions);
@@ -109,7 +118,7 @@ export default function SuggestForm({
     const trimmedIngredients = ingredients.trim();
     const trimmedInstructions = instructions.trim();
     if (!trimmedTitle || !trimmedIngredients || !trimmedInstructions) {
-      setError("Title, ingredients, and instructions are all required.");
+      setError(t("suggestForm.requiredError"));
       return;
     }
 
@@ -183,27 +192,27 @@ export default function SuggestForm({
         {editingRecipe ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <h2 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 22 }}>
-              Edit your recipe
+              {t("suggestForm.editTitle")}
             </h2>
             {isLiveEdit(editingRecipe) && (
               <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>
-                This recipe is already live. Your changes will be held for review and won&rsquo;t replace the
-                published version until they&rsquo;re approved.
+                {t("suggestForm.liveEditNotice")}
               </p>
             )}
           </div>
         ) : (
           <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>
-            Posting as <strong style={{ color: "var(--ink)" }}>{displayName}</strong>.{" "}
-            <a href="/profile" style={{ color: "var(--primary)", fontWeight: 600 }}>
-              Not you?
-            </a>
+            {t("suggestForm.postingAsBefore")}
+            <strong style={{ color: "var(--ink)" }}>{displayName}</strong>.{" "}
+            <LocaleLink href="/profile" style={{ color: "var(--primary)", fontWeight: 600 }}>
+              {t("suggestForm.notYou")}
+            </LocaleLink>
           </p>
         )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <label htmlFor="title" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
-            Title
+            {t("suggestForm.titleLabel")}
           </label>
           <input
             id="title"
@@ -211,21 +220,21 @@ export default function SuggestForm({
             maxLength={80}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="My grandmother's jollof rice"
+            placeholder={t("suggestForm.titlePlaceholder")}
             style={inputStyle}
           />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <label htmlFor="description" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
-            Short description <span style={{ fontWeight: 400 }}>(optional)</span>
+            {t("suggestForm.descriptionLabel")} <span style={{ fontWeight: 400 }}>{t("suggestForm.optional")}</span>
           </label>
           <input
             id="description"
             maxLength={160}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="One line about what makes it good"
+            placeholder={t("suggestForm.descriptionPlaceholder")}
             style={inputStyle}
           />
         </div>
@@ -233,20 +242,20 @@ export default function SuggestForm({
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: "1 1 180px" }}>
             <label htmlFor="cuisine" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
-              Cuisine <span style={{ fontWeight: 400 }}>(optional)</span>
+              {t("suggestForm.cuisineLabel")} <span style={{ fontWeight: 400 }}>{t("suggestForm.optional")}</span>
             </label>
             <input
               id="cuisine"
               maxLength={40}
               value={cuisine}
               onChange={(e) => setCuisine(e.target.value)}
-              placeholder="West African"
+              placeholder={t("suggestForm.cuisinePlaceholder")}
               style={inputStyle}
             />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: "1 1 140px" }}>
             <label htmlFor="timeMinutes" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
-              Time (minutes) <span style={{ fontWeight: 400 }}>(optional)</span>
+              {t("suggestForm.timeLabel")} <span style={{ fontWeight: 400 }}>{t("suggestForm.optional")}</span>
             </label>
             <input
               id="timeMinutes"
@@ -263,7 +272,7 @@ export default function SuggestForm({
 
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <label htmlFor="ingredients" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
-            Ingredients
+            {t("suggestForm.ingredientsLabel")}
           </label>
           <textarea
             id="ingredients"
@@ -271,14 +280,14 @@ export default function SuggestForm({
             rows={6}
             value={ingredients}
             onChange={(e) => setIngredients(e.target.value)}
-            placeholder={"One per line, e.g.\n2 cups rice\n1 can tomatoes\n1 onion, diced"}
+            placeholder={t("suggestForm.ingredientsPlaceholder")}
             style={{ ...inputStyle, resize: "vertical" }}
           />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <label htmlFor="instructions" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
-            Instructions
+            {t("suggestForm.instructionsLabel")}
           </label>
           <textarea
             id="instructions"
@@ -286,7 +295,7 @@ export default function SuggestForm({
             rows={8}
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
-            placeholder={"One step per line, e.g.\nRinse the rice until the water runs clear\nBlend the tomatoes and pepper\n..."}
+            placeholder={t("suggestForm.instructionsPlaceholder")}
             style={{ ...inputStyle, resize: "vertical" }}
           />
         </div>
@@ -310,12 +319,12 @@ export default function SuggestForm({
               alignSelf: "flex-start",
             }}
           >
-            {saving ? "Saving…" : editingRecipe ? "Save changes" : "Submit recipe"}
+            {saving ? t("suggestForm.saving") : editingRecipe ? t("suggestForm.saveChanges") : t("suggestForm.submitRecipe")}
           </button>
           {editingRecipe && (
-            <Link href="/suggest" style={{ fontSize: 14, fontWeight: 600, color: "var(--muted)" }}>
-              Cancel
-            </Link>
+            <LocaleLink href="/suggest" style={{ fontSize: 14, fontWeight: 600, color: "var(--muted)" }}>
+              {t("suggestForm.cancel")}
+            </LocaleLink>
           )}
         </div>
       </form>
@@ -323,7 +332,7 @@ export default function SuggestForm({
       {submissions.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 22 }}>
-            Your submissions
+            {t("suggestForm.yourSubmissions")}
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {submissions.map((r) => (
@@ -340,9 +349,9 @@ export default function SuggestForm({
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-                  <Link href={`/community/${r.id}`} style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+                  <LocaleLink href={`/community/${r.id}`} style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
                     {r.title}
-                  </Link>
+                  </LocaleLink>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <StatusBadge status={r.status} />
                     {isLiveEdit(r) && (
@@ -357,15 +366,15 @@ export default function SuggestForm({
                           color: "var(--muted)",
                         }}
                       >
-                        Edit pending review
+                        {t("suggestForm.editPendingReview")}
                       </span>
                     )}
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                  <Link href={`/suggest?edit=${r.id}`} style={{ fontSize: 14, fontWeight: 700, color: "var(--primary)" }}>
-                    Edit
-                  </Link>
+                  <LocaleLink href={`/suggest?edit=${r.id}`} style={{ fontSize: 14, fontWeight: 700, color: "var(--primary)" }}>
+                    {t("suggestForm.edit")}
+                  </LocaleLink>
                   <DeleteRecipeButton
                     recipeId={r.id}
                     onDeleted={() => setSubmissions((prev) => prev.filter((x) => x.id !== r.id))}

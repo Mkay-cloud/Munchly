@@ -1,8 +1,10 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import SignInGate from "@/components/SignInGate";
 import ThemeToggle from "@/components/ThemeToggle";
+import LocaleLink from "@/i18n/Link";
+import { getTranslations } from "@/i18n/getTranslations";
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
 import SuggestForm from "./SuggestForm";
 import type { CommunityRecipe } from "@/lib/community";
 
@@ -15,10 +17,15 @@ export const metadata: Metadata = {
 };
 
 export default async function SuggestPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ edit?: string }>;
 }) {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = getTranslations(locale);
   const { edit } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
@@ -62,9 +69,9 @@ export default async function SuggestPage({
         }}
       >
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Munchly
-          </Link>
+          <LocaleLink href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("common.backToMunchly")}
+          </LocaleLink>
           <ThemeToggle />
         </div>
       </header>
@@ -81,20 +88,19 @@ export default async function SuggestPage({
               letterSpacing: "-0.015em",
             }}
           >
-            Suggest a recipe
+            {t("suggestPage.title")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            Share something you cook with the rest of the Munchly community. Every submission is
-            reviewed before it goes live on{" "}
-            <Link href="/community" style={{ color: "var(--primary)", fontWeight: 600 }}>
-              the community page
-            </Link>
-            .
+            {t("suggestPage.subtitleBefore")}
+            <LocaleLink href="/community" style={{ color: "var(--primary)", fontWeight: 600 }}>
+              {t("suggestPage.subtitleLink")}
+            </LocaleLink>
+            {t("suggestPage.subtitleAfter")}
           </p>
         </div>
 
         {!userId ? (
-          <SignInGate message="Sign in to suggest a recipe." />
+          <SignInGate message={t("suggestPage.signInMessage")} />
         ) : !displayName ? (
           <div
             style={{
@@ -109,9 +115,9 @@ export default async function SuggestPage({
             }}
           >
             <p style={{ margin: 0, fontSize: 16, color: "var(--ink)" }}>
-              Set up a display name first, so we know what to call you on your recipe.
+              {t("suggestPage.setupNamePrompt")}
             </p>
-            <Link
+            <LocaleLink
               href="/profile"
               style={{
                 padding: "13px 22px",
@@ -122,8 +128,8 @@ export default async function SuggestPage({
                 fontSize: 15,
               }}
             >
-              Set up profile
-            </Link>
+              {t("suggestPage.setupProfileButton")}
+            </LocaleLink>
           </div>
         ) : (
           <SuggestForm

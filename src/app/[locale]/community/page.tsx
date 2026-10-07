@@ -1,11 +1,13 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import AccountNav from "@/components/AccountNav";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import LikeButton from "@/components/LikeButton";
+import LocaleLink from "@/i18n/Link";
+import { getTranslations } from "@/i18n/getTranslations";
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
 import type { CommunityProfile, CommunityRecipe } from "@/lib/community";
 
 export const revalidate = 30;
@@ -18,7 +20,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function CommunityPage() {
+export default async function CommunityPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = getTranslations(locale);
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   const viewerId = claims?.claims?.sub as string | undefined;
@@ -67,9 +76,9 @@ export default async function CommunityPage() {
         }}
       >
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Munchly
-          </Link>
+          <LocaleLink href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("common.backToMunchly")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -91,13 +100,13 @@ export default async function CommunityPage() {
                 letterSpacing: "-0.015em",
               }}
             >
-              Community recipes
+              {t("communityPage.title")}
             </h1>
             <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-              {recipes.length} recipe{recipes.length === 1 ? "" : "s"} shared by the Munchly community.
+              {t(recipes.length === 1 ? "communityPage.countOne" : "communityPage.countOther", { count: String(recipes.length) })}
             </p>
           </div>
-          <Link
+          <LocaleLink
             href="/suggest"
             style={{
               padding: "13px 20px",
@@ -108,16 +117,16 @@ export default async function CommunityPage() {
               fontSize: 15,
             }}
           >
-            Suggest a recipe
-          </Link>
+            {t("communityPage.suggestButton")}
+          </LocaleLink>
         </div>
 
         {recipes.length === 0 ? (
           <p style={{ color: "var(--muted)" }}>
-            Nothing here yet.{" "}
-            <Link href="/suggest" style={{ color: "var(--primary)", fontWeight: 600 }}>
-              Be the first to suggest one.
-            </Link>
+            {t("communityPage.emptyPrompt")}
+            <LocaleLink href="/suggest" style={{ color: "var(--primary)", fontWeight: 600 }}>
+              {t("communityPage.emptyCta")}
+            </LocaleLink>
           </p>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 260px), 1fr))", gap: 16 }}>
@@ -125,7 +134,7 @@ export default async function CommunityPage() {
               const author = profileMap.get(r.user_id);
               return (
                 <div key={r.id} style={{ display: "flex", flexDirection: "column", borderRadius: 20, overflow: "hidden", border: "1px solid var(--border)", background: "var(--card)" }}>
-                  <Link
+                  <LocaleLink
                     href={`/community/${r.id}`}
                     style={{ display: "flex", flexDirection: "column", textDecoration: "none", color: "var(--ink)" }}
                   >
@@ -138,7 +147,7 @@ export default async function CommunityPage() {
                         {[r.cuisine, r.time_minutes ? `${r.time_minutes} min` : null].filter(Boolean).join(" · ")}
                       </span>
                     </div>
-                  </Link>
+                  </LocaleLink>
                   <div
                     style={{
                       padding: "12px 18px 18px",
@@ -154,7 +163,7 @@ export default async function CommunityPage() {
                         <Image src={author?.avatar_url || "/panda-head.png"} alt="" fill sizes="24px" style={{ objectFit: "cover" }} />
                       </div>
                       <span style={{ fontSize: 13, color: "var(--muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {author?.display_name ?? "Someone"}
+                        {author?.display_name ?? t("communityPage.someone")}
                       </span>
                     </div>
                     <LikeButton

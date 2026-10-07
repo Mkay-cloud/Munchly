@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@/lib/supabase/useSession";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 export default function CommentForm({ recipeId }: { recipeId: string }) {
+  const t = useTranslations();
   const { session } = useSession();
   const router = useRouter();
   const [body, setBody] = useState("");
@@ -46,7 +48,7 @@ export default function CommentForm({ recipeId }: { recipeId: string }) {
         maxLength={1000}
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        placeholder="Add a comment…"
+        placeholder={t("commentForm.placeholder")}
         style={{
           padding: "12px 14px",
           borderRadius: 12,
@@ -75,7 +77,7 @@ export default function CommentForm({ recipeId }: { recipeId: string }) {
           alignSelf: "flex-start",
         }}
       >
-        {saving ? "Posting…" : "Post comment"}
+        {saving ? t("commentForm.posting") : t("commentForm.postComment")}
       </button>
     </form>
   );

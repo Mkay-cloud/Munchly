@@ -12,9 +12,10 @@ import FavoriteButton from "./FavoriteButton";
 import SiteMenu from "./SiteMenu";
 import ThemeToggle from "./ThemeToggle";
 import { isSoundEnabled, playLandSound, playSpinSound, setSoundEnabled } from "@/lib/sound";
+import { PLAN_MOODS, type PlanMood, MOOD_LABEL_KEYS } from "@/lib/weekPlan";
 
-const MOODS = ["Anything", "Comfort", "Quick", "Spicy", "Sweet"] as const;
-type Mood = (typeof MOODS)[number];
+const MOODS = PLAN_MOODS;
+type Mood = PlanMood;
 
 const PALETTES: [string, string][][] = [
   [
@@ -57,7 +58,7 @@ function shuffled<T>(arr: T[]): T[] {
   return copy;
 }
 
-function buildMoodPool(recipes: Recipe[], mood: Mood): Recipe[] {
+function buildMoodPool(recipes: Recipe[], mood: PlanMood): Recipe[] {
   let base: Recipe[];
   if (mood === "Anything") {
     base = recipes;
@@ -72,7 +73,7 @@ function buildMoodPool(recipes: Recipe[], mood: Mood): Recipe[] {
 
 export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; posts: BlogPostSummary[] }) {
   const t = useTranslations();
-  const [mood, setMood] = useState<Mood>("Anything");
+  const [mood, setMood] = useState<PlanMood>("Anything");
   const [rot, setRot] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<Recipe | null>(null);
@@ -345,7 +346,7 @@ export default function HomeClient({ recipes, posts }: { recipes: Recipe[]; post
                         transition: "all .15s",
                       }}
                     >
-                      {m}
+                      {t(MOOD_LABEL_KEYS[m])}
                     </button>
                   );
                 })}

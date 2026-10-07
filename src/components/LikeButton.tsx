@@ -4,6 +4,7 @@ import { useState, type MouseEvent } from "react";
 import AuthModal from "./AuthModal";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@/lib/supabase/useSession";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 export default function LikeButton({
   recipeId,
@@ -14,6 +15,7 @@ export default function LikeButton({
   initialLiked: boolean;
   initialCount: number;
 }) {
+  const t = useTranslations();
   const { session, loading: sessionLoading } = useSession();
   const [liked, setLiked] = useState(initialLiked);
   const [count, setCount] = useState(initialCount);
@@ -63,7 +65,7 @@ export default function LikeButton({
         onClick={toggle}
         disabled={busy}
         aria-pressed={liked}
-        aria-label={liked ? "Unlike this recipe" : "Like this recipe"}
+        aria-label={liked ? t("likeButton.unlikeAria") : t("likeButton.likeAria")}
         style={{
           display: "inline-flex",
           alignItems: "center",

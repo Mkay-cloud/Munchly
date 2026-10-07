@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 export default function DeleteRecipeButton({
   recipeId,
@@ -17,6 +18,7 @@ export default function DeleteRecipeButton({
   // somewhere to go once the row stops existing.
   redirectTo?: string;
 }) {
+  const t = useTranslations();
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export default function DeleteRecipeButton({
   if (confirming) {
     return (
       <span style={{ display: "inline-flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#B3261E" }}>Delete this recipe for good?</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#B3261E" }}>{t("deleteRecipeButton.confirmPrompt")}</span>
         <button
           type="button"
           onClick={doDelete}
@@ -62,7 +64,7 @@ export default function DeleteRecipeButton({
             opacity: deleting ? 0.7 : 1,
           }}
         >
-          {deleting ? "Deleting…" : "Yes, delete"}
+          {deleting ? t("deleteRecipeButton.deleting") : t("deleteRecipeButton.yesDelete")}
         </button>
         <button
           type="button"
@@ -79,7 +81,7 @@ export default function DeleteRecipeButton({
             cursor: deleting ? "default" : "pointer",
           }}
         >
-          Cancel
+          {t("deleteRecipeButton.cancel")}
         </button>
         {error && <span style={{ fontSize: 13, color: "#B3261E" }}>{error}</span>}
       </span>
@@ -100,7 +102,7 @@ export default function DeleteRecipeButton({
         cursor: "pointer",
       }}
     >
-      Delete
+      {t("deleteRecipeButton.deleteLabel")}
     </button>
   );
 }
