@@ -1,11 +1,13 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { getAllRecipes } from "@/sanity/queries";
 import AccountNav from "@/components/AccountNav";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import FavoriteButton from "@/components/FavoriteButton";
+import LocaleLink from "@/i18n/Link";
+import { getTranslations } from "@/i18n/getTranslations";
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
 
 export const revalidate = 60;
 
@@ -17,7 +19,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function AllRecipesPage() {
+export default async function AllRecipesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = getTranslations(locale);
   const recipes = await getAllRecipes();
 
   return (
@@ -33,9 +42,9 @@ export default async function AllRecipesPage() {
         }}
       >
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Munchly
-          </Link>
+          <LocaleLink href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("common.backToMunchly")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -56,20 +65,20 @@ export default async function AllRecipesPage() {
               letterSpacing: "-0.015em",
             }}
           >
-            All recipes
+            {t("recipesPage.title")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            {recipes.length} recipe{recipes.length === 1 ? "" : "s"} in the library so far.
+            {t(recipes.length === 1 ? "recipesPage.countOne" : "recipesPage.countOther", { count: String(recipes.length) })}
           </p>
         </div>
 
         {recipes.length === 0 ? (
-          <p style={{ color: "var(--muted)" }}>No recipes yet — check back soon.</p>
+          <p style={{ color: "var(--muted)" }}>{t("recipesPage.empty")}</p>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 240px), 1fr))", gap: 16 }}>
             {recipes.map((r) => (
               <div key={r._id} style={{ position: "relative" }}>
-                <Link
+                <LocaleLink
                   href={`/recipes/${r.slug}`}
                   style={{
                     display: "flex",
@@ -93,7 +102,7 @@ export default async function AllRecipesPage() {
                       {[r.cuisine, r.timeMinutes ? `${r.timeMinutes} min` : null].filter(Boolean).join(" · ")}
                     </span>
                   </div>
-                </Link>
+                </LocaleLink>
                 <div style={{ position: "absolute", top: 10, right: 10, zIndex: 1 }}>
                   <FavoriteButton slug={r.slug} title={r.title} variant="icon" />
                 </div>

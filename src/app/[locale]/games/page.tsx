@@ -1,8 +1,10 @@
-import Link from "next/link";
+import LocaleLink from "@/i18n/Link";
 import type { Metadata } from "next";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import { GAMES } from "@/lib/games";
+import { getTranslations } from "@/i18n/getTranslations";
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
 
 export const metadata: Metadata = {
   title: "Games — Munchly",
@@ -12,7 +14,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function GamesPage() {
+export default async function GamesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = getTranslations(locale);
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)" }}>
       <header
@@ -26,9 +36,9 @@ export default function GamesPage() {
         }}
       >
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Munchly
-          </Link>
+          <LocaleLink href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("common.backToMunchly")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -48,17 +58,16 @@ export default function GamesPage() {
               letterSpacing: "-0.015em",
             }}
           >
-            Games
+            {t("gamesPage.title")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            Quick little food games for when you need a break from deciding what&apos;s for dinner. No
-            account needed.
+            {t("gamesPage.subtitle")}
           </p>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {GAMES.map((g) => (
-            <Link
+            <LocaleLink
               key={g.href}
               href={g.href}
               style={{
@@ -117,9 +126,9 @@ export default function GamesPage() {
                   fontSize: 14,
                 }}
               >
-                Play
+                {t("gamesPage.play")}
               </span>
-            </Link>
+            </LocaleLink>
           ))}
         </div>
       </main>

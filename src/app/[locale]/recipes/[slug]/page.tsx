@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import LocaleLink from "@/i18n/Link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getRecipeBySlug } from "@/sanity/queries";
@@ -7,6 +7,8 @@ import FavoriteButton from "@/components/FavoriteButton";
 import AccountNav from "@/components/AccountNav";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
+import { getTranslations } from "@/i18n/getTranslations";
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
 
 export const revalidate = 60;
 
@@ -34,9 +36,11 @@ export async function generateMetadata({
 export default async function RecipePage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) {
-  const { slug } = await params;
+  const { slug, locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = getTranslations(locale);
   const recipe = await getRecipeBySlug(slug);
   if (!recipe) notFound();
 
@@ -53,9 +57,9 @@ export default async function RecipePage({
         }}
       >
         <div style={{ maxWidth: 800, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Munchly
-          </Link>
+          <LocaleLink href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("common.backToMunchly")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -96,7 +100,7 @@ export default async function RecipePage({
 
         {recipe.ingredients?.length > 0 && (
           <section style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <h2 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>Ingredients</h2>
+            <h2 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>{t("recipeDetailPage.ingredients")}</h2>
             <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
               {recipe.ingredients.map((ing, i) => (
                 <li
@@ -118,7 +122,7 @@ export default async function RecipePage({
 
         {recipe.instructions?.length > 0 && (
           <section style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <h2 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>Instructions</h2>
+            <h2 style={{ margin: 0, fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 24 }}>{t("recipeDetailPage.instructions")}</h2>
             <ol style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 14 }}>
               {recipe.instructions.map((block, i) => {
                 const text = block.children?.map((c) => c.text).join("") ?? "";

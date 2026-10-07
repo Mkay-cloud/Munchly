@@ -57,6 +57,38 @@ const messages: Messages = {
   localeSwitcher: {
     label: "Language",
   },
+  common: {
+    backToMunchly: "← Back to Munchly",
+  },
+  recipesPage: {
+    title: "All recipes",
+    countOne: "{count} recipe in the library so far.",
+    countOther: "{count} recipes in the library so far.",
+    empty: "No recipes yet — check back soon.",
+  },
+  recipeDetailPage: {
+    ingredients: "Ingredients",
+    instructions: "Instructions",
+  },
+  gamesPage: {
+    title: "Games",
+    subtitle: "Quick little food games for when you need a break from deciding what's for dinner. No account needed.",
+    play: "Play",
+  },
+  aboutPage: {
+    title: "About Munchly",
+    paragraph1: "Munchly started from one very ordinary problem: standing in front of the fridge every night, not hungry for “nothing in particular,” and not wanting to make a single decision about it. So instead of another recipe site to scroll through, Munchly is built around one button: spin the wheel, get an answer, go eat.",
+    paragraph2: "From there it's grown into a small toolkit for the rest of the week too — browse the full recipe library when you want to pick something yourself, plan out your meals for the week ahead, turn that plan straight into a shopping list, and see what you can cook from whatever's already in your fridge.",
+    paragraph3Before: "Munchly is an independent, still-growing project. It's built by one person, so new recipes and features show up in small steps rather than all at once. If there's something you'd love to see next, the ",
+    contactLink: "contact page",
+    paragraph3After: " goes straight to a real inbox, not a form that disappears into the void.",
+  },
+  contactPage: {
+    title: "Get in touch",
+    subtitle: "Found a bug, have a recipe to suggest, or just want to say hi? It goes to a real person.",
+    emailLabel: "Email",
+    note: "Munchly is run by one person, so replies aren't instant — but every message gets read.",
+  },
 };
 
 export default messages;

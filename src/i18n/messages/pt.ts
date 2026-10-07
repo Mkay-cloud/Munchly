@@ -57,6 +57,38 @@ const messages: Messages = {
   localeSwitcher: {
     label: "Idioma",
   },
+  common: {
+    backToMunchly: "← Voltar ao Munchly",
+  },
+  recipesPage: {
+    title: "Todas as receitas",
+    countOne: "{count} receita na biblioteca até agora.",
+    countOther: "{count} receitas na biblioteca até agora.",
+    empty: "Ainda não há receitas — volte em breve.",
+  },
+  recipeDetailPage: {
+    ingredients: "Ingredientes",
+    instructions: "Modo de preparo",
+  },
+  gamesPage: {
+    title: "Jogos",
+    subtitle: "Pequenos jogos sobre comida para quando você precisar de uma pausa de decidir o que jantar. Sem necessidade de conta.",
+    play: "Jogar",
+  },
+  aboutPage: {
+    title: "Sobre o Munchly",
+    paragraph1: "O Munchly nasceu de um problema bem comum: parado na frente da geladeira todas as noites, sem fome de “nada em especial”, e sem vontade de tomar nenhuma decisão sobre isso. Então, em vez de mais um site de receitas para rolar sem fim, o Munchly foi construído em torno de um único botão: gire a roda, receba uma resposta, vá comer.",
+    paragraph2: "A partir daí, cresceu também para um pequeno conjunto de ferramentas para o resto da semana — explore toda a biblioteca de receitas quando quiser escolher algo você mesmo, planeje suas refeições para a semana, transforme esse plano direto em lista de compras e veja o que dá para cozinhar com o que já tem na geladeira.",
+    paragraph3Before: "O Munchly é um projeto independente, ainda em crescimento. É construído por uma única pessoa, então novas receitas e funcionalidades aparecem aos poucos, não tudo de uma vez. Se há algo que você adoraria ver a seguir, a ",
+    contactLink: "página de contato",
+    paragraph3After: " vai direto para uma caixa de entrada de verdade, não para um formulário que desaparece no vazio.",
+  },
+  contactPage: {
+    title: "Entre em contato",
+    subtitle: "Encontrou um bug, tem uma receita para sugerir, ou só quer dizer oi? Chega até uma pessoa de verdade.",
+    emailLabel: "E-mail",
+    note: "O Munchly é administrado por uma única pessoa, então as respostas não são instantâneas — mas toda mensagem é lida.",
+  },
 };
 
 export default messages;

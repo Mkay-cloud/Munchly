@@ -1,7 +1,9 @@
-import Link from "next/link";
+import LocaleLink from "@/i18n/Link";
 import type { Metadata } from "next";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
+import { getTranslations } from "@/i18n/getTranslations";
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
 
 export const metadata: Metadata = {
   title: "Contact — Munchly",
@@ -11,7 +13,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ContactPage() {
+export default async function ContactPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = getTranslations(locale);
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--ink)" }}>
       <header
@@ -25,9 +35,9 @@ export default function ContactPage() {
         }}
       >
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Munchly
-          </Link>
+          <LocaleLink href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("common.backToMunchly")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -47,10 +57,10 @@ export default function ContactPage() {
               letterSpacing: "-0.015em",
             }}
           >
-            Get in touch
+            {t("contactPage.title")}
           </h1>
           <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-            Found a bug, have a recipe to suggest, or just want to say hi? It goes to a real person.
+            {t("contactPage.subtitle")}
           </p>
         </div>
 
@@ -65,7 +75,7 @@ export default function ContactPage() {
             background: "var(--card)",
           }}
         >
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>Email</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>{t("contactPage.emailLabel")}</span>
           <a
             href="mailto:hello@munchly.online"
             style={{ fontSize: 22, fontWeight: 600, color: "var(--primary)" }}
@@ -73,8 +83,7 @@ export default function ContactPage() {
             hello@munchly.online
           </a>
           <p style={{ margin: "6px 0 0", fontSize: 15, lineHeight: 1.6, color: "var(--ink)" }}>
-            Munchly is run by one person, so replies aren&apos;t instant - but every message gets
-            read.
+            {t("contactPage.note")}
           </p>
         </div>
       </main>
