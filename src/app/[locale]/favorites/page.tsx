@@ -1,11 +1,13 @@
 import Image from "next/image";
-import Link from "next/link";
+import LocaleLink from "@/i18n/Link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getRecipesBySlugs } from "@/sanity/queries";
 import SiteMenu from "@/components/SiteMenu";
 import ThemeToggle from "@/components/ThemeToggle";
 import FavoritesGate from "./FavoritesGate";
+import { getTranslations } from "@/i18n/getTranslations";
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
 
 export const metadata: Metadata = {
   title: "My favorites — Munchly",
@@ -18,7 +20,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function FavoritesPage() {
+export default async function FavoritesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = getTranslations(locale);
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const userId = data?.claims?.sub as string | undefined;
@@ -47,9 +56,9 @@ export default async function FavoritesPage() {
         }}
       >
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <Link href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
-            ← Back to Munchly
-          </Link>
+          <LocaleLink href="/" style={{ fontWeight: 600, fontSize: 15, color: "var(--ink)" }}>
+            {t("common.backToMunchly")}
+          </LocaleLink>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <SiteMenu />
             <ThemeToggle />
@@ -69,11 +78,11 @@ export default async function FavoritesPage() {
               letterSpacing: "-0.015em",
             }}
           >
-            My favorites
+            {t("favoritesPage.title")}
           </h1>
           {userId && (
             <p style={{ margin: 0, fontSize: 16, color: "var(--muted)" }}>
-              {recipes.length} saved recipe{recipes.length === 1 ? "" : "s"}.
+              {t(recipes.length === 1 ? "favoritesPage.countOne" : "favoritesPage.countOther", { count: String(recipes.length) })}
             </p>
           )}
         </div>
@@ -82,12 +91,12 @@ export default async function FavoritesPage() {
           <FavoritesGate />
         ) : recipes.length === 0 ? (
           <p style={{ color: "var(--muted)" }}>
-            Nothing saved yet. Tap the heart on any recipe to keep it here.
+            {t("favoritesPage.emptyPrompt")}
           </p>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 240px), 1fr))", gap: 16 }}>
             {recipes.map((r) => (
-              <Link
+              <LocaleLink
                 key={r._id}
                 href={`/recipes/${r.slug}`}
                 style={{
@@ -112,7 +121,7 @@ export default async function FavoritesPage() {
                     {[r.cuisine, r.timeMinutes ? `${r.timeMinutes} min` : null].filter(Boolean).join(" · ")}
                   </span>
                 </div>
-              </Link>
+              </LocaleLink>
             ))}
           </div>
         )}

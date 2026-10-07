@@ -1,7 +1,9 @@
 "use client";
 
 import SignInGate from "@/components/SignInGate";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 export default function FavoritesGate() {
-  return <SignInGate message="Sign in to see the recipes you've saved." />;
+  const t = useTranslations();
+  return <SignInGate message={t("favoritesPage.signInMessage")} />;
 }

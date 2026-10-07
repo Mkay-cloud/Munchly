@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@/lib/supabase/useSession";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 const DEFAULT_AVATAR = "/panda-head.png";
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024; // 5MB
@@ -15,6 +16,7 @@ export default function ProfileClient({
   initialDisplayName: string;
   initialAvatarUrl: string | null;
 }) {
+  const t = useTranslations();
   const { session, loading: sessionLoading } = useSession();
   const [displayName, setDisplayName] = useState(initialDisplayName);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
@@ -34,11 +36,11 @@ export default function ProfileClient({
     setSavedAt(null);
 
     if (!file.type.startsWith("image/")) {
-      setError("Please choose an image file.");
+      setError(t("profileForm.errorImageType"));
       return;
     }
     if (file.size > MAX_AVATAR_BYTES) {
-      setError("That image is too large - please pick one under 5MB.");
+      setError(t("profileForm.errorImageSize"));
       return;
     }
 
@@ -72,7 +74,7 @@ export default function ProfileClient({
     if (!session) return;
     const trimmed = displayName.trim();
     if (!trimmed) {
-      setError("Please enter a display name.");
+      setError(t("profileForm.errorDisplayNameRequired"));
       return;
     }
     setError(null);
@@ -90,7 +92,7 @@ export default function ProfileClient({
   };
 
   if (sessionLoading || !session) {
-    return <p style={{ color: "var(--muted)" }}>Loading…</p>;
+    return <p style={{ color: "var(--muted)" }}>{t("profileForm.loading")}</p>;
   }
 
   return (
@@ -100,7 +102,7 @@ export default function ProfileClient({
           type="button"
           onClick={pickAvatar}
           disabled={uploading}
-          aria-label="Change avatar"
+          aria-label={t("profileForm.changeAvatarAria")}
           style={{
             position: "relative",
             width: 88,
@@ -140,9 +142,9 @@ export default function ProfileClient({
               alignSelf: "flex-start",
             }}
           >
-            {uploading ? "Uploading…" : "Change photo"}
+            {uploading ? t("profileForm.uploading") : t("profileForm.changePhoto")}
           </button>
-          <span style={{ fontSize: 13, color: "var(--muted)" }}>JPG or PNG, up to 5MB.</span>
+          <span style={{ fontSize: 13, color: "var(--muted)" }}>{t("profileForm.photoHint")}</span>
         </div>
         <input
           ref={fileInputRef}
@@ -155,7 +157,7 @@ export default function ProfileClient({
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <label htmlFor="displayName" style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>
-          Display name
+          {t("profileForm.displayNameLabel")}
         </label>
         <input
           id="displayName"
@@ -164,7 +166,7 @@ export default function ProfileClient({
           maxLength={40}
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
-          placeholder="What should we call you?"
+          placeholder={t("profileForm.displayNamePlaceholder")}
           style={{
             padding: "12px 14px",
             borderRadius: 12,
@@ -175,12 +177,12 @@ export default function ProfileClient({
           }}
         />
         <span style={{ fontSize: 13, color: "var(--muted)" }}>
-          Shown on recipes you submit and comments you leave - not your email.
+          {t("profileForm.displayNameHint")}
         </span>
       </div>
 
       {error && <p style={{ margin: 0, fontSize: 14, color: "#B3261E" }}>{error}</p>}
-      {savedAt && !error && <p style={{ margin: 0, fontSize: 14, color: "var(--olive-text)" }}>Saved.</p>}
+      {savedAt && !error && <p style={{ margin: 0, fontSize: 14, color: "var(--olive-text)" }}>{t("profileForm.savedMessage")}</p>}
 
       <button
         type="submit"
@@ -198,7 +200,7 @@ export default function ProfileClient({
           alignSelf: "flex-start",
         }}
       >
-        {saving ? "Saving…" : "Save profile"}
+        {saving ? t("profileForm.saving") : t("profileForm.saveProfile")}
       </button>
     </form>
   );
