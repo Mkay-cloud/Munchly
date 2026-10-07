@@ -57,6 +57,38 @@ const messages: Messages = {
   localeSwitcher: {
     label: "Idioma",
   },
+  common: {
+    backToMunchly: "← Volver a Munchly",
+  },
+  recipesPage: {
+    title: "Todas las recetas",
+    countOne: "{count} receta en la biblioteca por ahora.",
+    countOther: "{count} recetas en la biblioteca por ahora.",
+    empty: "Aún no hay recetas — vuelve pronto.",
+  },
+  recipeDetailPage: {
+    ingredients: "Ingredientes",
+    instructions: "Instrucciones",
+  },
+  gamesPage: {
+    title: "Juegos",
+    subtitle: "Pequeños juegos de comida para cuando necesites un descanso de decidir qué cenar. No se necesita cuenta.",
+    play: "Jugar",
+  },
+  aboutPage: {
+    title: "Sobre Munchly",
+    paragraph1: "Munchly nació de un problema muy común: parado frente al refrigerador cada noche, sin hambre de “nada en particular” y sin ganas de tomar ni una sola decisión al respecto. Así que, en lugar de otro sitio de recetas para desplazarte sin fin, Munchly se construyó alrededor de un solo botón: gira la rueda, obtén una respuesta, ve a comer.",
+    paragraph2: "A partir de ahí, se ha convertido también en un pequeño conjunto de herramientas para el resto de la semana: explora toda la biblioteca de recetas cuando quieras elegir algo tú mismo, planifica tus comidas para la semana, convierte ese plan directamente en una lista de compras y descubre qué puedes cocinar con lo que ya tienes en el refrigerador.",
+    paragraph3Before: "Munchly es un proyecto independiente que sigue creciendo. Lo construye una sola persona, así que las nuevas recetas y funciones aparecen poco a poco en lugar de todas a la vez. Si hay algo que te encantaría ver a continuación, la ",
+    contactLink: "página de contacto",
+    paragraph3After: " va directo a una bandeja de entrada real, no a un formulario que desaparece en el vacío.",
+  },
+  contactPage: {
+    title: "Ponte en contacto",
+    subtitle: "¿Encontraste un error, tienes una receta que sugerir o solo quieres saludar? Llega a una persona real.",
+    emailLabel: "Correo electrónico",
+    note: "Munchly lo gestiona una sola persona, así que las respuestas no son instantáneas, pero cada mensaje se lee.",
+  },
 };
 
 export default messages;

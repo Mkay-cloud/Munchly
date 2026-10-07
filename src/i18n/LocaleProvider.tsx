@@ -4,6 +4,7 @@ import { createContext, useContext, useMemo } from "react";
 import type { Locale } from "./locales";
 import { isRtl } from "./locales";
 import type { Messages } from "./messages/types";
+import { createTranslator } from "./translate";
 
 type LocaleContextValue = {
   locale: Locale;
@@ -52,21 +53,5 @@ export function useDir(): "ltr" | "rtl" {
 // it yet.
 export function useTranslations() {
   const { messages } = useLocaleContext();
-
-  return function t(key: string, vars?: Record<string, string>): string {
-    const parts = key.split(".");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let value: any = messages;
-    for (const part of parts) {
-      value = value?.[part];
-    }
-    if (typeof value !== "string") {
-      return key;
-    }
-    if (!vars) return value;
-    return Object.entries(vars).reduce(
-      (acc, [name, replacement]) => acc.replaceAll(`{${name}}`, replacement),
-      value
-    );
-  };
+  return createTranslator(messages);
 }

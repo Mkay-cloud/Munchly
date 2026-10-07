@@ -57,4 +57,36 @@ export type Messages = {
   localeSwitcher: {
     label: string;
   };
+  common: {
+    backToMunchly: string;
+  };
+  recipesPage: {
+    title: string;
+    countOne: string;
+    countOther: string;
+    empty: string;
+  };
+  recipeDetailPage: {
+    ingredients: string;
+    instructions: string;
+  };
+  gamesPage: {
+    title: string;
+    subtitle: string;
+    play: string;
+  };
+  aboutPage: {
+    title: string;
+    paragraph1: string;
+    paragraph2: string;
+    paragraph3Before: string;
+    contactLink: string;
+    paragraph3After: string;
+  };
+  contactPage: {
+    title: string;
+    subtitle: string;
+    emailLabel: string;
+    note: string;
+  };
 };
