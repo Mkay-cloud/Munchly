@@ -25,6 +25,20 @@ function hrefFor(locale: Locale, barePath: string): string {
   return barePath === "/" ? `/${locale}` : `/${locale}${barePath}`;
 }
 
+const COOKIE_NAME = "NEXT_LOCALE";
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
+
+// Explicitly stamps the chosen locale into the NEXT_LOCALE cookie before
+// navigating. Without this, switching to English (which deliberately has
+// no URL prefix) is ambiguous to the proxy: it falls back to whatever
+// locale the cookie still says from a previous visit, which can redirect
+// the browser straight back to the locale the user just tried to leave.
+// Setting the cookie here makes the click itself the source of truth.
+function setLocaleCookie(locale: Locale) {
+  if (typeof document === "undefined") return;
+  document.cookie = `${COOKIE_NAME}=${locale}; path=/; max-age=${COOKIE_MAX_AGE}`;
+}
+
 // A language dropdown, rendered inside SiteMenu (so it shows up next to
 // search/the hamburger menu on every page). Builds a plain next/link for
 // each locale rather than using our own <Link> wrapper, since it's
@@ -105,7 +119,10 @@ export default function LocaleSwitcher() {
             <NextLink
               key={locale}
               href={hrefFor(locale, barePath)}
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setLocaleCookie(locale);
+                setOpen(false);
+              }}
               style={{
                 padding: "9px 12px",
                 borderRadius: 10,
