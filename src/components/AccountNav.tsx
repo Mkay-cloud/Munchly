@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import LocaleLink from "@/i18n/Link";
 import { useEffect, useState } from "react";
 import AuthModal from "./AuthModal";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@/lib/supabase/useSession";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 type Profile = { display_name: string | null; avatar_url: string | null };
 
@@ -14,6 +15,7 @@ export default function AccountNav() {
   const [showAuth, setShowAuth] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const t = useTranslations();
 
   useEffect(() => {
     // No reset-to-null branch for the signed-out case: when there's no
@@ -61,7 +63,7 @@ export default function AccountNav() {
             cursor: "pointer",
           }}
         >
-          Sign in
+          {t("accountNav.signIn")}
         </button>
         {showAuth && (
           <AuthModal onClose={() => setShowAuth(false)} onSuccess={() => setShowAuth(false)} />
@@ -127,28 +129,28 @@ export default function AccountNav() {
             zIndex: 30,
           }}
         >
-          <Link
+          <LocaleLink
             href="/favorites"
             onClick={() => setMenuOpen(false)}
             style={{ padding: "10px 12px", borderRadius: 10, fontWeight: 600, fontSize: 14, color: "var(--ink)" }}
           >
-            My favorites
-          </Link>
-          <Link
+            {t("accountNav.myFavorites")}
+          </LocaleLink>
+          <LocaleLink
             href="/profile"
             onClick={() => setMenuOpen(false)}
             style={{ padding: "10px 12px", borderRadius: 10, fontWeight: 600, fontSize: 14, color: "var(--ink)" }}
           >
-            My profile
-          </Link>
+            {t("accountNav.myProfile")}
+          </LocaleLink>
           {isAdmin && (
-            <Link
+            <a
               href="/admin"
               onClick={() => setMenuOpen(false)}
               style={{ padding: "10px 12px", borderRadius: 10, fontWeight: 600, fontSize: 14, color: "var(--primary)" }}
             >
-              Review submissions
-            </Link>
+              {t("accountNav.reviewSubmissions")}
+            </a>
           )}
           <button
             onClick={signOut}
@@ -164,7 +166,7 @@ export default function AccountNav() {
               cursor: "pointer",
             }}
           >
-            Sign out
+            {t("accountNav.signOut")}
           </button>
         </div>
       )}

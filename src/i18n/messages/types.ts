@@ -502,4 +502,37 @@ export type Messages = {
     footerTerms: string;
     pandaAlt: string;
   };
+  authModal: {
+    signInTitle: string;
+    enterCodeTitle: string;
+    closeAria: string;
+    noPasswordNeeded: string;
+    emailPlaceholder: string;
+    sendCode: string;
+    sending: string;
+    codeSentToBefore: string;
+    codeSentToAfter: string;
+    checkSpam: string;
+    codePlaceholder: string;
+    verifyAndSignIn: string;
+    verifying: string;
+    useDifferentEmail: string;
+  };
+  accountNav: {
+    signIn: string;
+    myFavorites: string;
+    myProfile: string;
+    reviewSubmissions: string;
+    signOut: string;
+  };
+  favoriteButton: {
+    save: string;
+    saved: string;
+    saveAria: string;
+    removeAria: string;
+  };
+  themeToggle: {
+    switchToLight: string;
+    switchToDark: string;
+  };
 };

@@ -502,6 +502,39 @@ const messages: Messages = {
     footerTerms: "Terms",
     pandaAlt: "Munchly the panda chef",
   },
+  authModal: {
+    signInTitle: "Sign in to Munchly",
+    enterCodeTitle: "Enter your code",
+    closeAria: "Close",
+    noPasswordNeeded: "No password needed. We'll email you a code to sign in.",
+    emailPlaceholder: "you@example.com",
+    sendCode: "Send code",
+    sending: "Sending…",
+    codeSentToBefore: "We sent a code to ",
+    codeSentToAfter: ". Enter it below.",
+    checkSpam: "Don't see it? Check your spam or junk folder — it can land there the first time.",
+    codePlaceholder: "Enter your code",
+    verifyAndSignIn: "Verify & sign in",
+    verifying: "Verifying…",
+    useDifferentEmail: "← Use a different email",
+  },
+  accountNav: {
+    signIn: "Sign in",
+    myFavorites: "My favorites",
+    myProfile: "My profile",
+    reviewSubmissions: "Review submissions",
+    signOut: "Sign out",
+  },
+  favoriteButton: {
+    save: "Save",
+    saved: "Saved",
+    saveAria: "Save {title} to favorites",
+    removeAria: "Remove {title} from favorites",
+  },
+  themeToggle: {
+    switchToLight: "Switch to light mode",
+    switchToDark: "Switch to dark mode",
+  },
 };
 
 export default messages;

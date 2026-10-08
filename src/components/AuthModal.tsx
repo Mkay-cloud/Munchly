@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 export default function AuthModal({
   onClose,
@@ -16,6 +17,7 @@ export default function AuthModal({
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations();
 
   const sendCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,11 +98,11 @@ export default function AuthModal({
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span style={{ fontFamily: "var(--font-fredoka)", fontWeight: 600, fontSize: 22, color: "var(--ink)" }}>
-            {step === "email" ? "Sign in to Munchly" : "Enter your code"}
+            {step === "email" ? t("authModal.signInTitle") : t("authModal.enterCodeTitle")}
           </span>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t("authModal.closeAria")}
             style={{ border: "none", background: "none", fontSize: 20, cursor: "pointer", color: "var(--muted)" }}
           >
             ×
@@ -110,13 +112,13 @@ export default function AuthModal({
         {step === "email" ? (
           <form onSubmit={sendCode} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>
-              No password needed. We&apos;ll email you a code to sign in.
+              {t("authModal.noPasswordNeeded")}
             </p>
             <input
               type="email"
               required
               autoFocus
-              placeholder="you@example.com"
+              placeholder={t("authModal.emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={{
@@ -144,16 +146,16 @@ export default function AuthModal({
                 opacity: loading ? 0.7 : 1,
               }}
             >
-              {loading ? "Sending…" : "Send code"}
+              {loading ? t("authModal.sending") : t("authModal.sendCode")}
             </button>
           </form>
         ) : (
           <form onSubmit={verifyCode} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <p style={{ margin: 0, fontSize: 14, color: "var(--muted)" }}>
-              We sent a code to <strong>{email}</strong>. Enter it below.
+              {t("authModal.codeSentToBefore")}<strong>{email}</strong>{t("authModal.codeSentToAfter")}
             </p>
             <p style={{ margin: 0, fontSize: 13, color: "var(--muted)" }}>
-              Don&apos;t see it? Check your spam or junk folder — it can land there the first time.
+              {t("authModal.checkSpam")}
             </p>
             <input
               type="text"
@@ -168,7 +170,7 @@ export default function AuthModal({
               maxLength={10}
               required
               autoFocus
-              placeholder="Enter your code"
+              placeholder={t("authModal.codePlaceholder")}
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
               style={{
@@ -198,7 +200,7 @@ export default function AuthModal({
                 opacity: loading || code.length < 6 ? 0.7 : 1,
               }}
             >
-              {loading ? "Verifying…" : "Verify & sign in"}
+              {loading ? t("authModal.verifying") : t("authModal.verifyAndSignIn")}
             </button>
             {/* 6 is just a sane minimum before enabling submit - Supabase's
                 actual required length (8, currently) is enforced server-side
@@ -212,7 +214,7 @@ export default function AuthModal({
               }}
               style={{ border: "none", background: "none", color: "var(--muted)", fontSize: 13, cursor: "pointer" }}
             >
-              ← Use a different email
+              {t("authModal.useDifferentEmail")}
             </button>
           </form>
         )}

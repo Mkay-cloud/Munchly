@@ -502,6 +502,39 @@ const messages: Messages = {
     footerTerms: "AGB",
     pandaAlt: "Munchly, der Panda-Koch",
   },
+  authModal: {
+    signInTitle: "Bei Munchly anmelden",
+    enterCodeTitle: "Code eingeben",
+    closeAria: "Schließen",
+    noPasswordNeeded: "Kein Passwort nötig. Wir senden dir einen Code per E-Mail zum Anmelden.",
+    emailPlaceholder: "du@beispiel.com",
+    sendCode: "Code senden",
+    sending: "Wird gesendet…",
+    codeSentToBefore: "Wir haben einen Code an ",
+    codeSentToAfter: " gesendet. Gib ihn unten ein.",
+    checkSpam: "Nicht angekommen? Schau in deinem Spam- oder Junk-Ordner nach — dort kann er beim ersten Mal landen.",
+    codePlaceholder: "Code eingeben",
+    verifyAndSignIn: "Bestätigen & anmelden",
+    verifying: "Wird überprüft…",
+    useDifferentEmail: "← Andere E-Mail verwenden",
+  },
+  accountNav: {
+    signIn: "Anmelden",
+    myFavorites: "Meine Favoriten",
+    myProfile: "Mein Profil",
+    reviewSubmissions: "Einreichungen prüfen",
+    signOut: "Abmelden",
+  },
+  favoriteButton: {
+    save: "Merken",
+    saved: "Gemerkt",
+    saveAria: "{title} zu Favoriten hinzufügen",
+    removeAria: "{title} aus Favoriten entfernen",
+  },
+  themeToggle: {
+    switchToLight: "Zum hellen Modus wechseln",
+    switchToDark: "Zum dunklen Modus wechseln",
+  },
 };
 
 export default messages;
