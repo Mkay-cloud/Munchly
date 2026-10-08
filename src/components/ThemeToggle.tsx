@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { applyTheme, getCurrentTheme, getStoredTheme, getSystemTheme, setStoredTheme, type Theme } from "@/lib/theme";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 export default function ThemeToggle() {
   // Lazy initializer (not an effect) - same pattern as the sound toggle on
@@ -9,6 +10,7 @@ export default function ThemeToggle() {
   // already set data-theme on <html> before this component mounts, so this
   // just reads it back rather than recomputing it.
   const [theme, setTheme] = useState<Theme>(() => getCurrentTheme());
+  const t = useTranslations();
 
   useEffect(() => {
     // Only follow the system preference live when the visitor hasn't made
@@ -36,8 +38,8 @@ export default function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-      title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={theme === "dark" ? t("themeToggle.switchToLight") : t("themeToggle.switchToDark")}
+      title={theme === "dark" ? t("themeToggle.switchToLight") : t("themeToggle.switchToDark")}
       style={{
         width: 42,
         height: 42,

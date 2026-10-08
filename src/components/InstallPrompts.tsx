@@ -4,6 +4,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useTranslations } from "@/i18n/LocaleProvider";
+import { isLocale } from "@/i18n/locales";
 import { getInstallMode, promptInstall, subscribeInstall, type InstallMode } from "@/lib/install";
 
 // "Install Munchly App" prompts, mounted once in app/[locale]/layout.tsx, on phones
@@ -21,6 +22,20 @@ const POPUP_DELAY_MS = 2500;
 // /download has its own install button.
 const HIDDEN_ON = ["/studio", "/download"];
 
+// usePathname() returns the browser-visible path, which carries a locale
+// prefix on every locale but English (e.g. "/es/download") - strip it
+// before matching HIDDEN_ON, or this never hides the prompts on /download
+// in any other language.
+function stripLocalePrefix(pathname: string): string {
+  const segments = pathname.split("/");
+  const maybeLocale = segments[1] || "";
+  if (isLocale(maybeLocale)) {
+    const rest = "/" + segments.slice(2).join("/");
+    return rest === "/" ? "/" : rest.replace(/\/+$/, "") || "/";
+  }
+  return pathname;
+}
+
 export default function InstallPrompts() {
   const pathname = usePathname();
   const router = useRouter();
@@ -30,7 +45,8 @@ export default function InstallPrompts() {
   const mode = useSyncExternalStore(subscribeInstall, getInstallMode, () => "none" as InstallMode);
   const [iosHelpOpen, setIosHelpOpen] = useState(false);
 
-  const hidden = HIDDEN_ON.some((p) => pathname === p || pathname?.startsWith(`${p}/`));
+  const barePath = stripLocalePrefix(pathname || "/");
+  const hidden = HIDDEN_ON.some((p) => barePath === p || barePath.startsWith(`${p}/`));
   if (mode === "none" || hidden) return null;
 
   const install = async () => {

@@ -502,6 +502,39 @@ const messages: Messages = {
     footerTerms: "शर्तें",
     pandaAlt: "Munchly, पांडा शेफ",
   },
+  authModal: {
+    signInTitle: "Munchly में साइन इन करें",
+    enterCodeTitle: "अपना कोड दर्ज करें",
+    closeAria: "बंद करें",
+    noPasswordNeeded: "पासवर्ड की ज़रूरत नहीं। साइन इन करने के लिए हम आपको ईमेल से एक कोड भेजेंगे।",
+    emailPlaceholder: "aap@example.com",
+    sendCode: "कोड भेजें",
+    sending: "भेजा जा रहा है…",
+    codeSentToBefore: "हमने एक कोड ",
+    codeSentToAfter: " पर भेज दिया है। इसे नीचे दर्ज करें।",
+    checkSpam: "नहीं दिख रहा? अपना स्पैम या जंक फ़ोल्डर जांचें — पहली बार यह वहां जा सकता है।",
+    codePlaceholder: "अपना कोड दर्ज करें",
+    verifyAndSignIn: "सत्यापित करें और साइन इन करें",
+    verifying: "सत्यापित किया जा रहा है…",
+    useDifferentEmail: "← दूसरा ईमेल इस्तेमाल करें",
+  },
+  accountNav: {
+    signIn: "साइन इन करें",
+    myFavorites: "मेरे पसंदीदा",
+    myProfile: "मेरी प्रोफ़ाइल",
+    reviewSubmissions: "सबमिशन देखें",
+    signOut: "साइन आउट करें",
+  },
+  favoriteButton: {
+    save: "सहेजें",
+    saved: "सहेजा गया",
+    saveAria: "{title} को पसंदीदा में सहेजें",
+    removeAria: "{title} को पसंदीदा से हटाएं",
+  },
+  themeToggle: {
+    switchToLight: "लाइट मोड पर स्विच करें",
+    switchToDark: "डार्क मोड पर स्विच करें",
+  },
 };
 
 export default messages;

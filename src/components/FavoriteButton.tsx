@@ -4,6 +4,7 @@ import { useEffect, useState, type MouseEvent } from "react";
 import AuthModal from "./AuthModal";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@/lib/supabase/useSession";
+import { useTranslations } from "@/i18n/LocaleProvider";
 
 export default function FavoriteButton({
   slug,
@@ -15,6 +16,7 @@ export default function FavoriteButton({
   variant?: "solid" | "outline" | "icon";
 }) {
   const { session, loading: sessionLoading } = useSession();
+  const t = useTranslations();
   // Keyed by slug so a stale result from a previously-viewed recipe never
   // gets shown as this recipe's favorite state, without a synchronous
   // setState at the top of the effect (only the async .then() sets state).
@@ -110,11 +112,11 @@ export default function FavoriteButton({
         onClick={toggle}
         disabled={busy || checking}
         aria-pressed={favorited}
-        aria-label={favorited ? `Remove ${title} from favorites` : `Save ${title} to favorites`}
+        aria-label={favorited ? t("favoriteButton.removeAria", { title }) : t("favoriteButton.saveAria", { title })}
         style={style}
       >
         <span aria-hidden>{favorited ? "♥" : "♡"}</span>
-        {variant !== "icon" && (favorited ? "Saved" : "Save")}
+        {variant !== "icon" && (favorited ? t("favoriteButton.saved") : t("favoriteButton.save"))}
       </button>
       {showAuth && (
         <AuthModal onClose={() => setShowAuth(false)} onSuccess={() => setShowAuth(false)} />

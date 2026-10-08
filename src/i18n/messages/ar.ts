@@ -502,6 +502,39 @@ const messages: Messages = {
     footerTerms: "الشروط",
     pandaAlt: "مونشلي، الباندا الطاهي",
   },
+  authModal: {
+    signInTitle: "تسجيل الدخول إلى Munchly",
+    enterCodeTitle: "أدخل الرمز",
+    closeAria: "إغلاق",
+    noPasswordNeeded: "لا حاجة لكلمة مرور. سنرسل إليك رمزًا عبر البريد الإلكتروني لتسجيل الدخول.",
+    emailPlaceholder: "you@example.com",
+    sendCode: "إرسال الرمز",
+    sending: "جارٍ الإرسال…",
+    codeSentToBefore: "أرسلنا رمزًا إلى ",
+    codeSentToAfter: ". أدخله أدناه.",
+    checkSpam: "لم تستلمه؟ تحقق من مجلد البريد العشوائي — قد يصل إليه في المرة الأولى.",
+    codePlaceholder: "أدخل الرمز",
+    verifyAndSignIn: "تحقّق وسجّل الدخول",
+    verifying: "جارٍ التحقق…",
+    useDifferentEmail: "← استخدام بريد إلكتروني آخر",
+  },
+  accountNav: {
+    signIn: "تسجيل الدخول",
+    myFavorites: "مفضلتي",
+    myProfile: "ملفي الشخصي",
+    reviewSubmissions: "مراجعة المقترحات",
+    signOut: "تسجيل الخروج",
+  },
+  favoriteButton: {
+    save: "حفظ",
+    saved: "محفوظ",
+    saveAria: "حفظ {title} في المفضلة",
+    removeAria: "إزالة {title} من المفضلة",
+  },
+  themeToggle: {
+    switchToLight: "التبديل إلى الوضع الفاتح",
+    switchToDark: "التبديل إلى الوضع الداكن",
+  },
 };
 
 export default messages;
