@@ -501,6 +501,7 @@ export type Messages = {
     footerPrivacy: string;
     footerTerms: string;
     pandaAlt: string;
+    pinterestAria: string;
   };
   authModal: {
     signInTitle: string;
