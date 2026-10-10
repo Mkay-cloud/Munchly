@@ -72,6 +72,13 @@ export async function generateMetadata({
         "A quick decision tool for when you can't figure out what to eat — pick a mood, spin, get an answer.",
       images: ["/og-image.png"],
     },
+    // Pinterest site-claim verification (Settings -> Claim -> Website). Only
+    // the homepage actually needs to carry this, but generateMetadata runs
+    // for every page here, so it's simplest to let every page carry it -
+    // harmless extra meta tag elsewhere.
+    other: {
+      "p:domain_verify": "f87d82379fcbee546510c8c4a8acffd7",
+    },
   };
 }
 
