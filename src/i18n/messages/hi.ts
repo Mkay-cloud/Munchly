@@ -501,6 +501,7 @@ const messages: Messages = {
     footerPrivacy: "गोपनीयता",
     footerTerms: "शर्तें",
     pandaAlt: "Munchly, पांडा शेफ",
+    pinterestAria: "Pinterest पर Munchly",
   },
   authModal: {
     signInTitle: "Munchly में साइन इन करें",

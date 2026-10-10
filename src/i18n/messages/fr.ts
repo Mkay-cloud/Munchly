@@ -501,6 +501,7 @@ const messages: Messages = {
     footerPrivacy: "Confidentialité",
     footerTerms: "Conditions",
     pandaAlt: "Munchly le panda cuisinier",
+    pinterestAria: "Munchly sur Pinterest",
   },
   authModal: {
     signInTitle: "Se connecter à Munchly",
